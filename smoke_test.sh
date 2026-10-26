@@ -25,7 +25,7 @@ rm -rf "$OUT"; mkdir -p "$OUT"
   --max_steps 8 --max_train_rows 40 --save_steps 4 --logging_steps 1 --lora_r 8
 "$PY" src/eval.py --model_id "$MODEL" --data "$DATA/eval.jsonl" --out "$OUT/eval_base.md" --label "학습 전" --limit 12 --max_new_tokens 96
 "$PY" src/eval.py --model_id "$MODEL" --adapter "$OUT/adapter" --data "$DATA/eval.jsonl" --out "$OUT/eval_adapter.md" --label "학습 후(8 step)" --limit 12 --max_new_tokens 96
-echo; echo "| 구분 | n | 도구 선택 | 인자 일치 | 필드 정확도 | 거절 정확도 | 턴 정확도 | 평균 지연(s) |"
-echo "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+echo; echo "| 구분 | 턴 n | 도구 선택 | 인자 일치 | 필드 정확도 | 거절 정확도 | 텍스트 턴 정확도 | 턴 정확도 | 평균 지연(s) |"
+echo "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
 cat "$OUT"/summary_row_*.md
 echo; echo "STATUS=SMOKE_OK  ($OUT)"

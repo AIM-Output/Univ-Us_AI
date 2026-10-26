@@ -29,7 +29,7 @@ F9 가 **하지 않는 것**(요구사항정의서 F9-D4·R23): 숫자 계산. �
 | | 학교 GPU 서버 | 캐글 |
 | --- | --- | --- |
 | GPU | A100 80GB 의 **MIG `1g.10gb` 슬라이스 1개 — 실제 9.5GiB** | T4 16GB × 2 (또는 P100 16GB) |
-| 정밀도 | **bf16 지원** (Ampere) | **bf16 없음 → fp16** (Turing). bf16 설정으로 돌리면 시작 즉시 실패 |
+| 정밀도 | **bf16 지원** (Ampere) | **bf16 없음 → fp16** (Turing). `config.env` 는 fp16 으로 두고, 혹시 bf16 이 남아 있어도 `train.py` 가 감지해 fp16 으로 자동 전환한다 |
 | 세션 | 상시. 단, pod 재시작 시 overlay(venv·HF 캐시) 소멸 | **12시간** 제한, **주 30시간** GPU 할당 |
 | 디스크 | 홈 `/home/jovyan` **10GB** 만 영속. venv(~8GB)·모델 가중치는 홈에 못 들어간다 → overlay 에 두고 재설치 전제 | 세션 종료 시 **전부 초기화** → 어댑터는 반드시 HF Hub 에 push |
 | 학습 가능 크기 | QLoRA 4-bit 기준 **4B 급까지**. 8B 는 컨텍스트 짧게 해도 OOM 위험 | QLoRA 4-bit 로 **8B 가능** |
@@ -46,7 +46,7 @@ F9 가 **하지 않는 것**(요구사항정의서 F9-D4·R23): 숫자 계산. �
 | `main` | — | — | — | — | — | **문서만** (이 README · DATA_FLOW) |
 | `common` | — | — | — | — | — | **공통 코드** — `src/` `tools/` `train.sh` `eval.sh` `smoke_test.*`. 모델 브랜치는 전부 여기서 갈라진다 |
 | `gpu/qwen3-4b` | `Qwen/Qwen3-4B` | 학교 서버 | ✅ | bf16 | 2560 | 기본 후보. tool calling 템플릿 내장 |
-| `gpu/hyperclovax-1.5b` | `naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B` | 학교 서버 | ❌ (bf16 LoRA 로 충분) | bf16 | 2560 (batch 1) | 한국어 특화·초경량. **HF gated** — 약관 동의 + `HF_TOKEN` 필요 |
+| `gpu/hyperclovax-1.5b` | `naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B` | 학교 서버 | ❌ (bf16 LoRA 로 충분) | bf16 | 2560 (batch 1) | 한국어 특화·초경량. **HF gated** — 약관 동의 + `hf auth login`(토큰은 홈 `~/.cache/huggingface/token` 에 남는다) 또는 `config.local.env` 의 `HF_TOKEN=` |
 | `kaggle/qwen3-8b` | `Qwen/Qwen3-8B` | 캐글 T4×2 | ✅ | **fp16** | 2560 | 정확도 상한. 세션 제한 때문에 `SAVE_STEPS` 짧고 HF push 필수 |
 
 > **MAX_SEQ 는 2304 아래로 내리지 않습니다.** system 메시지 + 도구 11개 정의만 **약 1,950 토큰**이라(실측, Qwen 토크나이저) 한 행이 2,000~2,200 토큰입니다.
@@ -67,7 +67,20 @@ bash eval.sh                     # 학습 전·후 같은 평가셋으로 채점
 - **공통 코드(`src/` 등)를 고칠 때는 `common` 에서 고치고** 각 모델 브랜치에서 `git merge common` 합니다. 모델 브랜치에서 직접 고치면 다른 브랜치가 못 받습니다.
 - 모델 브랜치에서 바꾸는 것은 **`config.env` · `setup.sh` · `README_BRANCH.md`** 뿐입니다.
 - 모델을 바꿔 보려면 `config.env` 의 `MODEL_ID` 한 줄만 바꿉니다. `src/` 안에는 모델 이름이 없습니다.
-- 내 PC 에서만 쓰는 값(경로·토큰·실험용 모델)은 `config.local.env` 에 씁니다(gitignore).
+- 내 PC 에서만 쓰는 값(경로·토큰·실험용 모델)은 `config.local.env` 에 씁니다(gitignore). `RUN_NAME=run2 bash train.sh` 처럼 환경변수로 줘도 됩니다(파일보다 우선).
+
+### 서버로 코드 보내기 — 이 저장소에는 원격이 없다
+
+`git pull` 할 곳이 없으므로 **브랜치를 체크아웃한 폴더를 그대로 복사**합니다. `.git` `data` `outputs` `.venv` 는 빼고 보냅니다.
+
+```bash
+# 내 PC (Git Bash) — 서버 접속 설정은 docs/SSH-서버-접속-가이드.md 의 host 별칭을 그대로 쓴다
+git switch gpu/qwen3-4b
+rsync -av --exclude .git --exclude data --exclude outputs --exclude .venv --exclude __pycache__ ./ jnu-gpu:~/Univ-Us_Train/
+#   rsync 가 없으면:  scp -r config.env setup.sh train.sh eval.sh requirements.txt src tools jnu-gpu:~/Univ-Us_Train/
+```
+
+나중에 GitHub 원격을 붙이면 서버에서 `git clone -b gpu/qwen3-4b <주소>` 로 바꿉니다. 그때까지는 **복사한 시점의 코드**가 서버에서 도는 것이므로, `common` 을 고쳤으면 다시 보내야 합니다.
 
 ### 로컬(Windows, RTX 4060 8GB)에서 돌려 보기
 
@@ -85,11 +98,12 @@ git switch common
 | --- | --- |
 | 평가셋은 학습에 절대 사용 금지 | `prepare_f9.py` 가 생성 시점에 `train.jsonl` / `eval.jsonl` 을 **템플릿 패밀리 단위**로 분리한다. 외부 데이터(`--extra`)는 train 에만 들어간다 |
 | 평가셋 고정 | 같은 `--seed` 면 같은 파일. 바꾸면 모델 간 비교가 깨진다 |
-| 3자 비교 | `eval.py` 를 **어댑터 없이 / 어댑터 있게** 두 번 돌려 같은 표에 넣는다(`eval.sh`). Base 모델 행은 `MODEL_ID` 를 `*-Base` 로 바꿔 한 번 더 |
+| 3자 비교 | `eval.py` 를 **어댑터 없이 / 어댑터 있게** 두 번 돌려 같은 표에 넣는다(`eval.sh`). Base 모델 행은 `BASE_MODEL_ID=Qwen/Qwen3-4B-Base bash eval.sh` 처럼 한 번에 |
 | 동일 프롬프트 | 학습·평가가 같은 `render_chat()` 을 쓴다 — 템플릿이 다르면 모델 비교가 아니다 |
+| 모든 턴 채점 | 행의 **assistant 턴 전부**를 채점한다(teacher forcing). 두 단계 행은 도구 턴 + 답변 턴, update/delete 행은 list_events 턴 + update/delete 턴 |
 | 실패 사례 보존 | `eval.md` 에 실패 10건을 남긴다. 성공률만 남기면 다음에 뭘 고칠지 모른다 |
 
-지표: **도구 선택 정확도 · 인자 정확도(필드별) · 거절 정확도(도구를 부르면 안 되는 질문) · 응답 지연**.
+지표(턴 단위): **도구 선택 정확도 · 인자 정확도(필드별) · 거절 정확도(도구를 부르면 안 되는 질문) · 텍스트 턴 정확도(거절 + 도구 결과 뒤 답변) · 턴 정확도 · 응답 지연**.
 
 ---
 
