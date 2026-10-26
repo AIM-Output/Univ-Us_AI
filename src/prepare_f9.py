@@ -140,6 +140,7 @@ def gen_create(fam: str) -> Gen:
         dur_s = f" {durp}" if durp else ""
         if fam == "ce_A":
             u = f"{phrase} {title} {t[0]}에 넣어줘"
+            dur = None                      # 발화에 길이가 없으면 기본 1시간 (F9 시간 해석 규칙)
         elif fam == "ce_B":
             u = f"{phrase} {t[0]} {title}{dur_s} 등록해줘"
         elif fam == "ce_C":
