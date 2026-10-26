@@ -20,7 +20,8 @@ set -a; source ./config.env; [ -f config.local.env ] && source ./config.local.en
 PERSIST_DIR="${PERSIST_DIR:-$HOME/univus-train-out}"
 SCRATCH_DIR="${SCRATCH_DIR:-$HOME/.venv/univus-train}"
 VENV="$SCRATCH_DIR/.venv"
-export HF_HOME="$SCRATCH_DIR/hf_cache"
+# 가중치 캐시만 overlay 로. HF_HOME 을 바꾸면 로그인 토큰($HF_HOME/token)까지 overlay 로 가서 재시작 때 사라진다
+export HF_HUB_CACHE="$SCRATCH_DIR/hf_cache"
 TORCH_INDEX="${TORCH_INDEX:-https://download.pytorch.org/whl/cu129}"   # 팀 requirements-gpu.txt 와 같은 CUDA 세대
 
 fail() { echo; echo "!!! $1 !!!"; echo "STATUS=FAILED"; exit 1; }
@@ -92,13 +93,13 @@ if [ "${HF_GATED:-0}" = "1" ]; then
     echo "  !!! ${MODEL_ID} 는 gated 모델입니다. 아래를 먼저 하세요:"
     echo "      1) https://huggingface.co/${MODEL_ID} 에서 약관 동의(Agree)"
     echo "      2) 토큰 발급(read) → 아래 중 하나"
-    echo "         $VENV/bin/huggingface-cli login            (홈에 저장돼 재시작 후에도 남음)"
+    echo "         $VENV/bin/hf auth login                     (토큰은 ~/.cache/huggingface/token — 홈이라 재시작 후에도 남음)"
     echo "         echo 'HF_TOKEN=hf_xxx' >> config.local.env  (gitignore)"
     fail "HF 토큰 없음 (gated 모델)"
   fi
 fi
 if [ "${PREFETCH:-1}" = "1" ] && [ -n "${MODEL_ID:-}" ]; then
-  echo "  가중치 미리 받기 → $HF_HOME  (재시작 후면 다시 받는 게 정상)"
+  echo "  가중치 미리 받기 → $HF_HUB_CACHE  (재시작 후면 다시 받는 게 정상)"
   "$VENV/bin/python" - <<PY || fail "가중치 다운로드 실패 (네트워크·토큰·약관 확인)"
 from huggingface_hub import snapshot_download
 p = snapshot_download("${MODEL_ID}", ignore_patterns=["*.pth", "*.bin", "original/*", "*.gguf", "*.onnx"])
@@ -108,7 +109,7 @@ fi
 
 echo
 echo "=============================================="
-echo " venv 크기 : $(du -sh "$VENV" 2>/dev/null | cut -f1)   HF 캐시: $(du -sh "$HF_HOME" 2>/dev/null | cut -f1)"
+echo " venv 크기 : $(du -sh "$VENV" 2>/dev/null | cut -f1)   HF 캐시: $(du -sh "$HF_HUB_CACHE" 2>/dev/null | cut -f1)"
 echo " 홈 남은 용량: $(df -h "$HOME" | awk 'NR==2{print $4}')  (10GB 한도 — outputs 체크포인트는 save_total_limit=2)"
 echo " STATUS=DONE"
 echo " 종료: $(date '+%F %T')"
