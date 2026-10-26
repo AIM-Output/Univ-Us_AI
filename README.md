@@ -45,9 +45,12 @@ F9 가 **하지 않는 것**(요구사항정의서 F9-D4·R23): 숫자 계산. �
 | --- | --- | --- | :---: | :---: | ---: | --- |
 | `main` | — | — | — | — | — | **문서만** (이 README · DATA_FLOW) |
 | `common` | — | — | — | — | — | **공통 코드** — `src/` `tools/` `train.sh` `eval.sh` `smoke_test.*`. 모델 브랜치는 전부 여기서 갈라진다 |
-| `gpu/qwen3-4b` | `Qwen/Qwen3-4B` | 학교 서버 | ✅ | bf16 | 1024 | 기본 후보. tool calling 템플릿 내장 |
-| `gpu/hyperclovax-1.5b` | `naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B` | 학교 서버 | ❌ (bf16 LoRA 로 충분) | bf16 | 2048 | 한국어 특화·초경량. **HF gated** — 약관 동의 + `HF_TOKEN` 필요 |
-| `kaggle/qwen3-8b` | `Qwen/Qwen3-8B` | 캐글 T4×2 | ✅ | **fp16** | 1024 | 정확도 상한. 세션 제한 때문에 `SAVE_STEPS` 짧고 HF push 필수 |
+| `gpu/qwen3-4b` | `Qwen/Qwen3-4B` | 학교 서버 | ✅ | bf16 | 2560 | 기본 후보. tool calling 템플릿 내장 |
+| `gpu/hyperclovax-1.5b` | `naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B` | 학교 서버 | ❌ (bf16 LoRA 로 충분) | bf16 | 2560 (batch 1) | 한국어 특화·초경량. **HF gated** — 약관 동의 + `HF_TOKEN` 필요 |
+| `kaggle/qwen3-8b` | `Qwen/Qwen3-8B` | 캐글 T4×2 | ✅ | **fp16** | 2560 | 정확도 상한. 세션 제한 때문에 `SAVE_STEPS` 짧고 HF push 필수 |
+
+> **MAX_SEQ 는 2304 아래로 내리지 않습니다.** system 메시지 + 도구 11개 정의만 **약 1,950 토큰**이라(실측, Qwen 토크나이저) 한 행이 2,000~2,200 토큰입니다.
+> 더 짧게 잡으면 정답(assistant 턴)이 잘리고, `train.py` 는 그런 행을 학습에서 **버립니다**. OOM 은 `BATCH`·`LORA_R` 로 잡습니다.
 
 > 수집 브랜치의 `training/README.md` 가 후보로 적었던 `HyperCLOVAX-SEED-Text-Instruct-8B` 는 **HF 에 존재하지 않습니다**(2026-10-26 확인 — 404).
 > 네이버가 공개한 SEED Text 계열은 0.5B·1.5B 이고, 8B 급은 Omni(멀티모달)뿐입니다. 그래서 8B 는 Qwen3 로만 둡니다.
