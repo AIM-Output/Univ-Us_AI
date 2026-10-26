@@ -3,7 +3,7 @@
 """F9 Function Calling LoRA/QLoRA 학습 — 모델 이름은 여기 없다. config.env → train.sh → 인자로 들어온다.
 
   python src/train.py --model_id <HF id> --data_dir data/f9 --output_dir outputs/run1 \
-      --load_4bit 1 --compute_dtype bf16 --max_seq 1024 --batch 1 --grad_accum 8 --lora_r 16 --epochs 3 --lr 2e-4
+      --load_4bit 1 --compute_dtype bf16 --max_seq 2560 --batch 1 --grad_accum 8 --lora_r 16 --epochs 3 --lr 2e-4
 
 환경 차이는 런타임에 맞춘다.
   · CUDA 없음(스모크) → fp32 · 4-bit 끔 · gradient checkpointing 끔
@@ -72,6 +72,13 @@ def from_pretrained_compat(cls, model_id: str, dtype, **kw):
         return cls.from_pretrained(model_id, torch_dtype=dtype, **kw)
 
 
+def strip_turn_newline(text: str, eos: str | None) -> str:
+    """턴 구분용 개행(eos 뒤 '\\n')은 정답이 아니다 — 떼어 두어야 trl 이 eos 를 다시 붙여 eos 가 두 번 나오지 않는다."""
+    if eos and text.endswith(eos + "\n"):
+        return text[:-1]
+    return text
+
+
 def build_pairs(tok, messages: list[dict], tools: list[dict], eos: str | None) -> list[tuple[str, str]] | None:
     """assistant 턴마다 (prompt, completion). 템플릿이 prefix 성질을 안 지키면 None(호출부가 full 로 폴백)."""
     pairs = []
@@ -82,25 +89,31 @@ def build_pairs(tok, messages: list[dict], tools: list[dict], eos: str | None) -
         full = render_chat(tok, messages[:i + 1], tools)
         if not full.startswith(prompt):
             return None
-        comp = full[len(prompt):]
-        if eos and comp.endswith(eos + "\n"):      # 턴 구분용 개행은 정답이 아니다 (trl 이 eos 를 다시 붙이지 않게)
-            comp = comp[:-1]
-        pairs.append((prompt, comp))
+        pairs.append((prompt, strip_turn_newline(full[len(prompt):], eos)))
     return pairs or None
 
 
 def build_sft_config(SFTConfig, **wanted):
-    """SFTConfig 가 실제로 가진 필드만 넘긴다. max_length ↔ max_seq_length 별칭 처리."""
+    """SFTConfig 가 실제로 가진 필드만 넘긴다. max_length ↔ max_seq_length · warmup 별칭 처리."""
     try:
-        names = {f.name for f in dataclasses.fields(SFTConfig)}
+        fields = {f.name: f for f in dataclasses.fields(SFTConfig)}
     except TypeError:
         import inspect
-        names = set(inspect.signature(SFTConfig.__init__).parameters)
+        fields = {k: None for k in inspect.signature(SFTConfig.__init__).parameters}
+    names = set(fields)
     if "max_length" in wanted and "max_length" not in names and "max_seq_length" in names:
         wanted["max_seq_length"] = wanted.pop("max_length")
+    if "warmup" in wanted:                       # transformers 5.x: warmup_steps(float<1=비율) · 4.x: warmup_ratio
+        ratio = wanted.pop("warmup")
+        ws = fields.get("warmup_steps")
+        ws_float = ws is not None and "float" in str(getattr(ws, "type", ""))
+        if "warmup_steps" in names and ws_float:
+            wanted["warmup_steps"] = ratio
+        elif "warmup_ratio" in names:
+            wanted["warmup_ratio"] = ratio
     dropped = sorted(k for k in wanted if k not in names)
     if dropped:
-        print(f"  (SFTConfig 에 없는 인자라 건너뜀: {', '.join(dropped)})")
+        print(f"  WARNING: SFTConfig 에 없는 인자라 건너뜀 — {', '.join(dropped)}  (설정이 반영되지 않았다)")
     return SFTConfig(**{k: v for k, v in wanted.items() if k in names})
 
 
@@ -150,6 +163,7 @@ def main() -> None:
     print("── 샘플 ──\n" + texts[0][:800] + ("…" if len(texts[0]) > 800 else "") + "\n──────────")
 
     n_pairs = n_fallback = 0
+    texts = [strip_turn_newline(t, tok.eos_token) for t in texts]      # 전체 텍스트 행도 eos 뒤 개행은 뗀다
     if args.loss == "completion":
         records = []
         for r, t in zip(rows, texts):
@@ -193,7 +207,7 @@ def main() -> None:
     sft_kwargs = dict(
         output_dir=args.output_dir, num_train_epochs=args.epochs, max_steps=args.max_steps,
         per_device_train_batch_size=args.batch, gradient_accumulation_steps=args.grad_accum,
-        learning_rate=args.lr, lr_scheduler_type="cosine", warmup_ratio=0.03,
+        learning_rate=args.lr, lr_scheduler_type="cosine", warmup=0.03,
         logging_steps=args.logging_steps, save_strategy="steps", save_steps=args.save_steps, save_total_limit=2,
         eval_strategy="no", bf16=(args.compute_dtype == "bf16"), fp16=(args.compute_dtype == "fp16"),
         gradient_checkpointing=use_gc, gradient_checkpointing_kwargs={"use_reentrant": False} if use_gc else None,
@@ -205,6 +219,9 @@ def main() -> None:
         sft_kwargs["completion_only_loss"] = True        # prompt/completion 열 → trl 이 completion 토큰만 손실에 넣는다
     else:
         sft_kwargs["dataset_text_field"] = "text"
+    if args.push_to_hub:
+        # 학습 **중**에도 체크포인트가 Hub 에 올라가게 (캐글: 세션이 끊겨도 last-checkpoint 가 남는다). 마지막 어댑터는 아래서 따로 올린다
+        sft_kwargs.update(push_to_hub=True, hub_model_id=args.push_to_hub, hub_strategy="checkpoint", hub_private_repo=True)
     cfg = build_sft_config(SFTConfig, **sft_kwargs)
     try:
         trainer = SFTTrainer(model=model, args=cfg, train_dataset=ds, processing_class=tok)

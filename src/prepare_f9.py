@@ -56,9 +56,11 @@ SYNC = [("e클래스", "eclass"), ("이클래스", "eclass"), ("학사일정", "
 OOS = ["오늘 점심 뭐 먹을까?", "내일 날씨 어때?", "비트코인 시세 알려줘", "파이썬 코드 좀 짜줘", "요즘 볼 만한 영화 추천해줘",
        "학식 메뉴 뭐야?", "교수님 연락처 알려줘", "버스 몇 분 뒤에 와?"]
 
-# 평가 전용 패밀리 — 여기 있는 말투는 train 에 들어가지 않는다 (가중치 기준 전체의 약 19%, 도구 11개 전부 평가에 포함)
+# 평가 전용 패밀리 — 여기 있는 말투는 train 에 들어가지 않는다 (가중치 기준 전체의 약 21%).
+# 도구 11개가 전부 평가에 나온다 — update_event/delete_event 는 up_B/del_B 행의 **2번째 턴**(list_events 로 대상을 찾은 뒤)이고,
+# eval.py 가 모든 assistant 턴을 채점하므로 도구별 표에 잡힌다. 첫 턴만 보는 집계(data/f9/README.md 의 도구 열)에는 list_events 로 센다.
 EVAL_FAMILIES = {"ce_F", "le_today", "nav_goto", "gr_ask2", "at_ask2", "as_eval", "ex_ask2", "sync_refresh",
-                 "pl_eval", "del_B", "ref_class"}
+                 "pl_eval", "up_B", "del_B", "ref_class"}
 
 # ── 날짜·시각 ────────────────────────────────────────────────
 
@@ -131,11 +133,21 @@ def _event_args(title: str, cat: str, d: dt.date, t: tuple | None, dur: int | No
     return args
 
 
+def future_slot(rng: random.Random, now: dt.datetime) -> tuple[str, dt.date, tuple]:
+    """(날짜 표현, 날짜, 시각) — 시작 시각이 now 보다 뒤가 될 때까지 다시 뽑는다. 백엔드는 과거 날짜를 거부한다(F9 8절)."""
+    for _ in range(100):
+        phrase, d = rel_date(rng, now)
+        t = rng.choice(TIMES)
+        if dt.datetime(d.year, d.month, d.day, t[1], t[2]) > now:
+            return phrase, d, t
+    d = now.date() + dt.timedelta(days=1)
+    return "내일", d, TIMES[-1]
+
+
 def gen_create(fam: str) -> Gen:
     def g(rng, now):
         title, cat = rng.choice(TITLES)
-        phrase, d = rel_date(rng, now)
-        t = rng.choice(TIMES)
+        phrase, d, t = future_slot(rng, now)
         durp, dur = rng.choice(DURATIONS + [("", None)])
         dur_s = f" {durp}" if durp else ""
         if fam == "ce_A":
@@ -160,17 +172,6 @@ def gen_create(fam: str) -> Gen:
             return u, [("call", "create_event", _event_args(title, cat, first, t, dur, f"weekly:{WD_CODE[idx]}"))]
         return u, [("call", "create_event", _event_args(title, cat, d, t, dur))]
     return g
-
-
-def _fake_events(rng, now, n) -> list[dict]:
-    items = []
-    for i in range(n):
-        title, _ = rng.choice(TITLES)
-        d = now.date() + dt.timedelta(days=rng.randint(0, 6))
-        t = rng.choice(TIMES)
-        items.append({"id": f"ev:{rng.randint(1000, 9999)}", "title": title, "kind": "user",
-                      "start": fmt_dt(dt.datetime(d.year, d.month, d.day, t[1], t[2]))})
-    return items
 
 
 def gen_list_events(fam: str, two_step: bool = False) -> Gen:
@@ -320,8 +321,7 @@ def gen_navigate(fam: str) -> Gen:
 def gen_update(fam: str) -> Gen:
     def g(rng, now):
         title, cat = rng.choice(TITLES)
-        phrase, d = rel_date(rng, now)
-        t = rng.choice(TIMES)
+        phrase, d, t = future_slot(rng, now)                      # 옮길 시각도 미래여야 한다
         u = f"{phrase} {title} {t[0]}로 옮겨줘" if fam == "up_A" else f"{phrase} {title} 시간을 {t[0]}로 바꿔줘"
         ev = {"id": f"ev:{rng.randint(1000, 9999)}", "title": title, "kind": "user",
               "start": fmt_dt(dt.datetime(d.year, d.month, d.day, rng.choice(TIMES)[1], 0))}
