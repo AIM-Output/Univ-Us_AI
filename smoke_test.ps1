@@ -30,8 +30,8 @@ Step "& $py src\eval.py --model_id $model --data $data\eval.jsonl --out $out\eva
 Step "& $py src\eval.py --model_id $model --adapter $out\adapter --data $data\eval.jsonl --out $out\eval_adapter.md --label '학습 후(8 step)' --limit 12 --max_new_tokens 96"
 
 Write-Host ""
-Write-Host "| 구분 | n | 도구 선택 | 인자 일치 | 필드 정확도 | 거절 정확도 | 턴 정확도 | 평균 지연(s) |"
-Write-Host "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+Write-Host "| 구분 | 턴 n | 도구 선택 | 인자 일치 | 필드 정확도 | 거절 정확도 | 텍스트 턴 정확도 | 턴 정확도 | 평균 지연(s) |"
+Write-Host "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
 Get-ChildItem "$out\summary_row_*.md" | ForEach-Object { Get-Content $_.FullName -Encoding UTF8 }
 Write-Host ""
 Write-Host "STATUS=SMOKE_OK ($out)" -ForegroundColor Green

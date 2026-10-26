@@ -26,7 +26,8 @@ if [ "${TARGET:-local}" = "gpu-server" ]; then
   for d in data outputs; do
     if [ ! -L "$d" ]; then [ -e "$d" ] && mv "$d" "$PERSIST_DIR/${d}_moved_$(date +%s)"; ln -s "$PERSIST_DIR/$d" "$d"; fi
   done
-  export HF_HOME="${HF_HOME:-$SCRATCH_DIR/hf_cache}"
+  # 가중치 캐시만 overlay 로 — HF_HOME 을 바꾸면 로그인 토큰($HF_HOME/token)까지 overlay 로 가서 재시작 때 사라진다
+  export HF_HUB_CACHE="${HF_HUB_CACHE:-$SCRATCH_DIR/hf_cache}"
   [ -x "$SCRATCH_DIR/.venv/bin/python" ] || { echo "venv 가 없습니다 ($SCRATCH_DIR/.venv) — pod 재시작 후라면 정상입니다. 먼저:  bash setup.sh"; exit 1; }
   PY="$SCRATCH_DIR/.venv/bin/python"
 elif [ -n "${VIRTUAL_ENV:-}" ]; then PY=python
@@ -42,10 +43,10 @@ fi
 
 # ── 학습 ───────────────────────────────────────────────────
 PUSH=(); [ -n "${HF_PUSH_REPO:-}" ] && PUSH=(--push_to_hub "$HF_PUSH_REPO")
-echo "== 학습: $MODEL_ID → $OUTPUT_DIR  (4bit=${LOAD_4BIT:-1} ${COMPUTE_DTYPE:-bf16} max_seq=${MAX_SEQ:-1024})"
+echo "== 학습: $MODEL_ID → $OUTPUT_DIR  (4bit=${LOAD_4BIT:-1} ${COMPUTE_DTYPE:-bf16} max_seq=${MAX_SEQ:-2560})"
 mkdir -p "$OUTPUT_DIR"
 "$PY" src/train.py --model_id "$MODEL_ID" --data_dir "$DATA_DIR" --output_dir "$OUTPUT_DIR" \
-  --load_4bit "${LOAD_4BIT:-1}" --compute_dtype "${COMPUTE_DTYPE:-bf16}" --max_seq "${MAX_SEQ:-1024}" \
+  --load_4bit "${LOAD_4BIT:-1}" --compute_dtype "${COMPUTE_DTYPE:-bf16}" --max_seq "${MAX_SEQ:-2560}" \
   --batch "${BATCH:-1}" --grad_accum "${GRAD_ACCUM:-8}" --lora_r "${LORA_R:-16}" \
   --epochs "${EPOCHS:-3}" --lr "${LR:-2e-4}" --save_steps "${SAVE_STEPS:-200}" --seed "${SEED:-42}" \
   ${PUSH[@]+"${PUSH[@]}"} "$@" 2>&1 | tee -a "$OUTPUT_DIR/train.log"

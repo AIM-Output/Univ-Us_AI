@@ -10,7 +10,7 @@ tools/f9_tools.json ─┐
 (선택) 공개 한국어    │                   data/f9/eval.jsonl    │
 function-calling ────┘   --extra                                │
 JSONL                                                           │        gpu/* 브랜치
-                                                                ├──────────────────────▶ 학교 서버 (git pull 로 코드,
+                                                                ├──────────────────────▶ 학교 서버 (코드는 rsync/scp 로 복사 — 원격 없음,
                                                                 │   data 는 PERSIST_DIR)  bash train.sh
                                                                 │
                                                                 │        kaggle/* 브랜치
@@ -32,9 +32,9 @@ JSONL                                                           │        gpu/*
 | :---: | --- | --- | --- | --- |
 | 1 | **데이터 생성** | `tools/f9_tools.json` → `data/f9/train.jsonl` · `eval.jsonl` · `README.md` | 어디서든 (CPU) | `python src/prepare_f9.py --n 1500 --seed 42` |
 | 2 | (선택) **외부 데이터 합치기** | 공개 한국어 function-calling JSONL → train 에만 추가 | 〃 | `python src/prepare_f9.py --extra 외부.jsonl` |
-| 3 | **학습** | train.jsonl → `outputs/<RUN_NAME>/adapter/` + `run.json` | gpu: 서버 · kaggle: 노트북 | `bash train.sh` / 노트북 실행 |
-| 4 | **어댑터 보관** | adapter/ → HF model repo (private) | 〃 | `HF_PUSH_REPO=<id>/<repo>` 또는 `--push_to_hub` |
-| 5 | **평가** | eval.jsonl + (어댑터 유무) → `outputs/<RUN_NAME>/eval_base.md` · `eval_adapter.md` · `compare.md` | 학습한 곳 (GPU) | `bash eval.sh` |
+| 3 | **학습** | train.jsonl → `outputs/<RUN_NAME>/adapter/` + `run.json` | gpu: 서버(코드는 rsync/scp 로 복사 — README 3장) · kaggle: 노트북 | `bash train.sh` / 노트북 실행 |
+| 4 | **어댑터 보관** | adapter/ → HF model repo (private). `HF_PUSH_REPO` 가 있으면 **학습 중 체크포인트도** `last-checkpoint/` 로 올라간다(hub_strategy=checkpoint) | 〃 | `HF_PUSH_REPO=<id>/<repo>` 또는 `--push_to_hub` |
+| 5 | **평가** | eval.jsonl + (어댑터 유무) → `outputs/<RUN_NAME>/eval_base.md` · `eval_adapter.md` · `compare.md` — 행의 assistant 턴 전부를 채점 | 학습한 곳 (GPU) | `bash eval.sh` |
 | 6 | **서빙** | adapter + base → merge → OpenAI 호환 서버 | 학교 서버 | 범위 밖 (WE-Meet 는 base_url 만 바꾼다) |
 
 ### 1단계 — 평가셋은 여기서 갈라진다
@@ -64,7 +64,8 @@ JSONL                                                           │        gpu/*
 | 변수 (gpu/* `config.env`) | 기본값 | 영속 | 담는 것 |
 | --- | --- | :---: | --- |
 | `PERSIST_DIR` | `$HOME/univus-train-out` | ✅ | `data/`(JSONL) · `outputs/`(어댑터·run.json·eval.md) · `logs/` |
-| `SCRATCH_DIR` | `$HOME/.venv/univus-train` | ❌ | `.venv/`(~8GB) · `hf_cache/`(모델 가중치, Qwen3-4B bf16 ≈ 8GB) |
+| `SCRATCH_DIR` | `$HOME/.venv/univus-train` | ❌ | `.venv/`(~8GB) · `hf_cache/`(모델 가중치, Qwen3-4B bf16 ≈ 8GB) — `HF_HUB_CACHE` 로 지정 |
+| (HF 로그인 토큰) | `~/.cache/huggingface/token` | ✅ | `hf auth login` 이 쓰는 곳. **`HF_HOME` 은 바꾸지 않는다** — 바꾸면 토큰까지 overlay 로 가서 재시작 때 사라진다. 대안: `config.local.env` 에 `HF_TOKEN=` |
 
 pod 가 재시작되면 `bash setup.sh` 를 다시 돌립니다. venv 재설치와 가중치 재다운로드가 **정상 동작**입니다. 어댑터는 `PERSIST_DIR` 에 있어 남습니다.
 홈 10GB 한도 때문에 체크포인트는 `save_total_limit=2` 로 제한합니다.
@@ -73,10 +74,10 @@ pod 가 재시작되면 `bash setup.sh` 를 다시 돌립니다. venv 재설치�
 
 | 제약 | 대응 |
 | --- | --- |
-| 세션 12시간 | `SAVE_STEPS` 를 짧게(50) → 끊기면 `--resume` 으로 이어서. 단 체크포인트도 세션과 함께 사라지므로 **긴 학습은 epoch 를 나눠 push** |
+| 세션 12시간 | `EPOCHS=1`·`SAVE_STEPS=50`. `HF_PUSH_REPO` 가 있으면 학습 중 체크포인트가 Hub 의 `last-checkpoint/` 로 올라간다. **`--resume` 은 세션을 넘지 못한다** — 다음 세션에서 이어 가려면 먼저 `hf download <repo> --include "last-checkpoint/*" --local-dir outputs/<RUN_NAME>` 로 받아 `checkpoint-N` 이름으로 둔 뒤 `--resume` |
 | 디스크 초기화 | 학습 끝에 **반드시** `--push_to_hub` 로 어댑터를 HF model repo 에 올린다. 노트북이 자동으로 한다 |
 | 데이터 반입 | `data/f9/*.jsonl` 을 HF dataset repo(private) 에 올려 두고 노트북이 `snapshot_download` |
-| bf16 없음 | `COMPUTE_DTYPE=fp16`. bf16 으로 두면 시작 즉시 중단된다(개발계획서 4.4 경고) |
+| bf16 없음 | `COMPUTE_DTYPE=fp16`. bf16 이 남아 있어도 `train.py` 가 `is_bf16_supported()` 로 감지해 fp16 으로 바꾸고 로그에 남긴다 |
 
 ### 6단계 이후 — WE-Meet 와 만나는 지점
 
