@@ -28,10 +28,11 @@ Qwen3-4B 와 **같은 평가셋으로 비교**하는 것이 이 브랜치의 목
 ## 실행 순서
 
 ```bash
-huggingface-cli login     # 1회 — 토큰은 홈(~/.cache/huggingface)에 남아 재시작 후에도 유지
+hf auth login             # 1회 — 토큰은 ~/.cache/huggingface/token (홈 볼륨)에 남아 재시작 후에도 유지. HF_HOME 은 바꾸지 않는다
+                          #        (대안: config.local.env 에 HF_TOKEN=hf_xxx)
 bash setup.sh             # gated 확인 → venv → 가중치
 bash train.sh
-bash eval.sh
+bash eval.sh              # LOAD_4BIT=0 이라 학습과 같은 bf16 로 채점한다
 ```
 
 영속 경로·홈 10GB 한도·`save_total_limit=2` 는 `gpu/qwen3-4b` 의 README_BRANCH 와 같다.
