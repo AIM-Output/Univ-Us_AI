@@ -1,0 +1,15 @@
+{
+  "id": "<kaggle-id>/univus-f9-qwen3-8b",
+  "title": "univus-f9-qwen3-8b",
+  "code_file": "univus_f9_train.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}
