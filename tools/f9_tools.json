@@ -1,0 +1,184 @@
+{
+  "_note": "WE-Meet 요구사항정의서 F9 §5 '도구 목록'을 OpenAI function-tool 형식으로 옮긴 것. `x-kind` 는 이 저장소용 확장(read|write|run|navigate)이며 모델에 넘기기 전에 common.load_tools() 가 뗀다. ⚠️ create_event.category 의 enum 과 list_events.kinds 의 enum 은 WE-Meet C1_Calendar_agent/calendar_core 의 실제 값과 맞춘 뒤 실학습해야 한다 (지금 값은 임시). 쓰기 도구(create/update/delete_event)는 '미리보기 객체'만 돌려주고 실행하지 않는다 — 실행은 사용자가 [확인]을 누른 뒤 서버가 한다.",
+  "tools": [
+    {
+      "type": "function",
+      "x-kind": "read",
+      "function": {
+        "name": "list_events",
+        "description": "기간 안의 일정·마감을 조회한다. '이번 주 마감 뭐 남았어', '내일 일정 뭐 있어' 같은 질문. kinds 로 종류를 거를 수 있다.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "from": { "type": "string", "format": "date", "description": "조회 시작일 (YYYY-MM-DD, 포함)" },
+            "to": { "type": "string", "format": "date", "description": "조회 종료일 (YYYY-MM-DD, 포함)" },
+            "kinds": {
+              "type": "array",
+              "items": { "type": "string", "enum": ["deadline", "academic", "class", "exam", "user", "todo", "study"] },
+              "description": "거를 종류. 생략하면 전부. deadline=e클래스 마감, academic=학사 일정, class=수업, exam=시험, user=내 일정, todo=할 일, study=학습 블록"
+            }
+          },
+          "required": ["from", "to"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "x-kind": "read",
+      "function": {
+        "name": "get_graduation",
+        "description": "졸업요건 계산 결과 요약(F2)을 읽는다 — 남은 학점, 영역별 이수, 판정. 계산은 하지 않고 읽기만 한다.",
+        "parameters": { "type": "object", "properties": {}, "required": [] }
+      }
+    },
+    {
+      "type": "function",
+      "x-kind": "read",
+      "function": {
+        "name": "get_attendance",
+        "description": "출결 상태(F3)를 읽는다 — 과목별 결석 횟수, 결석 한도, 위험 여부. course 를 주면 그 과목만.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "course": { "type": "string", "description": "과목 이름 (예: 운영체제). 생략하면 전 과목" }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "x-kind": "read",
+      "function": {
+        "name": "list_assignments",
+        "description": "과제 우선순위 목록(F7)을 읽는다. group 으로 '지금 해야 함 / 이번 주 / 나중에' 를 고른다.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "group": { "type": "string", "enum": ["now", "this_week", "later"], "description": "now=지금 해야 함, this_week=이번 주, later=나중에. 생략하면 전부" }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "x-kind": "read",
+      "function": {
+        "name": "get_exams",
+        "description": "시험과 공부 계획(F5)을 읽는다. upcoming=true 면 다가오는 시험만.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "upcoming": { "type": "boolean", "description": "true 면 아직 안 치른 시험만" }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "x-kind": "write",
+      "function": {
+        "name": "create_event",
+        "description": "내 일정을 새로 만든다. 실행이 아니라 **미리보기 객체**를 돌려주며, 사용자가 확인한 뒤 서버가 등록한다. 시각이 없으면 allDay=true 로 둔다. 길이가 없으면 1시간.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string", "description": "일정 이름" },
+            "start": { "type": "string", "description": "시작. 시각이 있으면 YYYY-MM-DDTHH:MM, 종일이면 YYYY-MM-DD" },
+            "end": { "type": "string", "description": "끝. start 와 같은 형식" },
+            "allDay": { "type": "boolean", "description": "종일 일정 여부" },
+            "category": { "type": "string", "enum": ["personal", "study", "team", "appointment", "other"], "description": "분류 (⚠️ C1 과 동기화 필요)" },
+            "repeat": { "type": "string", "description": "반복 규칙 (예: weekly:TU). 없으면 생략" }
+          },
+          "required": ["title", "start", "end", "allDay", "category"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "x-kind": "write",
+      "function": {
+        "name": "update_event",
+        "description": "내 일정을 고친다 — 미리보기 객체만 돌려준다. 대상 id 는 먼저 list_events 로 찾아야 한다. e클래스 마감·학사일정·수업은 고칠 수 없다.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "description": "일정 id (list_events 결과의 id)" },
+            "patch": { "type": "object", "description": "바꿀 필드만 (title, start, end, allDay, category 중)" }
+          },
+          "required": ["id", "patch"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "x-kind": "write",
+      "function": {
+        "name": "delete_event",
+        "description": "내 일정을 지운다 — 미리보기 객체만 돌려준다. 대상 id 는 먼저 list_events 로 찾아야 한다. e클래스 마감·학사일정·수업은 지울 수 없다.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "description": "일정 id (list_events 결과의 id)" }
+          },
+          "required": ["id"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "x-kind": "run",
+      "function": {
+        "name": "run_sync",
+        "description": "수집을 실행한다. eclass=e클래스 과제·자료(F6), academic=학사일정(F1), scholarship=장학 공지(F11), activity=대외활동(F12). 이미 돌고 있으면 상태만 돌려준다.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "source": { "type": "string", "enum": ["eclass", "academic", "scholarship", "activity"], "description": "수집 원천" }
+          },
+          "required": ["source"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "x-kind": "run",
+      "function": {
+        "name": "open_placement",
+        "description": "공강 학습 플랜(F8) 미리보기 화면을 연다. 바로 등록하지 않는다.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "range": { "type": "string", "enum": ["this_week", "next_week"], "description": "배치 범위. 생략하면 기본(이번 주)" }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "x-kind": "navigate",
+      "function": {
+        "name": "navigate",
+        "description": "앱 화면으로 이동한다. '학사일정 보여줘', '졸업요건 열어줘' 처럼 화면을 열어 달라는 요청.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "route": {
+              "type": "string",
+              "enum": [
+                "/", "/academic", "/assignments", "/graduation", "/attendance", "/courses", "/exams",
+                "/scholarships", "/opportunities", "/briefing", "/chat",
+                "/settings/profile", "/settings/sources", "/settings/notifications", "/settings/availability", "/settings/requirements"
+              ],
+              "description": "/=대시보드, /academic=학사일정, /assignments=e클래스 과제, /graduation=졸업요건, /attendance=출결, /courses=강의자료, /exams=시험, /scholarships=장학, /opportunities=대외활동·사업단, /briefing=브리핑, /chat=대화, /settings/*=설정"
+            }
+          },
+          "required": ["route"]
+        }
+      }
+    }
+  ]
+}

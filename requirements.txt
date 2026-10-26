@@ -1,0 +1,19 @@
+# ============================================================
+# Univ-Us_Train — 학습·평가 공통 패키지
+#
+#   서버(gpu/*)·캐글(kaggle/*)·로컬(smoke) 전부 **같은 목록**을 설치한다.
+#   torch 는 환경마다 CUDA 빌드가 달라 여기서 설치하지 않는다 — setup.sh / setup_local.ps1 / 캐글 노트북이
+#   맞는 index 로 먼저 설치한다 (서버·로컬 cu129, 캐글은 기본 제공 torch 사용).
+#
+#   하한만 적는다. 상한을 박으면 캐글 기본 이미지와 충돌한다.
+#   코드(src/)는 transformers 4.5x~5.x · trl 0.17~0.2x 의 인자 차이를 런타임에 감지해 맞춘다.
+# ============================================================
+transformers>=4.51
+peft>=0.14
+trl>=0.17
+datasets>=3.0
+accelerate>=1.0
+bitsandbytes>=0.45
+huggingface_hub>=0.30
+pyyaml
+python-dateutil
