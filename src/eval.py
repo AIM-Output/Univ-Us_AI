@@ -149,6 +149,7 @@ def main() -> None:
           f" · 모드 {mode} · {'cuda' if cuda else 'cpu'} 4bit={bool(args.load_4bit)} {args.compute_dtype}")
 
     results, lat, done = [], [], 0
+    sec = 0.0
     for ri, row in enumerate(rows, 1):
         msgs, tl = row["messages"], row.get("tools") or tools
         turn = 0
@@ -213,7 +214,7 @@ def main() -> None:
                      f"{_f(_pct(d['exact_ok'], d['n']))} | {_f(_pct(d['f_ok'], d['f_tot']))} |")
     missing = sorted(set(kinds) - set(per_tool))
     if missing:
-        lines.append(f"| (평가셋에 없음) | — | 0 | {', '.join(missing)} | | |")
+        lines.append(f"| (평가셋에 없음) {', '.join(missing)} | — | — | — | — | — |")
     fails = [r for r in results if not (r["exact_ok"] or r["text_ok"])]
     lines += ["", f"## 실패 사례 (최대 10건 / 전체 실패 {len(fails)}턴)", ""]
     for r in fails[:10]:
