@@ -12,7 +12,7 @@ GPU 서버(pod)는 바깥으로 나올 수 없으므로 이 서버는 **SSH 역�
   GET  /health                       상태 · 데이터 폴더 · 파일 목록
   GET  /data/manifest                data/f9 의 파일 이름·크기·sha256 (GPU 서버가 받은 뒤 검증한다)
   GET  /data/<name>                  train.jsonl · eval.jsonl · README.md 만 (경로 조작 거부)
-  POST /results/<run>/<path>         GPU 서버가 올리는 결과 — results/<run>/<path> 에 저장 (파일당 100MB)
+  POST /results/<run>/<path>         GPU 서버가 올리는 결과 — results/<run>/<path> 에 저장 (파일당 512MB)
   GET  /results                      results/ 트리
 """
 from __future__ import annotations
@@ -33,7 +33,7 @@ import common  # noqa: E402,F401 — stdout UTF-8 재설정만 빌려 쓴다
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_WHITELIST = ("train.jsonl", "eval.jsonl", "README.md")
-MAX_UPLOAD = 100 * 1024 * 1024          # 파일당 100MB — 어댑터(수십 MB)·평가 md/json 이 전부다
+MAX_UPLOAD = 512 * 1024 * 1024          # 파일당 512MB — Qwen3-4B r=16 어댑터가 fp32 로 ≈132MB, 8B 는 ≈170MB
 RUN_CHARS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-")
 
 app = Flask(__name__)
@@ -48,7 +48,7 @@ def _authorized() -> bool:
     if not key:
         return True
     auth = request.headers.get("Authorization", "")
-    return auth.startswith("Bearer ") and hmac.compare_digest(auth[7:].strip(), key)
+    return auth.startswith("Bearer ") and hmac.compare_digest(auth[7:].strip().encode("utf-8"), key.encode("utf-8"))
 
 
 @app.before_request
@@ -134,7 +134,7 @@ def upload_result(run: str, filename: str):
             size += len(chunk)
             if size > MAX_UPLOAD:
                 f.close(); tmp.unlink(missing_ok=True)
-                abort(413, description="파일당 100MB 까지")
+                abort(413, description="파일당 512MB 까지")
             f.write(chunk); h.update(chunk)
     tmp.replace(dest)
     return jsonify({"saved": str(dest.relative_to(base)).replace("\\", "/"), "bytes": size, "sha256": h.hexdigest()})

@@ -13,12 +13,12 @@ $envFile = Join-Path $Root "scripts\server.env"
 if (Test-Path $envFile) {
     foreach ($line in Get-Content $envFile -Encoding UTF8) {
         $t = ($line -split "#", 2)[0].Trim()
-        if ($t -match "^(UNIVUS_API_KEY|LOCAL_PORT)=(.*)$") { Set-Item -Path ("env:" + $matches[1]) -Value $matches[2].Trim().Trim('"') }
+        if ($t -match "^(UNIVUS_API_KEY|LOCAL_PORT)=(.*)$") { Set-Item -Path ("env:" + $matches[1]) -Value $matches[2].Trim().Trim('"').Trim("'") }
     }
 } else { Write-Host "scripts\server.env 가 없어 기본값(포트 8601, 인증 없음)으로 뜹니다" -ForegroundColor Yellow }
 $env:PYTHONUTF8 = "1"
-$args = @("local_server\app.py")
-if ($DataDir) { $args += @("--data-dir", $DataDir) }
-if ($ResultsDir) { $args += @("--results-dir", $ResultsDir) }
+$pyArgs = @("local_server\app.py")
+if ($DataDir) { $pyArgs += @("--data-dir", $DataDir) }
+if ($ResultsDir) { $pyArgs += @("--results-dir", $ResultsDir) }
 Write-Host "local_server 시작 — 포트 $(if ($env:LOCAL_PORT) { $env:LOCAL_PORT } else { 8601 }) · Ctrl+C 로 종료" -ForegroundColor Cyan
-& $py @args
+& $py @pyArgs

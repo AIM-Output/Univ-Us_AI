@@ -88,11 +88,12 @@ pod 는 홈이 **3.1GB** 남았고 바깥으로 열린 포트가 SSH 뿐이라, 
 
 | 어디 | 무엇 | 파일 |
 | --- | --- | --- |
-| pod | `gpu_server` (Flask :8600) — 학습 지휘 · 어댑터 병합(nf4) · OpenAI 호환 추론. 상태 `idle/training/merging/serving` 중 하나 | [`gpu_server/`](gpu_server/README.md) |
+| pod | `gpu_server` (Flask :8600, 127.0.0.1) — 학습 지휘 · 어댑터 병합(nf4 ≈2.8GB) · OpenAI 호환 추론. 상태 `idle/training/merging/loading/serving` 중 하나 | [`gpu_server/`](gpu_server/README.md) |
 | 내 PC | `local_server` (Flask :8601) — `data/f9` 제공 · `results/<run>` 수신 | [`local_server/`](local_server/README.md) |
 | 내 PC | SSH 터널 `-L 8600` `-R 8601` · 코드 배포(git archive → scp) | `scripts/tunnel.ps1` · `scripts/deploy_to_server.ps1` |
 
 WE-Meet 는 `.env` 의 `LLM_MAIN_BASE_URL=http://127.0.0.1:8600/v1` 만 바꾸면 됩니다. 절차 전체는 [gpu_server/README.md](gpu_server/README.md).
+`gpu_server/` `local_server/` `scripts/` 는 `common` 에 있으므로 **배포 전에 모델 브랜치에서 `git merge common`** 을 먼저 합니다.
 
 ### 로컬(Windows, RTX 4060 8GB)에서 돌려 보기
 

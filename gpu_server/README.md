@@ -23,9 +23,10 @@ local_server (Flask :8601)              │  ssh -L 8600  →  gpu_server (Flask
 | 상태 | 들어가는 길 | 나오는 길 | 이때 되는 것 |
 | --- | --- | --- | --- |
 | `idle` | 시작 · 작업 끝 | | 학습·병합·적재 시작 |
-| `training` | `POST /train/start` | 끝나면 자동 `idle` | `/train/status` `/train/stop` |
+| `training` | `POST /train/start` | 끝나면(또는 `/train/stop` 으로 프로세스 그룹이 사라지면) 자동 `idle` | `/train/status` `/train/stop` |
 | `merging` | `POST /model/merge` | 끝나면 자동 `idle` | `/model/merge/status` |
-| `loading` → `serving` | `POST /model/load` | `POST /model/unload` | **`/v1/chat/completions`** |
+| `loading` | `POST /model/load` | 적재가 끝나면 원자적으로 `serving` (실패하면 `idle`) | 아무것도 — 기다린다 |
+| `serving` | `loading` 에서 | `POST /model/unload` (serving 에서만) | **`/v1/chat/completions`** |
 
 `serving` 이 아닐 때 `/v1/chat/completions` 는 **503** 을 돌려줍니다. 학습하려면 먼저 `unload`.
 
@@ -34,7 +35,7 @@ local_server (Flask :8601)              │  ssh -L 8600  →  gpu_server (Flask
 | # | 어디서 | 명령 | 설명 |
 | :---: | --- | --- | --- |
 | 0 | 내 PC | `copy scripts\server.env.example scripts\server.env` 후 값 채움 · `config.local.env` 에 `UNIVUS_API_KEY=<같은 값>` | 두 서버가 같은 Bearer 키를 쓴다 |
-| 1 | 내 PC | `git switch gpu/qwen3-4b` → `.\scripts\deploy_to_server.ps1 -IncludeLocalEnv` | 브랜치의 추적 파일을 `~/univus-train` 로 (git archive → scp → tar) |
+| 1 | 내 PC | `git switch gpu/qwen3-4b` → **`git merge common`** → `.\scripts\deploy_to_server.ps1 -IncludeLocalEnv` | `gpu_server/` 는 `common` 에 있으므로 모델 브랜치에 먼저 병합해야 배포본에 들어간다. 배포는 git archive → scp → tar (커밋된 것만) |
 | 2 | pod | `cd ~/univus-train; bash gpu_server/setup_server.sh` | venv(overlay) + torch + requirements + 가중치 prefetch. **pod 재시작 후마다** |
 | 3 | pod | `bash gpu_server/run_server.sh start` | `:8600` 에 Flask. `status` `stop` `log` |
 | 4 | 내 PC | `.\scripts\tunnel.ps1` (창 하나 계속 켜 둠) | `-L 8600` + `-R 8601`, 끊기면 재연결 |
@@ -46,17 +47,23 @@ local_server (Flask :8601)              │  ssh -L 8600  →  gpu_server (Flask
 ### curl 예시 (내 PC, 터널이 떠 있는 상태 · `KEY` 는 UNIVUS_API_KEY)
 
 ```bash
-H='-H "Authorization: Bearer $KEY" -H "Content-Type: application/json"'
 curl -s -H "Authorization: Bearer $KEY" http://127.0.0.1:8600/health | python -m json.tool
 
-# 학습 (데이터는 pod 가 ssh -R 로 내 PC 에서 받아 간다)
+# 학습 — gpu_server 가 먼저 ssh -R 로 내 PC 에서 train.jsonl·eval.jsonl 을 받아(sha256 검증) 저장한 뒤 train.sh → eval.sh 를 돌린다
+#   extra_args 는 --max_steps N · --max_train_rows N · --epochs N · --lr X · --resume 만 받는다 (그 밖은 400)
+#   local_url 은 루프백(127.0.0.1/localhost)만 인정 — 다른 주소를 보내면 무시하고 기본값을 쓴다
 curl -s -X POST -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
-     -d '{"run_name":"qwen3-4b-f9"}' http://127.0.0.1:8600/train/start
+     -d '{"run_name":"qwen3-4b-f9","extra_args":["--epochs","1"]}' http://127.0.0.1:8600/train/start
 curl -s -H "Authorization: Bearer $KEY" http://127.0.0.1:8600/train/status | python -c "import json,sys;d=json.load(sys.stdin);print(d['state'],d['phase'],d['progress']);print('\n'.join(d['log_tail'][-8:]))"
-curl -s -X POST -H "Authorization: Bearer $KEY" http://127.0.0.1:8600/train/stop
+curl -s -X POST -H "Authorization: Bearer $KEY" http://127.0.0.1:8600/train/stop     # bash→python→tee 프로세스 그룹을 통째로 끝낸다
+#   끝나면 어댑터·run.json·평가 파일을 내 PC 로 올리고, 전부 성공했을 때만 pod 의 outputs/<run>/checkpoint-* 를 지운다(홈 예산).
+#   하나라도 업로드에 실패하면 ok="partial" 이고 체크포인트도 남긴다 — /train/status 의 upload_failed 를 본다.
 
-# 병합(nf4, 홈에 ≈2.6GB) → 적재 → 추론
-curl -s -X POST -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d '{"run_name":"qwen3-4b-f9"}' http://127.0.0.1:8600/model/merge
+# 병합(nf4, 홈에 ≈2.8GB) → 적재 → 추론
+#   mode=gpu-nf4(기본): 베이스를 nf4 로 GPU 에 올리고 그 위에 어댑터를 병합해 바로 저장 — RAM 8GB 불필요, 중간 파일 없음
+#   mode=cpu-bf16    : 베이스 bf16 을 CPU 에 올려 병합(컨테이너 메모리 한도 10GiB 미만이면 거절) → nf4 재적재 → 저장
+#   어느 쪽이든 <out_name>.partial 에 쓰고 끝나야 제자리로 옮긴다. 공간 부족이면 시작 전에 거절한다
+curl -s -X POST -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d '{"run_name":"qwen3-4b-f9","mode":"gpu-nf4"}' http://127.0.0.1:8600/model/merge
 curl -s -H "Authorization: Bearer $KEY" http://127.0.0.1:8600/model/merge/status
 curl -s -X POST -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d '{"source":"merged"}' http://127.0.0.1:8600/model/load
 #   병합 전에 어댑터로 바로 써 보려면:  -d '{"source":"adapter","run_name":"qwen3-4b-f9"}'  (베이스를 4-bit 로 받아 얹는다 — 가중치는 overlay 캐시)
@@ -73,8 +80,11 @@ curl -s -X POST -H "Authorization: Bearer $KEY" -H "Content-Type: application/js
 # → choices[0].message.tool_calls[0].function = {"name":"list_events","arguments":"{\"from\": \"2026-10-26\", ...}"}, finish_reason "tool_calls"
 ```
 
-`stream: true` 는 400(지원 안 함), `response_format: {"type":"json_object"}` 는 받아서 system 에 "JSON 만 출력" 을 덧붙입니다.
-`tool_choice: "none"` 이면 도구 없이 렌더합니다. 요청 본문은 로그에 남기지 않고 토큰 수·지연만 `logs/serve.log` 에 적습니다.
+`stream: true` 는 400(지원 안 함). `response_format` 의 `json_object` 와 `json_schema` 는 둘 다 JSON 모드로 받아 system 에 "JSON 만 출력"(json_schema 면 스키마까지)을 덧붙입니다 — notice_agent 가 json_schema 를 먼저 보내므로 여기서 200 이 나야 합니다.
+`tool_choice: "none"` 이면 도구 없이 렌더합니다. 모델이 요청의 `tools` 에 없는 이름을 부르면 도구 호출로 치지 않고 본문 텍스트로 돌려줍니다.
+상한: `max_tokens` 는 2048 까지, 렌더된 프롬프트가 8192 토큰을 넘으면 400. 요청 본문은 로그에 남기지 않고 토큰 수·지연만 `logs/serve.log` 에 적습니다.
+
+> **응답 시간 주의** — WE-Meet C4 브리핑의 한 줄 요약은 `LLM_TIMEOUT=3` 초입니다. MIG 1g.10gb 에서 nf4 4B 가 2,000 토큰 프롬프트를 처리하는 시간은 아직 실측 전이라, 3초 안에 못 들어오면 그 한 줄만 빠지고 브리핑은 그대로 나옵니다(설계상 안전). F9 는 "첫 응답 3초(스트리밍 표시)" 요구라 측정 후 판단합니다.
 
 ### WE-Meet 쪽 `.env`
 
@@ -90,15 +100,16 @@ LLM_MAIN_MODEL=univus-f9            # 서버는 이 값을 무시한다 (적재�
 
 | 위치 | 남나 | 담는 것 | 크기 |
 | --- | :---: | --- | --- |
-| `~/univus-train-out/models/<run>-merged-nf4/` | ✅ 홈 | **병합 nf4 가중치 + 토크나이저** — 서빙용 | Qwen3-4B ≈ **2.7~2.9GB** (선형층 0.56B/param + 임베딩 2B/param · 0.5B 실측 469MB) |
-| `~/univus-train-out/outputs/<run>/adapter/` | ✅ 홈 | LoRA 어댑터 | 30~60MB |
-| `~/univus-train-out/outputs/<run>/` | ✅ 홈 | run.json · eval_*.md/json · compare.md · checkpoint-*(최근 2개) | 체크포인트 포함 수백 MB — 끝난 run 의 `checkpoint-*` 는 지워도 됨 |
+| `~/univus-train-out/models/<run>-merged-nf4/` | ✅ 홈 | **병합 nf4 가중치 + 토크나이저** — 서빙용 | Qwen3-4B ≈ **2.8GB** (선형층 0.56B/param + 임베딩 2B/param · 0.5B 실측 469MB 로 검증) |
+| `~/univus-train-out/outputs/<run>/adapter/` | ✅ 홈 | LoRA 어댑터 (r=16, fp32 저장) | Qwen3-4B ≈ **132MB** |
+| `~/univus-train-out/outputs/<run>/` | ✅ 홈 | run.json · eval_*.md/json · compare.md | 수 MB. `checkpoint-*`(각 ≈ 어댑터 3배)는 **업로드가 전부 성공하면 서버가 자동 삭제**, 실패(partial)면 남긴다 |
 | `~/univus-train-out/data/f9/` · `logs/` | ✅ 홈 | 받은 JSONL · 서버/학습 로그 | 수 MB |
 | `~/.venv/univus-train/.venv` | ❌ overlay | venv (torch 포함) | ~8GB |
 | `~/.venv/univus-train/hf_cache` | ❌ overlay | 베이스 가중치(학습·`adapter` 적재·병합 때 필요) | Qwen3-4B bf16 ≈ 8GB |
 | `~/.venv/univus-train/merge_tmp` | ❌ overlay | 병합 중간 bf16 (끝나면 삭제) | ≈ 8GB |
 
-**홈 예산 3.1GB** 안에 병합본(≈2.8GB) 하나 + 어댑터 + 결과가 들어갑니다. 병합본을 두 개 두면 넘칩니다 — `/model/merge` 는 저장 전에 여유 공간을 재고 부족하면 거절합니다.
+**홈 예산 3.1GB(2026-10-30 실측)** 에서 병합본 ≈2.8GB + 어댑터 0.13GB + 데이터·로그 = 거의 꽉 찹니다. 그래서 규칙은 셋입니다.
+① 병합본은 **한 번에 하나**(새로 병합하면 같은 이름으로 덮어쓴다 — 덮어쓸 기존 크기는 여유로 계산한다) ② 병합 전에 끝난 run 의 `checkpoint-*` 가 지워져 있어야 한다(업로드 성공 시 자동) ③ `/model/merge` 는 시작 전에 여유 공간을 재고 부족하면 거절한다.
 `/health` 의 `disk.persist.free_gb` 로 수시로 확인하세요.
 
 ## pod 재시작 후 복구 순서
@@ -119,4 +130,5 @@ LLM_MAIN_MODEL=univus-f9            # 서버는 이 값을 무시한다 (적재�
 | `../scripts/tunnel.ps1` | SSH 터널 유지 |
 | `../local_server/` | 내 PC 데이터·결과 서버 |
 
-설정은 `config.env`(브랜치) → `config.local.env`(비밀·pod 전용) → 환경변수 순으로 읽습니다. `app.py` 안에 모델 이름은 없습니다.
+설정은 `config.env`(브랜치) → `config.local.env`(비밀·pod 전용) → 환경변수 순으로 읽습니다. env 파일의 키는 `[A-Za-z0-9_]` 만 되고, 값 안의 `#` 뒤는 주석으로 잘립니다(값에 `#` 을 쓰지 마세요). `app.py` 안에 모델 이름은 없습니다.
+서버는 기본으로 `127.0.0.1` 에만 묶입니다(ssh -L 이면 충분). 다른 주소로 열려면 `UNIVUS_API_KEY` 가 있어야 하고, 없으면 `app.py`·`run_server.sh` 둘 다 시작을 거부합니다. `run_server.sh stop` 은 프로세스 그룹(학습 자식 포함)을 끝내고 종료를 확인한 뒤 돌아옵니다.

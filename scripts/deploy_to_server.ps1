@@ -43,7 +43,7 @@ Write-Host "== scp → ${dest}:/tmp/univus-train.tar"
 & $scp -P $SshPort -i $Key -o StrictHostKeyChecking=accept-new $tar "${dest}:/tmp/univus-train.tar"
 if ($LASTEXITCODE -ne 0) { Write-Host "scp 실패" -ForegroundColor Red; exit 1 }
 
-$remoteCmd = "mkdir -p $Remote && tar -xf /tmp/univus-train.tar -C $Remote && rm -f /tmp/univus-train.tar && cd $Remote && chmod +x *.sh gpu_server/*.sh 2>/dev/null; echo '$branch' > .deployed_branch && echo DEPLOYED && ls"
+$remoteCmd = "mkdir -p $Remote && tar -xf /tmp/univus-train.tar -C $Remote && rm -f /tmp/univus-train.tar && cd $Remote && { chmod +x *.sh gpu_server/*.sh 2>/dev/null || true; } && echo '$branch' > .deployed_branch && echo DEPLOYED && ls"
 Write-Host "== 풀기 → $Remote"
 & $ssh -p $SshPort -i $Key -o StrictHostKeyChecking=accept-new $dest $remoteCmd
 if ($LASTEXITCODE -ne 0) { Write-Host "원격 풀기 실패" -ForegroundColor Red; exit 1 }
@@ -52,7 +52,8 @@ if ($IncludeLocalEnv) {
     $le = Join-Path $Root "config.local.env"
     if (Test-Path $le) {
         Write-Host "== config.local.env 전송 (UNIVUS_API_KEY · HF_TOKEN 등)"
-        & $scp -P $SshPort -i $Key $le "${dest}:$Remote/config.local.env"
+        $remoteRel = $Remote -replace "^~/", ""          # scp(SFTP) 는 ~ 를 풀지 않는다 — 홈 기준 상대경로로
+        & $scp -P $SshPort -i $Key $le "${dest}:$remoteRel/config.local.env"
     } else { Write-Host "config.local.env 가 없어 건너뜀 — UNIVUS_API_KEY=... 한 줄이라도 만들어 두면 서버 인증이 켜집니다" -ForegroundColor Yellow }
 }
 Remove-Item $tar -ErrorAction SilentlyContinue

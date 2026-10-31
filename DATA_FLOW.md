@@ -93,16 +93,16 @@ pod 는 **SSH(30562) 말고 열린 포트가 없다**고 보고, 터널 하나�
 [로컬 PC]                                                       [pod · 9.5GiB · 홈 3.1GB]
 WE-Meet 앱 ──→ http://127.0.0.1:8600/v1 ──(ssh -L 8600)──→ gpu_server (Flask)
                                                               ├ state=serving : Qwen3-4B 병합본(nf4, 홈 ≈2.8GB) 가 /v1/chat/completions 응답
-local_server (Flask :8601)                                    ├ state=training: train.sh ─ GET /data/train.jsonl ─┐
-  data/f9/*.jsonl  ◀──────────(ssh -R 8601)───────────────────┤                   (sha256 검증)                    │
-  results/<run>/   ◀── POST /results/<run>/adapter/… ─────────┘ 학습 끝 → 어댑터·run.json·eval·compare 업로드 ──┘
+local_server (Flask :8601)                                    ├ state=training: ① gpu_server 가 GET /data/*.jsonl 을 받아 sha256 검증 ─┐
+  data/f9/*.jsonl  ◀──────────(ssh -R 8601)───────────────────┤                 ② 그다음 train.sh → eval.sh 실행                      │
+  results/<run>/   ◀── POST /results/<run>/adapter/… ─────────┘ ③ 어댑터·run.json·eval·compare 업로드 → 전부 성공 시 checkpoint-* 삭제 ┘
                                                               └ state=merging : 어댑터 + 베이스(overlay 캐시) → nf4 → 홈 models/
 ```
 
 | 오가는 것 | 방향 | 크기 | 경로 |
 | --- | --- | --- | --- |
 | 학습 JSONL | 로컬 → pod | 수 MB | `-R` 터널, `GET /data/*` + sha256 |
-| 어댑터 · 평가 결과 | pod → 로컬 | 수십 MB | `-R` 터널, `POST /results/<run>/*` |
+| 어댑터 · 평가 결과 | pod → 로컬 | 어댑터 ≈132MB(4B, r=16 fp32) + 평가 파일 | `-R` 터널, `POST /results/<run>/*` (파일당 512MB 까지) |
 | 질의·응답 | 로컬 앱 ↔ pod | 턴당 수 KB (도구 스키마 ≈1,950 토큰 포함) | `-L` 터널, OpenAI 호환 |
 | 베이스 가중치 | HF Hub → pod overlay | ≈8GB | setup_server.sh prefetch (재시작 후 다시) |
 

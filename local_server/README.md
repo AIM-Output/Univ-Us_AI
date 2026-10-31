@@ -13,7 +13,7 @@ pod 에서 이 서버는 `ssh -R` 역터널을 타고 `http://127.0.0.1:8601` �
 | `GET /health` | 데이터 폴더·파일 목록·인증 여부 |
 | `GET /data/manifest` | `train.jsonl` `eval.jsonl` `README.md` 의 크기·sha256 — pod 가 받은 뒤 검증한다 |
 | `GET /data/<name>` | 위 세 파일만. 다른 이름·경로는 404 |
-| `POST /results/<run>/<path>` | pod 가 올리는 파일 → `results/<run>/<path>` (파일당 100MB, `.part` 로 받고 완료 시 교체) |
+| `POST /results/<run>/<path>` | pod 가 올리는 파일 → `results/<run>/<path>` (파일당 512MB — Qwen3-4B 어댑터가 fp32 로 ≈132MB, `.part` 로 받고 완료 시 교체) |
 | `GET /results` | `results/` 트리 |
 
 - `UNIVUS_API_KEY` 가 있으면 모든 요청에 `Authorization: Bearer <키>` 가 필요합니다(gpu_server 와 같은 키). 비워 두면 인증 없이 뜹니다 — 역터널 전용이지만 켜 두는 것을 권장합니다.
