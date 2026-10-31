@@ -159,12 +159,12 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 | 1 | 레포·브랜치 5개 구성, 스모크 테스트(로컬 4060) | ✅ | 2026-10-26 |
 | 2 | 학습·평가 코드 아키텍트 검증 | ✅ APPROVED | 2026-10-26 |
 | 3 | Flask 서버 2개 + 배포·터널 스크립트 작성, 로컬 테스트 58항목 | ✅ | 2026-10-31 |
-| 4 | 서버 코드 아키텍트 검증 | 🔄 | 1차 REJECTED(7건) → 수정 → 2차 REJECTED(블로커 2건: 같은 이름 재병합 디스크 초과 · 서버 종료 시 학습 프로세스 잔존) → **수정 중** |
+| 4 | 서버 코드 아키텍트 검증 | ✅ APPROVED (3차) | 1차 REJECTED(7건) → 2차 REJECTED(블로커 2건) → 3차 APPROVED 2026-10-31. 비차단 후속 7건은 7장 끝에 기록 |
 | 5 | pod 의 옛 `~/Univ-Us_AI` 클론 삭제 | ✅ | 커밋 안 된 작업은 로컬 scratchpad `server_backup_20261030` 에 백업 |
-| 6 | pod 에 코드 배포 (`~/univus-train`, gpu/qwen3-4b) | ✅ | 4번 수정 반영 후 **재배포 필요** |
-| 7 | pod 환경 설치 (`setup_server.sh`) | ✅ STATUS=DONE | venv 7.6GB · Qwen3-4B 캐시 7.6GB (overlay). pip 캐시가 홈을 채워 삭제함 → 스크립트가 캐시를 overlay 로 보내도록 수정 중 |
+| 6 | pod 에 코드 배포 (`~/univus-train`, gpu/qwen3-4b) | ✅ | 2026-10-31 2차 수정본 재배포 완료 (`.deployed_branch` = gpu/qwen3-4b) |
+| 7 | pod 환경 설치 (`setup_server.sh`) | ✅ STATUS=DONE | venv 7.6GB · Qwen3-4B 캐시 7.6GB (overlay). pip 캐시가 홈을 채워 삭제함 → 스크립트가 pip·xet 캐시를 overlay 로 보내도록 수정됨 |
 | 8 | pod 에 `config.local.env` (API 키) | ✅ | |
-| 9 | gpu_server 기동 + 터널 `/health` | ⬜ | |
+| 9 | gpu_server 기동 + 터널 `/health` | ✅ | 2026-10-31 06:36 `run_server.sh start` → 내 PC 에서 `http://127.0.0.1:8600/health` 200 (state idle, VRAM 9.39GiB 여유) · pod 에서 역터널로 `http://127.0.0.1:8601/data/manifest` 200 (sha256 포함, 무인증 401). **터널·로컬 서버는 내 PC 에서 켜 둔 동안만 유효** — 다시 켤 때 `scripts\tunnel.ps1` + `local_server\run_local.ps1` |
 | 10 | 첫 학습 run (`qwen3-4b-f9`) | ⬜ | 데이터 1,500건 합성 → 약 1,600쌍 × 3 epoch |
 | 11 | 병합 → 적재 → WE-Meet `.env` 연결 | ⬜ | 홈 1.3GB 라 병합본은 overlay 대체 예상 |
 | 12 | 3자 비교표(Base / Instruct / 학습 후) | ⬜ | `BASE_MODEL_ID=Qwen/Qwen3-4B-Base bash eval.sh` |
@@ -184,13 +184,22 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 - 캐글 브랜치: T4 는 bf16 없음(fp16), 세션 12h, 디스크 초기화 → 어댑터 HF push 필수, EPOCHS=1 부터.
 - 평가셋은 `--seed 42` 로 고정. 바꾸면 이전 실험과 비교 불가.
 
+**아키텍트 3차 검증에서 남긴 비차단 후속 7건** (`gpu_server/app.py` · `run_server.sh`, 시키면 처리):
+1. `app.py` 병합 추정 함수 docstring 에 모델 이름 언급 → 문구만 수정
+2. TERM 이 train.sh 와 eval.sh 사이(또는 다운로드 중)에 오면 `proc=None` 이라 `stopped` 가 안 찍혀 eval.sh 가 고아로 시작될 수 있음 → 핸들러에서 `TRAIN["stopped"]=True` 를 무조건 설정하고 `_run_logged` 가 시작 전에 확인
+3. `ensure_group_gone` 이 예외(PermissionError)를 내면 `TRAIN["proc"]` 이 남음 → try/finally 로 None 처리
+4. `run_server.sh stop` 의 KILL 대기 30초가 핸들러 최악 30초와 겹침 → 45초로
+5. `run_server.sh` 의 `curl -m 25` 가 `/train/stop` 최악 시간보다 짧음 → `-m 50`
+6. `/model/merge` 응답의 `out_dir` 이 overlay 로 떨어진 경우에도 홈 경로를 보여줌 → 실제 위치는 `result.location`
+7. `/health` 의 model 블록에 `persistent`·`path` 없음 → 추가
+
 ---
 
 ## 8. 다음 할 일 (순서)
 
-1. **서버 코드 2차 검증 지적 반영 → `common` 커밋 → 모델 브랜치 병합 → `deploy_to_server.ps1` 재배포** (진행 중)
-2. pod: `bash gpu_server/run_server.sh start` → 내 PC: `tunnel.ps1` + `run_local.ps1` → `/health` 200 확인
-3. 내 PC: `prepare_f9.py --n 1500 --seed 42` → `/train/start {"run_name":"qwen3-4b-f9"}` → `/train/status` 로 loss 확인 (수 시간)
+1. ~~서버 코드 2차 검증 지적 반영 → 커밋 → 병합 → 재배포~~ ✅ (2026-10-31)
+2. ~~서버 기동 → 터널 → `/health` 200~~ ✅ (2026-10-31) — 다시 켤 때: pod `run_server.sh start`, 내 PC `tunnel.ps1` + `run_local.ps1`
+3. 데이터는 이미 생성됨(`data/f9`, seed 42, train 1,185 / eval 315). 내 PC 에서 `/train/start {"run_name":"qwen3-4b-f9"}` → `/train/status` 로 loss 확인 (수 시간). **학습 중에는 터널과 로컬 서버를 끄지 말 것** (데이터 다운로드는 시작 직후 한 번, 결과 업로드는 끝날 때)
 4. `/model/merge` → `/model/load {"source":"merged"}` → `/v1/chat/completions` 도구 호출 확인 → WE-Meet `.env` 연결
 5. `results/qwen3-4b-f9/compare.md` 로 3자 비교표 정리 (Base 행 추가)
 6. 그다음 F4 RAG 착수 여부 결정
