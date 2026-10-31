@@ -84,3 +84,26 @@ pod 가 재시작되면 `bash setup.sh` 를 다시 돌립니다. venv 재설치�
 WE-Meet 의 F1·F11·F12·C4 와 앞으로 만들 F9 백엔드는 전부 `LLM_MAIN_*` 슬롯만 읽습니다.
 서빙 서버가 `/v1/chat/completions` 와 `tools` 파라미터를 받으면 앱 코드는 바뀌지 않습니다.
 서빙과 학습은 같은 9.5GiB 를 나눠 쓸 수 없으므로 **학습 중에는 서빙을 내리고, 서빙 중에는 학습하지 않습니다.**
+
+### 운영 시 흐름 — Flask 서버 2개가 SSH 터널 하나로 (2026-10-30)
+
+pod 는 **SSH(30562) 말고 열린 포트가 없다**고 보고, 터널 하나에 두 방향을 다 싣습니다 (`scripts/tunnel.ps1`).
+
+```
+[로컬 PC]                                                       [pod · 9.5GiB · 홈 3.1GB]
+WE-Meet 앱 ──→ http://127.0.0.1:8600/v1 ──(ssh -L 8600)──→ gpu_server (Flask)
+                                                              ├ state=serving : Qwen3-4B 병합본(nf4, 홈 ≈2.8GB) 가 /v1/chat/completions 응답
+local_server (Flask :8601)                                    ├ state=training: ① gpu_server 가 GET /data/*.jsonl 을 받아 sha256 검증 ─┐
+  data/f9/*.jsonl  ◀──────────(ssh -R 8601)───────────────────┤                 ② 그다음 train.sh → eval.sh 실행                      │
+  results/<run>/   ◀── POST /results/<run>/adapter/… ─────────┘ ③ 어댑터·run.json·eval·compare 업로드 → 전부 성공 시 checkpoint-* 삭제 ┘
+                                                              └ state=merging : 어댑터 + 베이스(overlay 캐시) → nf4 → 홈 models/
+```
+
+| 오가는 것 | 방향 | 크기 | 경로 |
+| --- | --- | --- | --- |
+| 학습 JSONL | 로컬 → pod | 수 MB | `-R` 터널, `GET /data/*` + sha256 |
+| 어댑터 · 평가 결과 | pod → 로컬 | 어댑터 ≈132MB(4B, r=16 fp32) + 평가 파일 | `-R` 터널, `POST /results/<run>/*` (파일당 512MB 까지) |
+| 질의·응답 | 로컬 앱 ↔ pod | 턴당 수 KB (도구 스키마 ≈1,950 토큰 포함) | `-L` 터널, OpenAI 호환 |
+| 베이스 가중치 | HF Hub → pod overlay | ≈8GB | setup_server.sh prefetch (재시작 후 다시) |
+
+학습과 서빙은 같은 VRAM 을 못 나누므로 **서빙 중 학습 요청은 409**, 학습 중 추론 요청은 **503** 입니다. HF Hub 업로드(4단계)는 선택이 됐고, 결과의 1차 보관처는 내 PC 의 `results/` 입니다.

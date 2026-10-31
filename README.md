@@ -82,6 +82,19 @@ rsync -av --exclude .git --exclude data --exclude outputs --exclude .venv --excl
 
 나중에 GitHub 원격을 붙이면 서버에서 `git clone -b gpu/qwen3-4b <주소>` 로 바꿉니다. 그때까지는 **복사한 시점의 코드**가 서버에서 도는 것이므로, `common` 을 고쳤으면 다시 보내야 합니다.
 
+### 운영 구조 — Flask 서버 2개 + SSH 터널 (2026-10-30 결정)
+
+pod 는 홈이 **3.1GB** 남았고 바깥으로 열린 포트가 SSH 뿐이라, **pod 에는 코드와 병합한 4-bit 가중치(Qwen3-4B ≈2.8GB)만** 두고 데이터·결과는 내 PC 가 듭니다.
+
+| 어디 | 무엇 | 파일 |
+| --- | --- | --- |
+| pod | `gpu_server` (Flask :8600, 127.0.0.1) — 학습 지휘 · 어댑터 병합(nf4 ≈2.8GB) · OpenAI 호환 추론. 상태 `idle/training/merging/loading/serving` 중 하나 | [`gpu_server/`](gpu_server/README.md) |
+| 내 PC | `local_server` (Flask :8601) — `data/f9` 제공 · `results/<run>` 수신 | [`local_server/`](local_server/README.md) |
+| 내 PC | SSH 터널 `-L 8600` `-R 8601` · 코드 배포(git archive → scp) | `scripts/tunnel.ps1` · `scripts/deploy_to_server.ps1` |
+
+WE-Meet 는 `.env` 의 `LLM_MAIN_BASE_URL=http://127.0.0.1:8600/v1` 만 바꾸면 됩니다. 절차 전체는 [gpu_server/README.md](gpu_server/README.md).
+`gpu_server/` `local_server/` `scripts/` 는 `common` 에 있으므로 **배포 전에 모델 브랜치에서 `git merge common`** 을 먼저 합니다.
+
 ### 로컬(Windows, RTX 4060 8GB)에서 돌려 보기
 
 ```powershell
