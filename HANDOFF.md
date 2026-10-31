@@ -82,7 +82,7 @@ Univ-Us_Train/
 | --- | --- |
 | 접속 | `ssh -p 30562 -i private.pem jovyan@168.131.30.102` (외부에서 열린 포트는 **SSH 뿐**이라고 가정) |
 | GPU | A100 80GB 의 MIG `1g.10gb` 슬라이스 1개 = **9.5GiB**, bf16 지원 |
-| 홈 `/home/jovyan` | 10GB **영속**. 현재 **1.3GB 여유** — `.vscode-server` 가 8.8GB 차지(`cli/servers` 4.2GB · `data/CachedExtensionVSIXs` 1.2GB · 구버전 확장 중복 ~1GB). 사용자 결정 전까지 손대지 않음 |
+| 홈 `/home/jovyan` | 10GB **영속**. **2026-10-31 정리 후 9.7GB 여유** (사용 384MB = `.vscode-server/data` 설정 281MB · `.codex` 90MB · 캐시 14MB). 정리 전엔 `.vscode-server` 가 8.8GB 였음 — 서버 빌드·확장·캐시 8.6GB 를 overlay `/home/jovyan_venv/.venv/_trash_20261031/` 로 옮김(pod 재시작 전까지 복구 가능, 재시작 시 자동 소멸). **VS Code Remote-SSH 로 다시 접속하면 서버는 자동 재설치되고 확장(Python·Claude Code 등)은 원격에 다시 설치해야 함** |
 | overlay (`/`, `~/.venv/*`) | 824GB 여유, **pod 재시작 시 소멸** |
 | 코드 | `~/univus-train` (git archive 사본, 브랜치 `gpu/qwen3-4b`, `.deployed_branch` 에 기록) |
 | venv | `~/.venv/univus-train/.venv` — Python 3.11 · torch 2.13+cu129 · transformers 5.22 · trl 1.17 · peft 0.21 · bnb 0.50 · flask (overlay) |
@@ -170,12 +170,13 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 | 12 | 3자 비교표(Base / Instruct / 학습 후) | ⬜ | `BASE_MODEL_ID=Qwen/Qwen3-4B-Base bash eval.sh` |
 | 13 | `tools/f9_tools.json` 의 `category`·`kinds` enum 을 WE-Meet C1 실제 값과 맞추기 | ⬜ | 실학습 전 필수 |
 | 14 | F4 RAG (parse/index/summarize/generate/ask) | ⬜ | 아직 시작 안 함 |
+| 15 | pod 홈 정리 ("처음 구축" 기준) | ✅ | 2026-10-31 홈 1.3GB → **9.7GB 여유**. `.vscode-server` 빌드·확장·캐시 8.6GB 를 overlay 임시 폴더로 이동(설정 `data/User`·`Machine` 유지), pip·xet 캐시 제거 |
 
 ---
 
 ## 7. 알려진 제약 · 주의
 
-- **홈 10GB**: `.vscode-server` 8.8GB. 병합본(≈2.8GB)을 홈에 영구 보관하려면 `~/.vscode-server/data/CachedExtensionVSIXs`(1.2GB)·`cli/servers` 의 구버전·중복 확장 삭제로 약 3GB 확보 가능 — **사용자 결정 사항**.
+- **홈 10GB**: 2026-10-31 정리로 9.7GB 여유 → 병합본(≈2.8GB)은 홈 `~/univus-train-out/models/` 에 영구 보관 가능(기본 `MODELS_DIR`). 홈을 다시 채우는 범인은 pip 캐시·hf-xet 캐시·`.vscode-server` 이므로, 설치 스크립트는 캐시를 overlay 로 보내고, VS Code Remote 는 꼭 필요한 확장만 설치할 것. overlay 의 옛 팀 venv `~/.venv/univus-ai`(7.9GB)는 홈과 무관해 그대로 둠(재시작 시 소멸).
 - 학습 후 홈에 남는 것: 어댑터 ≈132MB · run.json · 평가 md. `checkpoint-*` 는 업로드 성공 후 자동 삭제.
 - `/train/stop` 은 프로세스 그룹 전체를 종료해야 함(수정 중). 서버 종료 전 학습 중이면 먼저 `/train/stop`.
 - WE-Meet C4 브리핑의 `LLM_TIMEOUT=3`초는 nf4 4B 가 못 맞출 수 있음 → 측정 후 C4 쪽 조정 필요.
