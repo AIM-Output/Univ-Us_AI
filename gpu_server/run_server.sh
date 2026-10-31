@@ -14,7 +14,8 @@ HOST="${SERVER_HOST:-127.0.0.1}"
 PORT="${SERVER_PORT:-8600}"
 PID_FILE="$SCRATCH_DIR/gpu_server.pid"
 LOG="$PERSIST_DIR/logs/server.log"
-export HF_HUB_CACHE="${HF_HUB_CACHE:-$SCRATCH_DIR/hf_cache}" PYTHONUTF8=1 PERSIST_DIR SCRATCH_DIR
+export HF_HUB_CACHE="${HF_HUB_CACHE:-$SCRATCH_DIR/hf_cache}" HF_XET_CACHE="${HF_XET_CACHE:-$SCRATCH_DIR/xet_cache}" \
+       PIP_CACHE_DIR="${PIP_CACHE_DIR:-$SCRATCH_DIR/pip_cache}" PYTHONUTF8=1 PERSIST_DIR SCRATCH_DIR
 
 pid_of() { [ -f "$PID_FILE" ] && cat "$PID_FILE" 2>/dev/null; }
 is_ours() {   # pid 가 살아 있고 /proc/<pid>/cmdline 에 gpu_server/app.py 가 있을 때만 우리 서버로 본다
@@ -38,7 +39,10 @@ case "${1:-status}" in
   stop)
     p="$(pid_of)"
     if ! is_ours "$p"; then echo "실행 중 아님"; rm -f "$PID_FILE"; exit 0; fi
-    kill -TERM -- "-$p" 2>/dev/null || kill -TERM "$p" 2>/dev/null        # 프로세스 그룹(학습 자식 포함)
+    # 1) 학습이 돌고 있으면 서버에게 먼저 끝내 달라고 한다 — 학습 그룹은 별도 세션이라 아래 kill 이 닿지 않는다 (서버의 TERM 핸들러도 같은 일을 한다)
+    curl -s -m 25 -X POST -H "Authorization: Bearer ${UNIVUS_API_KEY:-}" "http://127.0.0.1:$PORT/train/stop" >/dev/null 2>&1 || true
+    # 2) 서버 프로세스 그룹에 TERM → 서버는 핸들러에서 남은 학습 그룹을 정리하고 내려간다
+    kill -TERM -- "-$p" 2>/dev/null || kill -TERM "$p" 2>/dev/null
     for _ in $(seq 1 30); do is_ours "$p" || break; sleep 1; done
     if is_ours "$p"; then kill -KILL -- "-$p" 2>/dev/null || kill -KILL "$p" 2>/dev/null; sleep 1; fi
     if is_ours "$p"; then echo "종료 실패 (pid $p)"; exit 1; fi
