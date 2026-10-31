@@ -22,6 +22,8 @@ SCRATCH_DIR="${SCRATCH_DIR:-$HOME/.venv/univus-train}"
 VENV="$SCRATCH_DIR/.venv"
 # 가중치 캐시만 overlay 로. HF_HOME 을 바꾸면 로그인 토큰($HF_HOME/token)까지 overlay 로 가서 재시작 때 사라진다
 export HF_HUB_CACHE="$SCRATCH_DIR/hf_cache"
+# pip 휠 캐시(~/.cache/pip, torch 휠만 수 GB)와 hf-xet 청크 캐시(~/.cache/huggingface/xet, HF_HOME 을 따라감)가 홈 10GB 를 채운다 → overlay 로
+export PIP_CACHE_DIR="$SCRATCH_DIR/pip_cache" HF_XET_CACHE="$SCRATCH_DIR/xet_cache"
 TORCH_INDEX="${TORCH_INDEX:-https://download.pytorch.org/whl/cu129}"   # 팀 requirements-gpu.txt 와 같은 CUDA 세대
 
 fail() { echo; echo "!!! $1 !!!"; echo "STATUS=FAILED"; exit 1; }
@@ -110,7 +112,12 @@ fi
 echo
 echo "=============================================="
 echo " venv 크기 : $(du -sh "$VENV" 2>/dev/null | cut -f1)   HF 캐시: $(du -sh "$HF_HUB_CACHE" 2>/dev/null | cut -f1)"
-echo " 홈 남은 용량: $(df -h "$HOME" | awk 'NR==2{print $4}')  (10GB 한도 — outputs 체크포인트는 save_total_limit=2)"
+echo " 홈(영속) 사용량 — 10GB 한도, 병합본 nf4 ≈2.8GB 가 들어가려면 3GB 이상 비어 있어야 한다:"
+df -h "$HOME" | sed 's/^/   /'
+if [ "$(df -Pk "$HOME" | awk 'NR==2{print $4}')" -lt 3145728 ]; then
+  echo " ⚠️ 홈 여유가 3GB 미만 — 병합본은 overlay(MODELS_FALLBACK_DIR)로 떨어져 pod 재시작 때 사라진다."
+  echo "    비울 곳:  du -xsh ~/.cache/* ~/.cache/huggingface/* ~/univus-train-out/outputs/*/checkpoint-* 2>/dev/null | sort -rh | head"
+fi
 echo " STATUS=DONE"
 echo " 종료: $(date '+%F %T')"
 echo
