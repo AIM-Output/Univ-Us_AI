@@ -17,6 +17,7 @@ RUN_NAME="${RUN_NAME:-run1}"; DATA_DIR="${DATA_DIR:-data/f9}"; OUTPUT_DIR="${OUT
 if [ "${TARGET:-local}" = "gpu-server" ]; then
   SCRATCH_DIR="${SCRATCH_DIR:-$HOME/.venv/univus-train}"
   export HF_HUB_CACHE="${HF_HUB_CACHE:-$SCRATCH_DIR/hf_cache}"     # 토큰은 ~/.cache/huggingface/token 에 그대로 (HF_HOME 은 건드리지 않는다)
+  export HF_XET_CACHE="${HF_XET_CACHE:-$SCRATCH_DIR/xet_cache}"     # xet 청크 캐시는 HF_HOME(홈)을 따라가므로 따로 overlay 로
   [ -x "$SCRATCH_DIR/.venv/bin/python" ] || { echo "venv 가 없습니다 ($SCRATCH_DIR/.venv) — pod 재시작 후라면 정상입니다. 먼저:  bash setup.sh"; exit 1; }
   PY="$SCRATCH_DIR/.venv/bin/python"
 elif [ -n "${VIRTUAL_ENV:-}" ]; then PY=python

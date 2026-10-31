@@ -14,7 +14,7 @@ local_server (Flask :8601)              │  ssh -L 8600  →  gpu_server (Flask
 ```
 
 > **LoRA 어댑터만으로는 추론이 안 됩니다.** 어댑터(수십 MB)는 베이스 가중치 위에 얹는 차분이라 베이스(또는 병합본)가 반드시 같이 있어야 합니다.
-> 홈 3GB 예산에 맞추는 방법이 `POST /model/merge` 입니다 — 베이스 + 어댑터를 병합한 뒤 **nf4 4-bit 로 저장**하면 Qwen3-4B 가 약 2.7~2.9GB 가 되어 홈에 영구 보관됩니다(임베딩은 bf16 그대로라 0.65B/param 보다 큽니다).
+> 홈 3GB 예산에 맞추는 방법이 `POST /model/merge` 입니다 — 베이스 + 어댑터를 병합한 뒤 **nf4 4-bit 로 저장**하면 Qwen3-4B 가 ≈2.8GB 가 되어 홈에 영구 보관됩니다(임베딩은 bf16 그대로라 선형층 0.56B/param + 임베딩 2B/param 으로 셉니다).
 
 ## 상태 기계 — 한 번에 한 가지만
 
@@ -106,17 +106,35 @@ LLM_MAIN_MODEL=univus-f9            # 서버는 이 값을 무시한다 (적재�
 | `~/univus-train-out/data/f9/` · `logs/` | ✅ 홈 | 받은 JSONL · 서버/학습 로그 | 수 MB |
 | `~/.venv/univus-train/.venv` | ❌ overlay | venv (torch 포함) | ~8GB |
 | `~/.venv/univus-train/hf_cache` | ❌ overlay | 베이스 가중치(학습·`adapter` 적재·병합 때 필요) | Qwen3-4B bf16 ≈ 8GB |
-| `~/.venv/univus-train/merge_tmp` | ❌ overlay | 병합 중간 bf16 (끝나면 삭제) | ≈ 8GB |
+| `~/.venv/univus-train/merge_tmp` | ❌ overlay | 병합 중간 bf16 — **`mode=cpu-bf16` 일 때만** 생기고 끝나면 삭제 (기본 `gpu-nf4` 는 안 만든다) | ≈ 8GB |
+| `~/.venv/univus-train/pip_cache` | ❌ overlay | pip 휠 캐시(`PIP_CACHE_DIR`). 기본 위치 `~/.cache/pip` 에 두면 torch cu129 휠만으로 홈이 꽉 찬다(실제 겪음) | 수 GB |
+| `~/.venv/univus-train/xet_cache` | ❌ overlay | hf-xet 청크 캐시(`HF_XET_CACHE`). `HF_HUB_CACHE` 가 아니라 `HF_HOME` 을 따라 `~/.cache/huggingface/xet` 로 가므로 따로 옮긴다 | 수 GB |
+| `~/.venv/univus-train/models/` | ❌ overlay | **병합본 폴백**(`MODELS_FALLBACK_DIR`) — 홈에 자리가 없을 때 여기 저장되고, pod 재시작 후 `/model/merge` 로 다시 만든다 | ≈2.8GB |
 
 **홈 예산 3.1GB(2026-10-30 실측)** 에서 병합본 ≈2.8GB + 어댑터 0.13GB + 데이터·로그 = 거의 꽉 찹니다. 그래서 규칙은 셋입니다.
-① 병합본은 **한 번에 하나**(새로 병합하면 같은 이름으로 덮어쓴다 — 덮어쓸 기존 크기는 여유로 계산한다) ② 병합 전에 끝난 run 의 `checkpoint-*` 가 지워져 있어야 한다(업로드 성공 시 자동) ③ `/model/merge` 는 시작 전에 여유 공간을 재고 부족하면 거절한다.
+① 병합본은 **한 번에 하나**. 같은 이름으로 다시 병합할 때 여유 공간이 예상 크기보다 작으면(홈에는 기존 것과 `.partial` 이 같이 못 들어간다) **기존 병합본을 먼저 지우고** 병합하고, 여유가 충분하면 `.partial` 에 다 쓴 뒤 바꿔치기한다(`merge.json` 의 `removed_old_first`) ② 병합 전에 끝난 run 의 `checkpoint-*` 가 지워져 있어야 한다(업로드 성공 시 자동) ③ `/model/merge` 는 시작 전에 여유 공간을 재고 부족하면 거절한다.
 `/health` 의 `disk.persist.free_gb` 로 수시로 확인하세요.
+
+### 병합본이 홈에 안 들어갈 때 — `MODELS_DIR` · `MODELS_FALLBACK_DIR`
+
+2026-10-31 실측: 캐시를 정리한 뒤에도 홈 여유가 **1.3GB** 라 2.8GB 병합본이 홈에 들어가지 않습니다. 그래서 위치를 두 단계로 둡니다.
+
+| 변수 | 기본값 | 뜻 |
+| --- | --- | --- |
+| `MODELS_DIR` | `$PERSIST_DIR/models` (홈) | 1순위. 여유가 모자라면 같은 이름의 옛 병합본을 먼저 지우고 다시 잰다 |
+| `MODELS_FALLBACK_DIR` | `$SCRATCH_DIR/models` (overlay) | 홈에 못 넣을 때. 응답과 `merge.json` 에 `persistent: false` + 경고가 붙는다 |
+
+- `/model/merge` 는 홈 → (옛 것 삭제 후) 홈 → overlay 순으로 자리를 고르고, 둘 다 안 되면 거절합니다. 끝나면 다른 위치에 남은 같은 이름의 옛 병합본은 지웁니다.
+- `/model/load {"source":"merged"}` 와 `/models` 는 **두 곳을 다 봅니다**(홈 먼저). `/health` 의 `disk.models_dir` · `disk.models_fallback_dir` 에 각각의 여유가 나옵니다.
+- **영속 산출물은 어댑터(≈132MB, 홈)입니다.** overlay 의 병합본은 pod 재시작 때 사라지지만 어댑터가 남아 있으면 `POST /model/merge` 한 번(A100 슬라이스에서 약 1~2분, 베이스 가중치는 setup 의 prefetch 로 overlay 에 다시 받아 둔 상태)으로 복원됩니다. 어댑터 사본은 내 PC 의 `results/<run>/adapter/` 에도 있습니다.
+- 홈을 비워 병합본을 영속으로 두려면: `du -xsh ~/.cache/* ~/.cache/huggingface/* ~/univus-train-out/outputs/*/checkpoint-* 2>/dev/null | sort -rh | head` 로 큰 것을 찾아 `~/.cache/pip`, `~/.cache/huggingface/xet`, 끝난 run 의 `checkpoint-*` 를 지웁니다. `setup_server.sh` 가 끝에 `df -h ~` 를 찍고 3GB 미만이면 경고합니다. 3GB 이상 비면 다음 `/model/merge` 부터 홈에 저장됩니다.
 
 ## pod 재시작 후 복구 순서
 
 1. `bash gpu_server/setup_server.sh` — venv 와 HF 캐시를 다시 만든다(정상). 홈의 병합본·어댑터·데이터는 그대로 있다.
 2. `bash gpu_server/run_server.sh start`
-3. 서빙만 할 거면 `POST /model/load {"source":"merged"}` — 병합본은 홈에 있으므로 **가중치 재다운로드 없이** 바로 뜬다.
+3. 서빙만 할 거면 `POST /model/load {"source":"merged"}` — 병합본이 **홈**에 있으면 가중치 재다운로드 없이 바로 뜬다.
+   병합본이 overlay(폴백)에 있었다면 사라졌으므로 `POST /model/merge` 로 다시 만든다(어댑터는 홈에 남아 있다, 1~2분).
    다시 학습·병합하려면 베이스 가중치가 필요하므로 setup 의 prefetch 가 끝나 있어야 한다.
 
 ## 파일
@@ -125,10 +143,10 @@ LLM_MAIN_MODEL=univus-f9            # 서버는 이 값을 무시한다 (적재�
 | --- | --- |
 | `app.py` | Flask — 상태 기계 · `/train/*` · `/model/*` · `/v1/chat/completions` (`src/common.py` 의 렌더·파서를 그대로 씀) |
 | `setup_server.sh` | pod 환경 (처음 1회 + 재시작 후). venv 는 `train.sh` 와 공유 |
-| `run_server.sh` | `start` `stop` `status` `restart` `log` — pidfile `~/univus-train-out/gpu_server.pid` |
+| `run_server.sh` | `start` `stop` `status` `restart` `log` — pidfile `$SCRATCH_DIR/gpu_server.pid`(= `~/.venv/univus-train/`, pod 와 함께 사라져 묵은 pidfile 이 안 남는다) |
 | `../scripts/deploy_to_server.ps1` | 내 PC → pod 코드 배포 |
 | `../scripts/tunnel.ps1` | SSH 터널 유지 |
 | `../local_server/` | 내 PC 데이터·결과 서버 |
 
 설정은 `config.env`(브랜치) → `config.local.env`(비밀·pod 전용) → 환경변수 순으로 읽습니다. env 파일의 키는 `[A-Za-z0-9_]` 만 되고, 값 안의 `#` 뒤는 주석으로 잘립니다(값에 `#` 을 쓰지 마세요). `app.py` 안에 모델 이름은 없습니다.
-서버는 기본으로 `127.0.0.1` 에만 묶입니다(ssh -L 이면 충분). 다른 주소로 열려면 `UNIVUS_API_KEY` 가 있어야 하고, 없으면 `app.py`·`run_server.sh` 둘 다 시작을 거부합니다. `run_server.sh stop` 은 프로세스 그룹(학습 자식 포함)을 끝내고 종료를 확인한 뒤 돌아옵니다.
+서버는 기본으로 `127.0.0.1` 에만 묶입니다(ssh -L 이면 충분). 다른 주소로 열려면 `UNIVUS_API_KEY` 가 있어야 하고, 없으면 `app.py`·`run_server.sh` 둘 다 시작을 거부합니다. `run_server.sh stop` 은 ① 먼저 `POST /train/stop` 으로 돌고 있는 학습을 끝내 달라고 하고 ② 서버 프로세스 그룹에 TERM 을 보냅니다. 학습(`bash train.sh | tee`)은 **별도 세션**이라 서버 그룹의 kill 이 닿지 않으므로, 서버 자신이 TERM/INT 핸들러에서 학습 그룹을 `killpg` 로 정리한 뒤 내려갑니다. 서버가 죽어도 학습이 고아로 남지 않습니다.

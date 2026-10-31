@@ -67,13 +67,20 @@ CFG.update(_parse_env_file(REPO_ROOT / "config.local.env"))                 # �
 PERSIST_DIR = Path(os.environ.get("PERSIST_DIR") or CFG.get("PERSIST_DIR") or (HOME / "univus-train-out")).expanduser().resolve()
 SCRATCH_DIR = Path(os.environ.get("SCRATCH_DIR") or CFG.get("SCRATCH_DIR") or (HOME / ".venv" / "univus-train")).expanduser().resolve()
 os.environ.setdefault("HF_HUB_CACHE", str(SCRATCH_DIR / "hf_cache"))      # 가중치 캐시만 overlay — 토큰(HF_HOME)은 건드리지 않는다
+os.environ.setdefault("HF_XET_CACHE", str(SCRATCH_DIR / "xet_cache"))     # hf-xet 청크 캐시는 HF_HOME 을 따라 홈으로 가므로 따로 옮긴다
 os.environ.setdefault("PYTHONUTF8", "1")
 API_KEY = (os.environ.get("UNIVUS_API_KEY") or CFG.get("UNIVUS_API_KEY") or "").strip()
 API_KEY_B = API_KEY.encode("utf-8")
 LOCAL_SERVER_URL = (os.environ.get("LOCAL_SERVER_URL") or CFG.get("LOCAL_SERVER_URL") or "http://127.0.0.1:8601").rstrip("/")
 TRAIN_DATA_DIR = Path(os.environ.get("TRAIN_DATA_DIR") or (REPO_ROOT / CFG.get("DATA_DIR", "data/f9")))
 LOG_DIR = PERSIST_DIR / "logs"
-MODELS_DIR = PERSIST_DIR / "models"
+# 병합본 위치 — 홈(영속)이 기본, 홈에 자리가 없으면 overlay(재시작 시 소멸)로 떨어진다
+MODELS_DIR = Path(os.environ.get("MODELS_DIR") or CFG.get("MODELS_DIR") or (PERSIST_DIR / "models")).expanduser().resolve()
+MODELS_FALLBACK_DIR = Path(os.environ.get("MODELS_FALLBACK_DIR") or CFG.get("MODELS_FALLBACK_DIR")
+                           or (SCRATCH_DIR / "models")).expanduser().resolve()
+OVERLAY_WARNING = ("병합본이 overlay(MODELS_FALLBACK_DIR)에 저장됐습니다 — pod 재시작 때 사라집니다. "
+                   "어댑터(홈)는 남으니 재시작 후 POST /model/merge 로 다시 만드세요(A100 슬라이스에서 1~2분). "
+                   "홈 공간을 비우면 다음 병합부터 홈에 저장됩니다")
 TOOLS_PATH = REPO_ROOT / "tools" / "f9_tools.json"
 IM_END = "<|im_end|>"
 LOOPBACK = ("127.0.0.1", "localhost", "::1")
@@ -213,28 +220,84 @@ def popen_group(cmd: list[str], env: dict, log_fh) -> subprocess.Popen:
     return subprocess.Popen(cmd, cwd=str(REPO_ROOT), env=env, stdout=log_fh, stderr=subprocess.STDOUT, **kw)
 
 
-def kill_process_group(proc: subprocess.Popen, timeout: float = 20.0) -> bool:
-    """SIGTERM → 기다림 → SIGKILL 을 **그룹 전체**에. 반환: 그룹이 끝났는가."""
-    if proc.poll() is not None:
-        return True
-    if os.name == "posix":
-        for sig, wait in ((signal.SIGTERM, timeout), (signal.SIGKILL, 10.0)):
-            try:
-                os.killpg(os.getpgid(proc.pid), sig)
-            except ProcessLookupError:
-                return True
-            try:
-                proc.wait(timeout=wait)
-                return True
-            except subprocess.TimeoutExpired:
-                continue
-        return proc.poll() is not None
-    subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)], capture_output=True)   # Windows(개발 PC): 트리째
+def _group_alive(pgid: int) -> bool:
+    """그룹(pgid)에 살아 있는 프로세스가 하나라도 있는가 — killpg(pgid, 0)."""
     try:
-        proc.wait(timeout=timeout)
+        os.killpg(pgid, 0)
         return True
-    except subprocess.TimeoutExpired:
+    except ProcessLookupError:
         return False
+    except PermissionError:
+        return True
+
+
+def wait_group_gone(pgid: int, timeout: float, proc: Optional[subprocess.Popen] = None) -> bool:
+    """그룹이 사라질 때까지 기다린다. 리더(proc)가 끝났으면 매번 poll 로 reap 한다 — 좀비 리더도 그룹에 남아 killpg(0) 이 성공하기 때문."""
+    t0 = time.time()
+    while True:
+        if proc is not None:
+            proc.poll()
+        if not _group_alive(pgid):
+            return True
+        if time.time() - t0 >= timeout:
+            return False
+        time.sleep(0.2)
+
+
+def ensure_group_gone(pgid: int, timeout: float = 20.0, proc: Optional[subprocess.Popen] = None) -> bool:
+    """그룹이 사라질 때까지 기다리고, timeout 안에 안 사라지면 SIGKILL 을 그룹 전체에 보낸다. POSIX 전용(Windows 는 True)."""
+    if os.name != "posix":
+        return True
+    if wait_group_gone(pgid, timeout, proc):
+        return True
+    try:
+        os.killpg(pgid, signal.SIGKILL)
+    except ProcessLookupError:
+        return True
+    return wait_group_gone(pgid, 10.0, proc)
+
+
+def kill_process_group(proc: subprocess.Popen, timeout: float = 20.0) -> bool:
+    """SIGTERM 을 **그룹 전체**에 → timeout 안에 안 사라지면 SIGKILL. 리더(bash)가 먼저 죽어도 남은 python|tee 까지 확인한다.
+    pgid 는 proc.pid 다(start_new_session=True 로 띄웠으므로) — reap 된 뒤 os.getpgid 를 부르면 실패하니 쓰지 않는다."""
+    if os.name != "posix":
+        if proc.poll() is None:
+            subprocess.run(["taskkill", "/T", "/F", "/PID", str(proc.pid)], capture_output=True)   # Windows(개발 PC): 트리째
+        try:
+            proc.wait(timeout=timeout)
+            return True
+        except subprocess.TimeoutExpired:
+            return False
+    pgid = proc.pid
+    try:
+        os.killpg(pgid, signal.SIGTERM)
+    except ProcessLookupError:
+        pass
+    gone = ensure_group_gone(pgid, timeout, proc)      # 리더를 reap 하면서 그룹을 본다
+    try:
+        proc.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        pass
+    return gone and proc.poll() is not None
+
+
+def install_signal_handlers() -> None:
+    """서버가 TERM/INT 로 내려갈 때 학습 프로세스 그룹을 같이 끝낸다 — 별도 세션이라 run_server.sh 의 kill 은 거기까지 닿지 않는다."""
+    def _on_signal(signum, _frame):
+        proc = TRAIN.get("proc")
+        if proc is not None:
+            TRAIN["stopped"] = True
+            _log("server.log", f"signal {signum}: 학습 프로세스 그룹 종료 후 내려간다")
+            kill_process_group(proc, timeout=15.0)
+            TRAIN["proc"] = None
+        with LOCK:
+            _set_state("idle")
+        sys.exit(0)
+    for s in (signal.SIGTERM, signal.SIGINT):
+        try:
+            signal.signal(s, _on_signal)
+        except (ValueError, OSError):      # 메인 스레드가 아니면 등록할 수 없다
+            pass
 
 
 # ── 학습: 데이터 받기 → train.sh → eval.sh → 결과 올리기 ───────
@@ -331,8 +394,12 @@ def _run_logged(cmd: list[str], env: dict, log_path: Path) -> int:
     with open(log_path, "a", encoding="utf-8") as log:
         log.write(f"\n$ {' '.join(cmd)}\n"); log.flush()
         proc = popen_group(cmd, env, log)
+        pgid = proc.pid                      # 세션 리더 = 그룹 id
         TRAIN["proc"] = proc
         rc = proc.wait()
+        # bash 가 먼저 끝나도 python | tee 가 남아 있을 수 있다 — 그룹이 사라진 뒤에야 다음 단계(또는 idle)로 간다
+        if not ensure_group_gone(pgid, 20.0, proc):
+            log.write("!!! 프로세스 그룹이 SIGKILL 뒤에도 남아 있음 — 수동 확인 필요\n")
         TRAIN["proc"] = None
         return rc
 
@@ -486,6 +553,46 @@ def _dir_size(p: Path) -> int:
     return sum(f.stat().st_size for f in p.rglob("*") if f.is_file()) if p.exists() else 0
 
 
+def _disk_free(p: Path) -> int:
+    return shutil.disk_usage(p).free
+
+
+def _merged_roots() -> list[tuple[Path, bool]]:
+    """(폴더, 영속 여부) — 홈 먼저, overlay 폴백은 다를 때만."""
+    roots = [(MODELS_DIR, True)]
+    if MODELS_FALLBACK_DIR != MODELS_DIR:
+        roots.append((MODELS_FALLBACK_DIR, False))
+    return roots
+
+
+def _find_merged(name: str) -> Optional[tuple[Path, bool]]:
+    for root, persistent in _merged_roots():
+        if (root / name / "config.json").is_file():
+            return root / name, persistent
+    return None
+
+
+def _pick_merge_target(out_name: str, est_bytes: int) -> tuple[Path, bool, bool]:
+    """어디에 저장할지 — 홈 → 같은 이름의 옛 병합본을 지우면 홈 → overlay 순. 반환 (root, persistent, removed_old_first)."""
+    tried = []
+    for root, persistent in _merged_roots():
+        root.mkdir(parents=True, exist_ok=True)
+        shutil.rmtree(root / f"{out_name}.partial", ignore_errors=True)
+        out_dir = root / out_name
+        free = _disk_free(root)                   # 기존 병합본은 여유로 세지 않는다 — .partial 과 동시에 디스크에 있으므로
+        if est_bytes <= free * 0.95:
+            return root, persistent, False
+        old = _dir_size(out_dir)
+        if out_dir.exists() and est_bytes <= (free + old) * 0.95:
+            # 같은 폴더에 병합본 둘(기존 + .partial)이 동시에 못 들어간다 → 기존 것을 먼저 지운다 (idle 이라 적재된 모델 없음)
+            shutil.rmtree(out_dir)
+            _log("merge.log", f"{root}: 기존 병합본 먼저 삭제 (여유 {free/1e9:.2f}GB < 예상 {est_bytes/1e9:.2f}GB, 기존 {old/1e9:.2f}GB)")
+            return root, persistent, True
+        tried.append(f"{root} 여유 {free/1e9:.2f}GB")
+    raise RuntimeError(f"저장 공간 부족 — 병합본 예상 {est_bytes/1e9:.2f}GB, " + " · ".join(tried)
+                       + " — 홈의 ~/.cache/pip · ~/.cache/huggingface/xet · outputs/*/checkpoint-* 를 비우세요")
+
+
 def load_model(source: str, name: Optional[str], adapter_path: Optional[str]) -> dict:
     import torch
     from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -495,12 +602,15 @@ def load_model(source: str, name: Optional[str], adapter_path: Optional[str]) ->
         nm = _valid_name(name or _default_merged_name(CFG.get("RUN_NAME", "run1")))
         if not nm:
             raise ValueError("name 형식 오류 (영문·숫자로 시작, ._- 만)")
-        path = MODELS_DIR / nm
-        if not (path / "config.json").is_file():
-            raise FileNotFoundError(f"병합본 없음: {path} — 먼저 POST /model/merge")
+        found = _find_merged(nm)
+        if not found:
+            raise FileNotFoundError(f"병합본 없음: {nm} ({MODELS_DIR} · {MODELS_FALLBACK_DIR}) — 먼저 POST /model/merge")
+        path, persistent = found
         tok = AutoTokenizer.from_pretrained(str(path), trust_remote_code=True)
         model = _from_pretrained(AutoModelForCausalLM, str(path), device_map=device_map, trust_remote_code=True)
         label = nm
+        MODEL["persistent"] = persistent
+        MODEL["path"] = str(path)
     elif source == "adapter":
         from peft import PeftModel
         if name is not None and not _valid_name(name):
@@ -524,11 +634,16 @@ def load_model(source: str, name: Optional[str], adapter_path: Optional[str]) ->
     tools, _ = common.load_tools(TOOLS_PATH)
     mode = common.detect_render_mode(tok, tools)
     MODEL.update({"model": model, "tok": tok, "name": label, "source": source, "render_mode": mode, "loaded_at": time.time()})
-    return {"name": label, "source": source, "render_mode": mode, "vram": _vram()}
+    info = {"name": label, "source": source, "render_mode": mode, "vram": _vram()}
+    if source == "merged":
+        info.update({"path": MODEL.get("path"), "persistent": MODEL.get("persistent")})
+        if not MODEL.get("persistent"):
+            info["warning"] = OVERLAY_WARNING
+    return info
 
 
 def unload_model() -> None:
-    MODEL.update({"model": None, "tok": None, "name": None, "source": None, "render_mode": None})
+    MODEL.update({"model": None, "tok": None, "name": None, "source": None, "render_mode": None, "persistent": None, "path": None})
     try:
         import gc, torch
         gc.collect()
@@ -544,6 +659,7 @@ def _merge_worker(run_name: str, out_name: str, adapter_path: Optional[str], mod
     tmp = SCRATCH_DIR / "merge_tmp"
     out_dir = MODELS_DIR / out_name
     partial = MODELS_DIR / f"{out_name}.partial"
+    persistent = True
     try:
         import gc
         import torch
@@ -558,12 +674,12 @@ def _merge_worker(run_name: str, out_name: str, adapter_path: Optional[str], mod
         # 0) 공간 — 가중치를 읽지 않고 구조만으로 추정. 덮어쓸 기존 병합본 크기는 여유로 쳐 준다
         est = _estimate_from_id(base_id)
         n_params, est_bytes = est["params"], est["estimated_bytes"]
-        MODELS_DIR.mkdir(parents=True, exist_ok=True)
-        free = shutil.disk_usage(PERSIST_DIR).free + _dir_size(out_dir)
-        if est_bytes > free * 0.95:
-            raise RuntimeError(f"홈 여유 {free/1e9:.2f}GB < 병합본 예상 {est_bytes/1e9:.2f}GB — 먼저 공간을 비우세요")
-        shutil.rmtree(partial, ignore_errors=True)
+        root, persistent, removed_old_first = _pick_merge_target(out_name, est_bytes)   # 홈 → (옛 것 삭제 후) 홈 → overlay
+        out_dir = root / out_name
+        partial = root / f"{out_name}.partial"
         partial.mkdir(parents=True, exist_ok=True)
+        if not persistent:
+            _log("merge.log", f"⚠️ 홈에 자리가 없어 overlay 에 저장한다: {out_dir}")
         tok = AutoTokenizer.from_pretrained(str(apath), trust_remote_code=True)
 
         if mode == "gpu-nf4":
@@ -606,15 +722,21 @@ def _merge_worker(run_name: str, out_name: str, adapter_path: Optional[str], mod
         if out_dir.exists():
             shutil.rmtree(out_dir)
         partial.rename(out_dir)
+        for other, _p in _merged_roots():          # 다른 위치에 남은 같은 이름의 옛 병합본은 지운다 (어느 것이 최신인지 헷갈리지 않게)
+            if other != root and (other / out_name).exists():
+                shutil.rmtree(other / out_name, ignore_errors=True)
         size = _dir_size(out_dir)
         info = {"run_name": run_name, "out_name": out_name, "mode": mode, "base_model": base_id, "adapter": str(apath),
                 "params": n_params, "embedding_params": est["embedding_params"], "estimated_bytes": est_bytes,
-                "size_bytes": size, "home_free_gb_after": round(shutil.disk_usage(PERSIST_DIR).free / 1e9, 2),
+                "size_bytes": size, "removed_old_first": removed_old_first,
+                "location": str(out_dir), "persistent": persistent, "warning": None if persistent else OVERLAY_WARNING,
+                "home_free_gb_after": round(_disk_free(PERSIST_DIR) / 1e9, 2),
+                "fallback_free_gb_after": round(_disk_free(MODELS_FALLBACK_DIR) / 1e9, 2) if MODELS_FALLBACK_DIR.exists() else None,
                 "quant": "bnb nf4 double-quant", "created_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
                 "versions": common.lib_versions()}
         (out_dir / "merge.json").write_text(json.dumps(info, ensure_ascii=False, indent=2), encoding="utf-8")
         MERGE.update({"ok": True, "result": info})
-        _log("merge.log", f"완료 {out_dir} {size/1e9:.2f}GB")
+        _log("merge.log", f"완료 {out_dir} {size/1e9:.2f}GB persistent={persistent}")
     except Exception as e:  # noqa: BLE001
         MERGE.update({"ok": False, "error": str(e)[:400]})
         _log("merge.log", f"실패: {e!r}")
@@ -780,7 +902,9 @@ def health():
                                "target": CFG.get("TARGET"), "local_server_url": LOCAL_SERVER_URL,
                                "persist_dir": str(PERSIST_DIR), "scratch_dir": str(SCRATCH_DIR),
                                "hf_hub_cache": os.environ.get("HF_HUB_CACHE"), "auth": bool(API_KEY)},
-                    "vram": _vram(), "disk": {"persist": _disk(PERSIST_DIR), "scratch": _disk(SCRATCH_DIR)},
+                    "vram": _vram(), "disk": {"persist": _disk(PERSIST_DIR), "scratch": _disk(SCRATCH_DIR),
+                                              "models_dir": {"path": str(MODELS_DIR), **_disk(MODELS_DIR)},
+                                              "models_fallback_dir": {"path": str(MODELS_FALLBACK_DIR), **_disk(MODELS_FALLBACK_DIR)}},
                     "train": {k: v for k, v in TRAIN.items() if k != "proc"}, "merge": MERGE,
                     "versions": common.lib_versions()})
 
@@ -905,10 +1029,18 @@ def model_unload():
 
 @app.get("/models")
 def models_list():
-    merged = sorted(p.name for p in MODELS_DIR.iterdir() if (p / "config.json").is_file()) if MODELS_DIR.exists() else []
+    detail, seen = [], set()
+    for root, persistent in _merged_roots():          # 홈 먼저 — 같은 이름이면 홈 것이 보인다
+        if not root.exists():
+            continue
+        for p in sorted(root.iterdir()):
+            if (p / "config.json").is_file() and not p.name.endswith(".partial") and p.name not in seen:
+                seen.add(p.name)
+                detail.append({"name": p.name, "persistent": persistent, "path": str(p), "size_bytes": _dir_size(p)})
     outs = PERSIST_DIR / "outputs"
     adapters = sorted(p.parent.parent.name for p in outs.glob("*/adapter/adapter_config.json")) if outs.exists() else []
-    return jsonify({"merged": merged, "adapters": adapters})
+    return jsonify({"merged": [d["name"] for d in detail], "merged_detail": detail, "adapters": adapters,
+                    "models_dir": str(MODELS_DIR), "models_fallback_dir": str(MODELS_FALLBACK_DIR)})
 
 
 @app.get("/v1/models")
@@ -955,6 +1087,7 @@ def main() -> None:
           f"persist={PERSIST_DIR}  scratch={SCRATCH_DIR}  local={LOCAL_SERVER_URL}  "
           f"auth={'on' if API_KEY else 'OFF (루프백 전용)'}", flush=True)
     print(f"  vram={_vram()}  disk(persist)={_disk(PERSIST_DIR)}", flush=True)
+    install_signal_handlers()
     app.run(host=args.host, port=args.port, threaded=True)
 
 
