@@ -17,3 +17,6 @@ bitsandbytes>=0.45
 huggingface_hub>=0.30
 pyyaml
 python-dateutil
+# ── 서버 (gpu_server · local_server) ──
+flask>=3.0
+requests>=2.31
