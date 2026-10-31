@@ -17,6 +17,8 @@ PERSIST_DIR="${PERSIST_DIR:-$HOME/univus-train-out}"
 SCRATCH_DIR="${SCRATCH_DIR:-$HOME/.venv/univus-train}"
 VENV="$SCRATCH_DIR/.venv"
 export HF_HUB_CACHE="${HF_HUB_CACHE:-$SCRATCH_DIR/hf_cache}"     # 토큰(~/.cache/huggingface/token)은 홈에 그대로
+# pip 휠 캐시(~/.cache/pip, torch 휠만 수 GB)와 hf-xet 청크 캐시(~/.cache/huggingface/xet, HF_HOME 을 따라감)가 홈 10GB 를 채운다 → overlay 로
+export PIP_CACHE_DIR="${PIP_CACHE_DIR:-$SCRATCH_DIR/pip_cache}" HF_XET_CACHE="${HF_XET_CACHE:-$SCRATCH_DIR/xet_cache}"
 TORCH_INDEX="${TORCH_INDEX:-https://download.pytorch.org/whl/cu129}"
 fail() { echo; echo "!!! $1 !!!"; echo "STATUS=FAILED"; exit 1; }
 
@@ -83,7 +85,13 @@ fi
 
 echo
 echo "=============================================="
-echo " venv $(du -sh "$VENV" 2>/dev/null | cut -f1) · HF 캐시 $(du -sh "$HF_HUB_CACHE" 2>/dev/null | cut -f1) · 홈 여유 $(df -h "$HOME" | awk 'NR==2{print $4}')"
+echo " overlay: venv $(du -sh "$VENV" 2>/dev/null | cut -f1) · HF 캐시 $(du -sh "$HF_HUB_CACHE" 2>/dev/null | cut -f1) · pip 캐시 $(du -sh "$PIP_CACHE_DIR" 2>/dev/null | cut -f1) · xet 캐시 $(du -sh "$HF_XET_CACHE" 2>/dev/null | cut -f1)"
+echo " 홈(영속) — 10GB 한도, 병합본 nf4 ≈2.8GB 가 들어가려면 3GB 이상 비어 있어야 한다:"
+df -h "$HOME" | sed 's/^/   /'
+if [ "$(df -Pk "$HOME" | awk 'NR==2{print $4}')" -lt 3145728 ]; then
+  echo " ⚠️ 홈 여유가 3GB 미만 — /model/merge 는 병합본을 overlay(MODELS_FALLBACK_DIR=$SCRATCH_DIR/models)에 두고, pod 재시작 후 다시 만들어야 한다."
+  echo "    비울 곳:  du -xsh ~/.cache/* ~/.cache/huggingface/* ~/univus-train-out/outputs/*/checkpoint-* 2>/dev/null | sort -rh | head"
+fi
 echo " STATUS=DONE   $(date '+%F %T')"
 echo
 echo " 서버 켜기:  bash gpu_server/run_server.sh start      (= nohup $VENV/bin/python gpu_server/app.py --port ${SERVER_PORT:-8600} > $PERSIST_DIR/logs/server.log 2>&1 &)"

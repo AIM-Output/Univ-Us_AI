@@ -28,6 +28,7 @@ if [ "${TARGET:-local}" = "gpu-server" ]; then
   done
   # 가중치 캐시만 overlay 로 — HF_HOME 을 바꾸면 로그인 토큰($HF_HOME/token)까지 overlay 로 가서 재시작 때 사라진다
   export HF_HUB_CACHE="${HF_HUB_CACHE:-$SCRATCH_DIR/hf_cache}"
+  export HF_XET_CACHE="${HF_XET_CACHE:-$SCRATCH_DIR/xet_cache}"     # xet 청크 캐시는 HF_HOME(홈)을 따라가므로 따로 overlay 로
   [ -x "$SCRATCH_DIR/.venv/bin/python" ] || { echo "venv 가 없습니다 ($SCRATCH_DIR/.venv) — pod 재시작 후라면 정상입니다. 먼저:  bash setup.sh"; exit 1; }
   PY="$SCRATCH_DIR/.venv/bin/python"
 elif [ -n "${VIRTUAL_ENV:-}" ]; then PY=python
