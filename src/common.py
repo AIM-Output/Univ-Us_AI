@@ -36,7 +36,7 @@ FALLBACK_TOOL_INSTRUCTION = (
 )
 
 _ISO_DT = re.compile(r"^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}):(\d{2})(?::\d{2})?)?$")
-_THINK = re.compile(r"<think>.*?</think>\s*", re.DOTALL)
+_THINK = re.compile(r"<think>.*?(?:</think>\s*|\Z)", re.DOTALL)     # 닫히지 않은 <think> 꼬리도 지운다
 _TOOL_CALL = re.compile(re.escape(TOOL_CALL_OPEN) + r"\s*(.*?)\s*" + re.escape(TOOL_CALL_CLOSE), re.DOTALL)
 
 
