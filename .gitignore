@@ -4,7 +4,8 @@ outputs/
 logs/
 results/
 models/
-*.pid        # 학습 결과 사본 · nf4 병합본 · 서버 pidfile
+# 학습 결과 사본 · nf4 병합본 · 서버 pidfile
+*.pid
 
 # ── 환경 ──
 .venv/
@@ -20,5 +21,7 @@ wandb/
 *.pem
 .env
 kaggle.json
-config.local.env        # 내 PC 전용 덮어쓰기 (config.env 는 브랜치별로 추적한다)
-scripts/server.env      # SSH 접속 정보 · API 키 (server.env.example 만 추적)
+# 내 PC 전용 덮어쓰기 (config.env 는 브랜치별로 추적한다)
+config.local.env
+# SSH 접속 정보 · API 키 (server.env.example 만 추적)
+scripts/server.env
