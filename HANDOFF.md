@@ -1,7 +1,7 @@
 # Univ-Us_Train 인수인계 (HANDOFF)
 
 > **이 문서 하나로 로컬 PC 에서든 학교 GPU 서버에서든 Claude Code 에게 작업을 이어서 시킬 수 있게 쓴 문서입니다.**
-> 마지막 갱신: 2026-10-31 · 작성: logan0741 + Claude Code
+> 마지막 갱신: 2026-11-02 · 작성: logan0741 + Claude Code
 > 상세 설계는 [README.md](README.md) · [DATA_FLOW.md](DATA_FLOW.md) · [gpu_server/README.md](gpu_server/README.md) 에 있고, 이 문서는 **맥락 · 현재 상태 · 다음 할 일**을 모읍니다.
 
 ---
@@ -12,6 +12,7 @@
 | --- | --- |
 | **로컬 PC** | `C:\Project\Univ-Us_AI\Univ-Us_Train` 에서 Claude Code 를 열고 → `HANDOFF.md 읽고 6장 현재 상태 확인한 뒤 8장 N번부터 이어가줘` |
 | **GPU 서버** | `ssh -p 30562 -i private.pem jovyan@168.131.30.102` → `cd ~/univus-train` → Claude Code 실행 → 같은 요청 |
+| **GPU 서버 작업 기록** | pod 의 Claude 가 한 일은 `~/univus-train-out/POD_SESSION_LOG_<날짜>.md` 에 남긴다(배포에 덮어써지지 않는 영속 폴더). 로컬에서 이어갈 때 이 파일도 읽는다 — 2026-11-01 기록은 enum 근거·8 step 스모크·발견한 불일치를 담고 있고, 로컬이 2026-11-02 에 전부 반영했다 |
 
 서버의 `~/univus-train` 은 **로컬 레포의 `gpu/qwen3-4b` 브랜치를 `git archive` 로 보낸 사본**이라 `.git` 이 없습니다.
 서버에서 코드를 고쳤으면 **로컬 레포에 같은 수정을 반영하고 다시 배포**해야 남습니다(서버 쪽 수정은 다음 배포 때 덮어써짐).
@@ -165,18 +166,21 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 | 7 | pod 환경 설치 (`setup_server.sh`) | ✅ STATUS=DONE | venv 7.6GB · Qwen3-4B 캐시 7.6GB (overlay). pip 캐시가 홈을 채워 삭제함 → 스크립트가 pip·xet 캐시를 overlay 로 보내도록 수정됨 |
 | 8 | pod 에 `config.local.env` (API 키) | ✅ | |
 | 9 | gpu_server 기동 + 터널 `/health` | ✅ | 2026-10-31 06:36 `run_server.sh start` → 내 PC 에서 `http://127.0.0.1:8600/health` 200 (state idle, VRAM 9.39GiB 여유) · pod 에서 역터널로 `http://127.0.0.1:8601/data/manifest` 200 (sha256 포함, 무인증 401). **터널·로컬 서버는 내 PC 에서 켜 둔 동안만 유효** — 다시 켤 때 `scripts\tunnel.ps1` + `local_server\run_local.ps1` |
-| 10 | 첫 학습 run (`qwen3-4b-f9`) | ⬜ | 학습 쌍 1,568 × 3 epoch = 588 step. pod 스모크 실측 약 34 s/step → 학습 약 5.5h + 평가(315건 × 2회) 약 1h. 시작: 내 PC 에서 `POST /train/start {"run_name":"qwen3-4b-f9"}` |
+| 10 | 첫 학습 run (`qwen3-4b-f9`) | 🔄 | 학습 쌍 1,568 × 3 epoch = 588 step. pod 스모크 실측 약 34 s/step → 학습 약 5.5h + 평가(315건 × 2회) 약 1h. **2026-11-02 02:33(내 PC 시각) 시작** — 데이터 받기 OK, 예상 완료 09:00~10:00. 확인: `GET /train/status`. 시작 명령: 내 PC 에서 `POST /train/start {"run_name":"qwen3-4b-f9"}` |
 | 11 | 병합 → 적재 → WE-Meet `.env` 연결 | ⬜ | 홈 1.3GB 라 병합본은 overlay 대체 예상 |
 | 12 | 3자 비교표(Base / Instruct / 학습 후) | ⬜ | `BASE_MODEL_ID=Qwen/Qwen3-4B-Base bash eval.sh` |
-| 13 | `tools/f9_tools.json` 의 `category`·`kinds` enum 을 WE-Meet C1 실제 값과 맞추기 | ✅ | 2026-11-02. category = C1 `config.py` CATEGORIES(personal·study·team·etc), kinds = 백엔드 `main.py` CALENDAR_SOURCES 의 kind(deadline·academic·class·exam·user·study, todo 제거). `data/f9` 같은 seed 로 재생성 → pod 재배포 |
+| 13 | `tools/f9_tools.json` 의 `category`·`kinds` enum 을 WE-Meet C1 실제 값과 맞추기 | ✅ | 2026-11-02. category = C1 `config.py` CATEGORIES(personal·study·team·etc), kinds = 백엔드 `main.py` CALENDAR_SOURCES 의 kind(deadline·academic·class·exam·user·study, todo 제거). `data/f9` 같은 seed 로 재생성 → pod 재배포. 같은 날 2차: 종일 일정 `end` 를 exclusive(다음 날, C1-R14)로 고쳐 다시 재생성(train 1,568쌍 / eval 358쌍, 종일 57건 모두 end=start+1) |
 | 14 | F4 RAG (parse/index/summarize/generate/ask) | ⬜ | 아직 시작 안 함 |
 | 15 | pod 홈 정리 ("처음 구축" 기준) | ✅ | 2026-10-31 홈 1.3GB → **9.7GB 여유**. `.vscode-server` 빌드·확장·캐시 8.6GB 를 overlay 임시 폴더로 이동(설정 `data/User`·`Machine` 유지), pip·xet 캐시 제거. (11-01 VS Code Remote 재접속으로 서버·확장 2GB 재설치 → 여유 8GB) |
 | 16 | pod 실기기 스모크 — 새 데이터 받기 → `train.sh --max_steps 4 --max_train_rows 16` → `eval.sh --limit 12` | ✅ | 2026-11-02. Qwen3-4B nf4 가 MIG 9.5GiB 에서 적재·학습·평가 끝까지 OK. 16행 = 20쌍, 토큰 p50 2032 / max 2274 (<2560, 버림 0), 약 34 s/step, loss 1.83→0.55. 데이터 양방향 전송(내려받기 sha256 일치 · `/results` 업로드) 확인. 산출물 `~/univus-train-out/outputs/qwen3-4b-smoke/`, 로그 `~/univus-train-out/logs/smoke.log`, 스크립트 `~/univus-train-out/smoke_run.sh` |
+| 17 | 평가 거절 채점 보정 (`src/eval.py`) | ✅ | 2026-11-02. 거절 턴은 도구 미호출 + 거절 표현(`common.REFUSAL_MARKERS`)이 있어야 맞음. 이전엔 텍스트만 있으면 맞음이라 학습 전 모델의 '도와드리겠다' 도 100% 로 잡혔다(pod 로그 §5 지적). 학습 데이터의 거절 문장 176건 전부 마커 포함 확인 |
 
 ---
 
 ## 7. 알려진 제약 · 주의
 
+- **학습 중 pod 에서 GPU 작업 금지** — 같은 MIG 9.5GiB 를 나누면 OOM. `train.py`·`eval.py`·스모크 모두 안 됨. 진행은 내 PC 에서 `GET /train/status` 로만 본다. 학습 중 터널·로컬 서버가 잠깐 끊겨도 학습은 계속되지만, **끝날 때 결과 업로드**가 있으니 그때는 켜져 있어야 한다(꺼져 있으면 `ok: partial`, 어댑터는 pod `outputs/` 에 남음).
+- 로컬 PC 에서 만든 `data/f9/*.jsonl` 은 LF 고정(`common.write_jsonl`) — pod 에서 재생성한 것과 sha256 이 같다.
 - **홈 10GB**: 2026-10-31 정리로 9.7GB 여유 → 병합본(≈2.8GB)은 홈 `~/univus-train-out/models/` 에 영구 보관 가능(기본 `MODELS_DIR`). 홈을 다시 채우는 범인은 pip 캐시·hf-xet 캐시·`.vscode-server` 이므로, 설치 스크립트는 캐시를 overlay 로 보내고, VS Code Remote 는 꼭 필요한 확장만 설치할 것. overlay 의 옛 팀 venv `~/.venv/univus-ai`(7.9GB)는 홈과 무관해 그대로 둠(재시작 시 소멸).
 - 학습 후 홈에 남는 것: 어댑터 ≈132MB · run.json · 평가 md. `checkpoint-*` 는 업로드 성공 후 자동 삭제.
 - `/train/stop` 은 프로세스 그룹 전체를 종료해야 함(수정 중). 서버 종료 전 학습 중이면 먼저 `/train/stop`.
@@ -201,7 +205,7 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 
 1. ~~서버 코드 2차 검증 지적 반영 → 커밋 → 병합 → 재배포~~ ✅ (2026-10-31)
 2. ~~서버 기동 → 터널 → `/health` 200~~ ✅ (2026-10-31) — 다시 켤 때: pod `run_server.sh start`, 내 PC `tunnel.ps1` + `run_local.ps1`
-3. 데이터는 이미 생성됨(`data/f9`, seed 42, train 1,185 행 = 학습 쌍 1,568 / eval 315 — 2026-11-02 enum 동기화 후 재생성). 내 PC 에서 `/train/start {"run_name":"qwen3-4b-f9"}` → `/train/status` 로 loss 확인 (수 시간). **학습 중에는 터널과 로컬 서버를 끄지 말 것** (데이터 다운로드는 시작 직후 한 번, 결과 업로드는 끝날 때)
+3. 🔄 **2026-11-02 02:33 시작** (`run_name` qwen3-4b-f9). 데이터는 `data/f9`(seed 42, train 1,185 행 = 학습 쌍 1,568 / eval 315 행 = 358 쌍 — enum 동기화 + 종일 end exclusive 반영). 내 PC 에서 `/train/start {"run_name":"qwen3-4b-f9"}` → `/train/status` 로 loss 확인 (수 시간). **학습 중에는 터널과 로컬 서버를 끄지 말 것** (데이터 다운로드는 시작 직후 한 번, 결과 업로드는 끝날 때)
 4. `/model/merge` → `/model/load {"source":"merged"}` → `/v1/chat/completions` 도구 호출 확인 → WE-Meet `.env` 연결
 5. `results/qwen3-4b-f9/compare.md` 로 3자 비교표 정리 (Base 행 추가)
 6. 그다음 F4 RAG 착수 여부 결정
@@ -219,3 +223,5 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 | 2026-10-30 | 병합본은 nf4 단일 체크포인트 | LoRA 어댑터만으로는 추론 불가, 베이스 8GB 는 홈에 못 둠 |
 | 2026-10-31 | pod 의 옛 클론만 삭제, 도구 캐시는 유지 | 사용자 선택 |
 | 2026-11-02 | 도구 enum 을 WE-Meet 코드 실제 값으로 (category `etc`, kinds 에서 `todo` 제거) | 임시값으로 학습하면 모델이 앱에 없는 `appointment`·`other` 를 내보낸다. 할 일은 C1 에서 kind=user + isTodo 라 별도 kind 가 없다 |
+| 2026-11-02 | 종일 일정 `end` = 다음 날(exclusive) 로 고친 뒤 학습 시작 (pod 로그 §7-1 의 두 갈래 중 '고친 뒤') | WE-Meet C1-R14 규칙. end=start 로 학습하면 모델이 앱 규칙과 다른 값을 내보낸다. 고치는 비용은 재생성 수 초 + 재배포 1분 |
+| 2026-11-02 | 거절 턴 채점에 거절 표현 조건 추가 | 학습 전 모델이 거절하지 않았는데 100% 로 잡히면 Base/Instruct 행이 부풀려져 비교표 신뢰가 떨어진다(논문 약점) |
