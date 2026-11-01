@@ -55,7 +55,7 @@
 Univ-Us_Train/
 ├── HANDOFF.md  CLAUDE.md  README.md  DATA_FLOW.md
 ├── config.env            ← 브랜치별 (모델·메모리·경로). 비밀값은 config.local.env (gitignore)
-├── tools/f9_tools.json   ← WE-Meet F9 도구 11개 스키마 (⚠️ category·kinds enum 은 임시값)
+├── tools/f9_tools.json   ← WE-Meet F9 도구 11개 스키마 (category·kinds enum 은 2026-11-02 에 C1 실제 값과 동기화)
 ├── src/common.py         ← 렌더(chat template + tools) · <tool_call> 파서 · 공용 유틸
 ├── src/prepare_f9.py     ← 한국어 합성 데이터 생성 → data/f9/{train,eval}.jsonl (평가셋 템플릿 패밀리 단위 분리)
 ├── src/train.py          ← QLoRA/LoRA, completion-only 손실, max_seq 초과 행 제거, HF push
@@ -152,7 +152,7 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 
 ---
 
-## 6. 현재 상태 (2026-10-31 기준 체크리스트)
+## 6. 현재 상태 (2026-11-02 기준 체크리스트)
 
 | # | 항목 | 상태 | 비고 |
 | :---: | --- | :---: | --- |
@@ -165,12 +165,13 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 | 7 | pod 환경 설치 (`setup_server.sh`) | ✅ STATUS=DONE | venv 7.6GB · Qwen3-4B 캐시 7.6GB (overlay). pip 캐시가 홈을 채워 삭제함 → 스크립트가 pip·xet 캐시를 overlay 로 보내도록 수정됨 |
 | 8 | pod 에 `config.local.env` (API 키) | ✅ | |
 | 9 | gpu_server 기동 + 터널 `/health` | ✅ | 2026-10-31 06:36 `run_server.sh start` → 내 PC 에서 `http://127.0.0.1:8600/health` 200 (state idle, VRAM 9.39GiB 여유) · pod 에서 역터널로 `http://127.0.0.1:8601/data/manifest` 200 (sha256 포함, 무인증 401). **터널·로컬 서버는 내 PC 에서 켜 둔 동안만 유효** — 다시 켤 때 `scripts\tunnel.ps1` + `local_server\run_local.ps1` |
-| 10 | 첫 학습 run (`qwen3-4b-f9`) | ⬜ | 데이터 1,500건 합성 → 약 1,600쌍 × 3 epoch |
+| 10 | 첫 학습 run (`qwen3-4b-f9`) | ⬜ | 학습 쌍 1,568 × 3 epoch = 588 step. pod 스모크 실측 약 34 s/step → 학습 약 5.5h + 평가(315건 × 2회) 약 1h. 시작: 내 PC 에서 `POST /train/start {"run_name":"qwen3-4b-f9"}` |
 | 11 | 병합 → 적재 → WE-Meet `.env` 연결 | ⬜ | 홈 1.3GB 라 병합본은 overlay 대체 예상 |
 | 12 | 3자 비교표(Base / Instruct / 학습 후) | ⬜ | `BASE_MODEL_ID=Qwen/Qwen3-4B-Base bash eval.sh` |
-| 13 | `tools/f9_tools.json` 의 `category`·`kinds` enum 을 WE-Meet C1 실제 값과 맞추기 | ⬜ | 실학습 전 필수 |
+| 13 | `tools/f9_tools.json` 의 `category`·`kinds` enum 을 WE-Meet C1 실제 값과 맞추기 | ✅ | 2026-11-02. category = C1 `config.py` CATEGORIES(personal·study·team·etc), kinds = 백엔드 `main.py` CALENDAR_SOURCES 의 kind(deadline·academic·class·exam·user·study, todo 제거). `data/f9` 같은 seed 로 재생성 → pod 재배포 |
 | 14 | F4 RAG (parse/index/summarize/generate/ask) | ⬜ | 아직 시작 안 함 |
-| 15 | pod 홈 정리 ("처음 구축" 기준) | ✅ | 2026-10-31 홈 1.3GB → **9.7GB 여유**. `.vscode-server` 빌드·확장·캐시 8.6GB 를 overlay 임시 폴더로 이동(설정 `data/User`·`Machine` 유지), pip·xet 캐시 제거 |
+| 15 | pod 홈 정리 ("처음 구축" 기준) | ✅ | 2026-10-31 홈 1.3GB → **9.7GB 여유**. `.vscode-server` 빌드·확장·캐시 8.6GB 를 overlay 임시 폴더로 이동(설정 `data/User`·`Machine` 유지), pip·xet 캐시 제거. (11-01 VS Code Remote 재접속으로 서버·확장 2GB 재설치 → 여유 8GB) |
+| 16 | pod 실기기 스모크 — 새 데이터 받기 → `train.sh --max_steps 4 --max_train_rows 16` → `eval.sh --limit 12` | ✅ | 2026-11-02. Qwen3-4B nf4 가 MIG 9.5GiB 에서 적재·학습·평가 끝까지 OK. 16행 = 20쌍, 토큰 p50 2032 / max 2274 (<2560, 버림 0), 약 34 s/step, loss 1.83→0.55. 데이터 양방향 전송(내려받기 sha256 일치 · `/results` 업로드) 확인. 산출물 `~/univus-train-out/outputs/qwen3-4b-smoke/`, 로그 `~/univus-train-out/logs/smoke.log`, 스크립트 `~/univus-train-out/smoke_run.sh` |
 
 ---
 
@@ -200,7 +201,7 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 
 1. ~~서버 코드 2차 검증 지적 반영 → 커밋 → 병합 → 재배포~~ ✅ (2026-10-31)
 2. ~~서버 기동 → 터널 → `/health` 200~~ ✅ (2026-10-31) — 다시 켤 때: pod `run_server.sh start`, 내 PC `tunnel.ps1` + `run_local.ps1`
-3. 데이터는 이미 생성됨(`data/f9`, seed 42, train 1,185 / eval 315). 내 PC 에서 `/train/start {"run_name":"qwen3-4b-f9"}` → `/train/status` 로 loss 확인 (수 시간). **학습 중에는 터널과 로컬 서버를 끄지 말 것** (데이터 다운로드는 시작 직후 한 번, 결과 업로드는 끝날 때)
+3. 데이터는 이미 생성됨(`data/f9`, seed 42, train 1,185 행 = 학습 쌍 1,568 / eval 315 — 2026-11-02 enum 동기화 후 재생성). 내 PC 에서 `/train/start {"run_name":"qwen3-4b-f9"}` → `/train/status` 로 loss 확인 (수 시간). **학습 중에는 터널과 로컬 서버를 끄지 말 것** (데이터 다운로드는 시작 직후 한 번, 결과 업로드는 끝날 때)
 4. `/model/merge` → `/model/load {"source":"merged"}` → `/v1/chat/completions` 도구 호출 확인 → WE-Meet `.env` 연결
 5. `results/qwen3-4b-f9/compare.md` 로 3자 비교표 정리 (Base 행 추가)
 6. 그다음 F4 RAG 착수 여부 결정
@@ -217,3 +218,4 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 | 2026-10-30 | 서버는 학습·추론, 데이터는 로컬 Flask, 서버 간 통신 | 서버 홈 용량이 작음 |
 | 2026-10-30 | 병합본은 nf4 단일 체크포인트 | LoRA 어댑터만으로는 추론 불가, 베이스 8GB 는 홈에 못 둠 |
 | 2026-10-31 | pod 의 옛 클론만 삭제, 도구 캐시는 유지 | 사용자 선택 |
+| 2026-11-02 | 도구 enum 을 WE-Meet 코드 실제 값으로 (category `etc`, kinds 에서 `todo` 제거) | 임시값으로 학습하면 모델이 앱에 없는 `appointment`·`other` 를 내보낸다. 할 일은 C1 에서 kind=user + isTodo 라 별도 kind 가 없다 |
