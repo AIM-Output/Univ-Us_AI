@@ -123,7 +123,8 @@ Gen = Callable[[random.Random, dt.datetime], tuple[str, list]]
 
 def _event_args(title: str, cat: str, d: dt.date, t: tuple | None, dur: int | None, repeat: str | None = None) -> dict:
     if t is None:
-        args = {"title": title, "start": fmt_d(d), "end": fmt_d(d), "allDay": True, "category": cat}
+        # 종일 end 는 exclusive — 하루짜리 10/20 → end 2026-10-21 (WE-Meet C1-R14)
+        args = {"title": title, "start": fmt_d(d), "end": fmt_d(d + dt.timedelta(days=1)), "allDay": True, "category": cat}
     else:
         s = dt.datetime(d.year, d.month, d.day, t[1], t[2])
         args = {"title": title, "start": fmt_dt(s), "end": fmt_dt(s + dt.timedelta(minutes=dur or 60)),
