@@ -1,5 +1,5 @@
 {
-  "_note": "WE-Meet 요구사항정의서 F9 §5 '도구 목록'을 OpenAI function-tool 형식으로 옮긴 것. `x-kind` 는 이 저장소용 확장(read|write|run|navigate)이며 모델에 넘기기 전에 common.load_tools() 가 뗀다. ⚠️ create_event.category 의 enum 과 list_events.kinds 의 enum 은 WE-Meet C1_Calendar_agent/calendar_core 의 실제 값과 맞춘 뒤 실학습해야 한다 (지금 값은 임시). 쓰기 도구(create/update/delete_event)는 '미리보기 객체'만 돌려주고 실행하지 않는다 — 실행은 사용자가 [확인]을 누른 뒤 서버가 한다.",
+  "_note": "WE-Meet 요구사항정의서 F9 §5 '도구 목록'을 OpenAI function-tool 형식으로 옮긴 것. `x-kind` 는 이 저장소용 확장(read|write|run|navigate)이며 모델에 넘기기 전에 common.load_tools() 가 뗀다. create_event.category 의 enum 은 WE-Meet C1_Calendar_agent/calendar_core/config.py 의 CATEGORIES(personal·study·team·etc), list_events.kinds 의 enum 은 univ_us_local/backend/app/main.py 의 CALENDAR_SOURCES 가 /api/events 에 섞는 kind(deadline·academic·class·exam·user·study)와 2026-11-02 에 맞췄다. 할 일은 kind=user 에 isTodo 로 들어 있어 따로 없다. 쓰기 도구(create/update/delete_event)는 '미리보기 객체'만 돌려주고 실행하지 않는다 — 실행은 사용자가 [확인]을 누른 뒤 서버가 한다.",
   "tools": [
     {
       "type": "function",
@@ -14,8 +14,8 @@
             "to": { "type": "string", "format": "date", "description": "조회 종료일 (YYYY-MM-DD, 포함)" },
             "kinds": {
               "type": "array",
-              "items": { "type": "string", "enum": ["deadline", "academic", "class", "exam", "user", "todo", "study"] },
-              "description": "거를 종류. 생략하면 전부. deadline=e클래스 마감, academic=학사 일정, class=수업, exam=시험, user=내 일정, todo=할 일, study=학습 블록"
+              "items": { "type": "string", "enum": ["deadline", "academic", "class", "exam", "user", "study"] },
+              "description": "거를 종류. 생략하면 전부. deadline=e클래스 마감, academic=학사 일정, class=수업, exam=시험(확정된 것), user=내 일정·할 일, study=학습 블록"
             }
           },
           "required": ["from", "to"]
@@ -89,7 +89,7 @@
             "start": { "type": "string", "description": "시작. 시각이 있으면 YYYY-MM-DDTHH:MM, 종일이면 YYYY-MM-DD" },
             "end": { "type": "string", "description": "끝. start 와 같은 형식" },
             "allDay": { "type": "boolean", "description": "종일 일정 여부" },
-            "category": { "type": "string", "enum": ["personal", "study", "team", "appointment", "other"], "description": "분류 (⚠️ C1 과 동기화 필요)" },
+            "category": { "type": "string", "enum": ["personal", "study", "team", "etc"], "description": "분류 — personal=개인, study=학업, team=팀플, etc=기타" },
             "repeat": { "type": "string", "description": "반복 규칙 (예: weekly:TU). 없으면 생략" }
           },
           "required": ["title", "start", "end", "allDay", "category"]
