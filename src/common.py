@@ -63,9 +63,19 @@ def load_jsonl(path: str | Path, limit: Optional[int] = None) -> list[dict]:
 
 def write_jsonl(path: str | Path, rows: list[dict]) -> None:
     ensure_dir(Path(path).parent)
-    with open(path, "w", encoding="utf-8") as f:
+    with open(path, "w", encoding="utf-8", newline="\n") as f:      # LF 고정 — Windows 에서 만들어도 pod 와 같은 바이트(sha256 일치)
         for r in rows:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
+
+
+# 거절 턴 채점 — 도구를 안 부른 것만으로는 부족하고 거절 표현이 있어야 맞음으로 친다.
+# (prepare_f9 의 거절 문장은 모두 "…수 없습니다" 꼴. "수정을 도와드리겠습니다" 같은 답은 거절이 아니다)
+REFUSAL_MARKERS = ("수 없", "불가", "어렵습니다", "지원하지 않", "할 수가 없")
+
+
+def is_refusal_text(text: str) -> bool:
+    t = strip_think(text)
+    return any(m in t for m in REFUSAL_MARKERS)
 
 
 def load_tools(path: str | Path) -> tuple[list[dict], dict[str, str]]:
@@ -325,4 +335,6 @@ if __name__ == "__main__":
     inj = inject_tools_system(flat, [{"type": "function", "function": {"name": "navigate", "parameters": {}}}])
     assert inj[0]["role"] == "system" and "navigate" in inj[0]["content"]
     assert [m["role"] for m in inj] == ["system", "user", "assistant", "user", "assistant"]
+    assert is_refusal_text("e클래스에서 가져온 일정은 바꿀 수 없습니다.") and is_refusal_text("그건 제가 알 수 없습니다.")
+    assert not is_refusal_text("네, 수정을 도와드리겠습니다. 어떤 시간으로 옮길까요?")
     print("common.py 자가 점검 OK")

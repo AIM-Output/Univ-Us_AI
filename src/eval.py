@@ -12,7 +12,7 @@
   · 도구 선택 정확도   도구 턴에서 도구 이름이 맞는가
   · 인자 일치          정규화(날짜 ISO·공백·정렬) 후 인자 전체가 같은가
   · 필드 정확도        기대 인자 필드별 일치율
-  · 거절 정확도        첫 턴이 텍스트인 행(거절·범위 밖)에서 도구를 안 불렀는가
+  · 거절 정확도        첫 턴이 텍스트인 행(거절·범위 밖)에서 도구를 안 부르고 거절 표현('…수 없습니다' 등, common.REFUSAL_MARKERS)이 있는가
   · 텍스트 턴 정확도   텍스트 턴 전체(거절 + 도구 결과 뒤 답변)에서 도구를 안 부르고 빈 답이 아닌가
   · 턴 정확도          (인자까지 맞은 도구 턴 + 맞은 텍스트 턴) / 전체 턴
   · 지연               턴당 생성 시간
@@ -28,8 +28,8 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import (TOOL_CALL_CLOSE, detect_render_mode, ensure_dir, expected_call, lib_versions,  # noqa: E402
-                    load_jsonl, load_tools, normalize_value, parse_tool_call, render_chat, strip_think)
+from common import (TOOL_CALL_CLOSE, detect_render_mode, ensure_dir, expected_call, is_refusal_text,  # noqa: E402
+                    lib_versions, load_jsonl, load_tools, normalize_value, parse_tool_call, render_chat, strip_think)
 
 ROOT = Path(__file__).resolve().parents[1]
 HEADER = ["| 구분 | 턴 n | 도구 선택 | 인자 일치 | 필드 정확도 | 거절 정확도 | 텍스트 턴 정확도 | 턴 정확도 | 평균 지연(s) |",
@@ -109,13 +109,15 @@ def generate(torch, tok, model, prompt: str, max_new_tokens: int) -> tuple[str, 
     return text, time.time() - t0
 
 
-def score_turn(expected: dict | None, pred_text: str) -> dict:
-    """도구 턴: 이름·인자 채점. 텍스트 턴: 도구를 안 부르고 빈 답이 아니면 맞음."""
+def score_turn(expected: dict | None, pred_text: str, refusal: bool = False) -> dict:
+    """도구 턴: 이름·인자 채점. 텍스트 턴: 도구를 안 부르고 빈 답이 아니면 맞음.
+    거절 턴(refusal=True): 거기에 더해 거절 표현(is_refusal_text)이 있어야 맞음 — "도와드리겠다"고 답하면 틀림."""
     pred = parse_tool_call(pred_text)
     r = {"expected_tool": expected["name"] if expected else None, "pred_tool": pred["name"] if pred else None,
          "name_ok": False, "exact_ok": False, "field_total": 0, "field_ok": 0, "text_ok": None}
     if expected is None:
-        r["text_ok"] = pred is None and bool(strip_think(pred_text).strip())
+        text = strip_think(pred_text).strip()
+        r["text_ok"] = pred is None and bool(text) and (is_refusal_text(text) if refusal else True)
         return r
     if pred is None:
         r["field_total"] = len(expected["arguments"])
@@ -160,8 +162,8 @@ def main() -> None:
             prompt = render_chat(tok, msgs[:i], tl, add_generation_prompt=True)
             text, sec = generate(torch, tok, model, prompt, args.max_new_tokens)
             lat.append(sec)
-            s = score_turn(expected, text)
             prev_tool_turns = sum(1 for p in msgs[:i] if p.get("role") == "assistant" and p.get("tool_calls"))
+            s = score_turn(expected, text, refusal=(expected is None and prev_tool_turns == 0))
             s.update({"id": f"{row.get('id')}#t{turn}", "turn": turn,
                       "turn_type": "tool" if expected else ("refusal" if prev_tool_turns == 0 else "answer"),
                       "user": next((p["content"] for p in reversed(msgs[:i]) if p["role"] == "user"), ""),

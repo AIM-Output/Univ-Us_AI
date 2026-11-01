@@ -87,7 +87,7 @@
           "properties": {
             "title": { "type": "string", "description": "일정 이름" },
             "start": { "type": "string", "description": "시작. 시각이 있으면 YYYY-MM-DDTHH:MM, 종일이면 YYYY-MM-DD" },
-            "end": { "type": "string", "description": "끝. start 와 같은 형식" },
+            "end": { "type": "string", "description": "끝. start 와 같은 형식. 종일이면 마지막 날의 다음 날(exclusive) — 하루짜리 10/20 → 2026-10-21" },
             "allDay": { "type": "boolean", "description": "종일 일정 여부" },
             "category": { "type": "string", "enum": ["personal", "study", "team", "etc"], "description": "분류 — personal=개인, study=학업, team=팀플, etc=기타" },
             "repeat": { "type": "string", "description": "반복 규칙 (예: weekly:TU). 없으면 생략" }
