@@ -59,6 +59,7 @@ Univ-Us_Train/
 ├── tools/f9_tools.json   ← WE-Meet F9 도구 11개 스키마 (category·kinds enum 은 2026-11-02 에 C1 실제 값과 동기화)
 ├── src/common.py         ← 렌더(chat template + tools) · <tool_call> 파서 · 공용 유틸
 ├── src/prepare_f9.py     ← 한국어 합성 데이터 생성 → data/f9/{train,eval}.jsonl (평가셋 템플릿 패밀리 단위 분리)
+├── src/prepare_f9_v2.py  ← 추가 학습 데이터 v2 (말투 623패밀리 × 슬롯, 1만 건) → data/f9/extra_v2.jsonl → prepare_f9 --extra 로 train 에만 병합
 ├── src/train.py          ← QLoRA/LoRA, completion-only 손실, max_seq 초과 행 제거, HF push
 ├── src/eval.py           ← 모든 assistant 턴 채점 → 비교표 (도구 선택·인자·거절·텍스트 턴·지연)
 ├── train.sh  eval.sh     ← config.env → config.local.env → 셸 env 순으로 읽고 실행
@@ -102,7 +103,7 @@ Univ-Us_Train/
 ### 학습
 ```
 [내 PC]                                        [GPU 서버 pod]
-tools/f9_tools.json ─ prepare_f9.py ─▶ data/f9/train.jsonl · eval.jsonl
+tools/f9_tools.json ─ prepare_f9.py (+ prepare_f9_v2.py --extra) ─▶ data/f9/train.jsonl · eval.jsonl
 local_server (Flask :8601)  ◀── ssh -R 8601 ──  gpu_server /train/start
    GET /data/manifest · /data/*.jsonl  ─────────▶  sha256 검증 → ~/univus-train-out/data/f9/
                                                    bash train.sh  (QLoRA, config.env)
@@ -133,6 +134,8 @@ git switch gpu/qwen3-4b ; git merge common          # 공통 코드 바뀌었으
 .\scripts\tunnel.ps1                                # -L 8600 / -R 8601 (켜 둔 채로)
 .\local_server\run_local.ps1                        # 데이터 서버 :8601 (켜 둔 채로)
 python src\prepare_f9.py --n 1500 --seed 42         # data/f9 생성 (평가셋 고정: seed 바꾸지 말 것)
+python src\prepare_f9_v2.py --n 10000 --seed 7      # 추가 학습 데이터 v2 → data/f9/extra_v2.jsonl (+ extra_v2.README.md)
+python src\prepare_f9.py --n 1500 --seed 42 --extra data\f9\extra_v2.jsonl   # v2 를 train 에만 병합 (train 11,185행 · eval 315행 불변)
 ```
 ```bash
 # ── pod ──
@@ -176,6 +179,7 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 | 15 | pod 홈 정리 ("처음 구축" 기준) | ✅ | 2026-10-31 홈 1.3GB → **9.7GB 여유**. `.vscode-server` 빌드·확장·캐시 8.6GB 를 overlay 임시 폴더로 이동(설정 `data/User`·`Machine` 유지), pip·xet 캐시 제거. (11-01 VS Code Remote 재접속으로 서버·확장 2GB 재설치 → 여유 8GB) |
 | 16 | pod 실기기 스모크 — 새 데이터 받기 → `train.sh --max_steps 4 --max_train_rows 16` → `eval.sh --limit 12` | ✅ | 2026-11-02. Qwen3-4B nf4 가 MIG 9.5GiB 에서 적재·학습·평가 끝까지 OK. 16행 = 20쌍, 토큰 p50 2032 / max 2274 (<2560, 버림 0), 약 34 s/step, loss 1.83→0.55. 데이터 양방향 전송(내려받기 sha256 일치 · `/results` 업로드) 확인. 산출물 `~/univus-train-out/outputs/qwen3-4b-smoke/`, 로그 `~/univus-train-out/logs/smoke.log`, 스크립트 `~/univus-train-out/smoke_run.sh` |
 | 17 | 평가 거절 채점 보정 (`src/eval.py`) | ✅ | 2026-11-02. 거절 턴은 도구 미호출 + 거절 표현(`common.REFUSAL_MARKERS`)이 있어야 맞음. 이전엔 텍스트만 있으면 맞음이라 학습 전 모델의 '도와드리겠다' 도 100% 로 잡혔다(pod 로그 §5 지적). 학습 데이터의 거절 문장 176건 전부 마커 포함 확인 |
+| 18 | 추가 학습 데이터 v2 — 1만 건 (`src/prepare_f9_v2.py` → `data/f9/extra_v2.jsonl`) | ✅ | 2026-11-02 19시. 1차 데이터는 **고유 사용자 문장 484개**(패밀리 템플릿 × 슬롯)라 평가셋의 다른 말투에 약했다(`open_placement` 0/13, 거절 29%, `list_events` 81%, '다음 주 X요일' → 이번 주). v2 는 **말투 623패밀리 × 날짜·시각·제목 슬롯**을 seed 7 로 결정적으로 조합, 정답 날짜는 전부 코드로 계산. 10,000행 = create 2,200(다음 주 X요일 655 · 종일 420 · 여러 날 110 · 끝 시각 명시 330 · 매주 210 · 24시간 표기 185 · 한국어 수사 185 · N월 N일 395) · list_events 1,500(범위 × kinds, '이번 주'는 월~일 모든 요일의 now) · navigate 800(16 route) · run_sync 400 · get_graduation 300 · get_attendance 400 · get_exams 300 · list_assignments 450 · **open_placement 600** · update 500(2-step, 원래 길이 유지·상대 이동·제목 변경) · delete 400(2-step) · **거절 1,600**(e클래스 400 · 학사일정/수업 600 · 범위 밖 600, 문장은 prepare_f9 와 동일 3종) · 인사/안내 텍스트 150 · 도구 결과 뒤 답변 400. 대비쌍 포함(수업 지워=거절 vs 스터디 지워=delete · 과제 마감 미뤄=거절 vs 과제 하기 미뤄=update · 과제=list_assignments vs 마감=list_events · 화면 열어=navigate vs 값 질문=get_* · 공부 블록 뭐 있어=list_events study vs 빈 시간 채워=open_placement). 품질: 고유 문장 9,978/10,000 · eval 문장과 겹침 0(정확히 같은 문장뿐 아니라 채움말·어미·'좀'·띄어쓰기를 정규화해도 0) · 생성기와 별개의 검산 스크립트로 날짜 1,990·시각 1,670·조회 범위 2,480건 재해석 → 불일치 0 · 시간대 없는 1~12시 0건 · 토큰 p50 ≈2,060 / max ≈2,380 (<2,560). `prepare_f9.load_extra` 가 외부 행의 `id`·`meta` 를 보존하도록 4줄 수정. **train.jsonl 11,185행(쌍 12,868) / eval.jsonl 불변(sha256 e53cf213…)**. 학습 시간 추정: 쌍 12,868 × 3 epoch ÷ 8 = 4,826 step × 38.9s ≈ **52시간**(1 epoch ≈ 17.4시간). 아키텍트 **APPROVED**(블로커 0, 비차단 11건 전부 반영 — 출결 2-step 답이 질문과 어긋나던 3틀 제외 · 은/는 · eval 유사 문장 필터 · 어색한 틀/채움말/느낌표 · 가짜 list_events 결과를 백엔드 모양 `{id,title,kind,start,end}` 로 통일 등). 재생성: `python src\prepare_f9_v2.py --n 10000 --seed 7` (5초) |
 
 ---
 
@@ -215,8 +219,9 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 2. ~~서버 기동 → 터널 → `/health` 200~~ ✅ (2026-10-31) — 다시 켤 때: pod `run_server.sh start`, 내 PC `tunnel.ps1` + `run_local.ps1`
 3. ~~첫 학습 run `qwen3-4b-f9`~~ ✅ (2026-11-02 02:33 → 09:52, 학습·평가·업로드 자동 완료 — §6-10). 데이터는 `data/f9`(seed 42, train 1,185 행 = 학습 쌍 1,568 / eval 315 행 = 358 쌍). 진행 확인은 `scripts/watch_train.py`(게이지) 또는 `GET /train/status`. **학습 중에는 터널과 로컬 서버를 끄지 말 것** (결과 업로드가 끝날 때 있음)
 4. ~~`/model/merge` → `/model/load` → `/v1/chat/completions` 도구 호출 확인 → WE-Meet 연결~~ ✅ (2026-11-02 — 어댑터 방식으로 서빙, WE-Meet 에 `F9_Chat_agent` 를 끼워 넣고 설치본에 배포, §6-11). WE-Meet 쪽 변경은 커밋 전 — 커밋·릴리스(`v*` 태그 → CI 빌드)는 사용자 결정
-5. `results/qwen3-4b-f9/compare.md` 로 3자 비교표 정리 (Base 행 추가)
-6. 그다음 F4 RAG 착수 여부 결정
+5. ~~추가 학습 데이터 v2 1만 건 생성~~ ✅ (2026-11-02, §6-18). 2차 학습은 사용자 결정 — 순서: `POST /model/unload`(서빙 해제) → 터널 + `local_server\run_local.ps1` 켜기(새 train.jsonl 을 pod 가 받아 감) → `POST /train/start {"run_name":"qwen3-4b-f9-v2"}`. 3 epoch 기준 ≈52시간, `config.env` 의 EPOCHS 를 1 로 두면 ≈17시간. 학습 중 WE-Meet 대화 기능은 멈춘다(같은 GPU)
+6. `results/qwen3-4b-f9/compare.md` 로 3자 비교표 정리 (Base 행 추가)
+7. 그다음 F4 RAG 착수 여부 결정
 
 ---
 
@@ -235,3 +240,6 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 | 2026-11-02 | 거절 턴 채점에 거절 표현 조건 추가 | 학습 전 모델이 거절하지 않았는데 100% 로 잡히면 Base/Instruct 행이 부풀려져 비교표 신뢰가 떨어진다(논문 약점) |
 | 2026-11-02 | WE-Meet 연결은 설치본에 직접 끼워 넣기(in-place) | 이 PC 에 Rust·Python 3.12·node_modules 가 없어 설치 파일을 다시 만들 수 없는데, 설치본 사이드카가 .py 원본과 `frontend/out` 을 그대로 담고 있어 같은 배치로 복사하면 바로 동작한다(화면만 `npm run build`, Node 22 있음). 정식 반영은 WE-Meet 커밋 → `v*` 태그 → CI 릴리스 |
 | 2026-11-02 | 서빙은 어댑터 방식(`source: adapter`), nf4 병합본은 비상용 | 병합(어댑터를 4-bit 가중치에 더한 뒤 재양자화)이 학습 결과를 깎는다 — 같은 13문장에서 병합본 8/13, 어댑터 10/13. 어댑터 방식은 평가(compare.md)와 같은 구성이라 수치가 그대로 적용된다. 대신 베이스 캐시(overlay)가 필요하고 턴당 1.5배쯤 느리다 |
+| 2026-11-02 | 추가 데이터 v2 는 손으로 1만 문장을 쓰지 않고 **말투 뱅크 × 슬롯 생성기**(`prepare_f9_v2.py`)로 만든다 | 1만 건의 날짜 정답을 사람이 쓰면 틀린다. 생성기는 now 를 랜덤으로 뽑고 정답을 코드로 계산하므로 '다음 주 X요일'·종일 end·반복 첫 날짜가 항상 규칙대로다. 약점이던 말투 다양성은 패밀리 623개(1차 ~60개)로 채운다 |
+| 2026-11-02 | v2 는 train 에만 넣고 **평가셋은 seed 42 그대로** 둔다 | 1차 학습(77.7%)과 같은 358턴으로 비교해야 2차 학습 효과를 말할 수 있다. v2 문장이 eval 문장과 하나도 같지 않음을 생성기가 검사한다 |
+| 2026-11-02 | 거절 답은 1차와 같은 고정 3문장, 인사·기능 질문에는 짧은 안내 문장 | 거절은 `REFUSAL_MARKERS` 채점과 백엔드 표시가 문장에 묶여 있다. 인사("안녕", "뭐 할 수 있어")에 거절 문장이 나가는 것은 어색해서 안내 문장을 따로 가르친다 |
