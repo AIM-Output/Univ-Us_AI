@@ -145,8 +145,10 @@ bash gpu_server/run_server.sh start|status|stop     # Flask :8600 (127.0.0.1)
 curl -H "Authorization: Bearer $KEY" http://127.0.0.1:8600/health
 curl -X POST -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d '{"run_name":"qwen3-4b-f9"}' http://127.0.0.1:8600/train/start
 curl -H "Authorization: Bearer $KEY" http://127.0.0.1:8600/train/status
+python scripts/watch_train.py                                        # 학습 진행 게이지 (30초마다 갱신, --once 한 번)
 curl -X POST ... -d '{"run_name":"qwen3-4b-f9"}'                 http://127.0.0.1:8600/model/merge
-curl -X POST ... -d '{"source":"merged"}'                        http://127.0.0.1:8600/model/load
+curl -X POST ... -d '{"source":"adapter","run_name":"qwen3-4b-f9"}'  http://127.0.0.1:8600/model/load   # 서빙(어댑터 방식, 1분). 병합본이면 {"source":"merged"}
+python scripts/f9_chat.py "내일 오후 3시 스터디 2시간"                 # 서빙 중 모델에 도구 11개 붙여 한 문장 보내기 (인자 없으면 대화 모드)
 curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 주 마감 뭐 남았어?"}],"tools":[...]}' http://127.0.0.1:8600/v1/chat/completions
 ```
 전체 설명과 응답 예시: [gpu_server/README.md](gpu_server/README.md).
@@ -166,8 +168,8 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 | 7 | pod 환경 설치 (`setup_server.sh`) | ✅ STATUS=DONE | venv 7.6GB · Qwen3-4B 캐시 7.6GB (overlay). pip 캐시가 홈을 채워 삭제함 → 스크립트가 pip·xet 캐시를 overlay 로 보내도록 수정됨 |
 | 8 | pod 에 `config.local.env` (API 키) | ✅ | |
 | 9 | gpu_server 기동 + 터널 `/health` | ✅ | 2026-10-31 06:36 `run_server.sh start` → 내 PC 에서 `http://127.0.0.1:8600/health` 200 (state idle, VRAM 9.39GiB 여유) · pod 에서 역터널로 `http://127.0.0.1:8601/data/manifest` 200 (sha256 포함, 무인증 401). **터널·로컬 서버는 내 PC 에서 켜 둔 동안만 유효** — 다시 켤 때 `scripts\tunnel.ps1` + `local_server\run_local.ps1` |
-| 10 | 첫 학습 run (`qwen3-4b-f9`) | 🔄 | 학습 쌍 1,568 × 3 epoch = 588 step. pod 스모크 실측 약 34 s/step → 학습 약 5.5h + 평가(315건 × 2회) 약 1h. **2026-11-02 02:33(내 PC 시각) 시작** — 데이터 받기 OK, 예상 완료 09:00~10:00. 확인: `GET /train/status`. 시작 명령: 내 PC 에서 `POST /train/start {"run_name":"qwen3-4b-f9"}` |
-| 11 | 병합 → 적재 → WE-Meet `.env` 연결 | ⬜ | 홈 1.3GB 라 병합본은 overlay 대체 예상 |
+| 10 | 첫 학습 run (`qwen3-4b-f9`) | ✅ | 2026-11-02 02:33 시작 → 08:57 학습 끝(588 step, 6h 24m, 38.9 s/step, train_loss 0.036, 토큰 p50 2082 / max 2340, 버림 0) → 평가 2회 09:52 끝 → 업로드 15개 전부 성공 → `checkpoint-400`·`588` 자동 삭제. 결과: 내 PC `results/qwen3-4b-f9/`(어댑터 66MB · eval_base/adapter.md+json · compare.md · train.log), pod `~/univus-train-out/outputs/qwen3-4b-f9/`. **compare.md(358턴)**: 턴 정확도 33.2% → **77.7%**, 도구 선택 68.3 → 91.1%, 인자 일치 40.3 → 88.4%, 거절 1.5 → 29.2%. 약점: `open_placement` 13턴 전부 `list_events` 로 오답, 거절 65턴 중 29% 만 거절(나머지는 `list_events` 호출), `list_events` 선택 81%. 나머지 8개 도구는 100%. loss 가 step 100 에 이미 0.016 — 템플릿 데이터를 외운 것이라 평가셋 밖 일반화는 별도 확인 필요 |
+| 11 | 병합 → 적재 → 도구 호출 확인 → WE-Meet `.env` 연결 | ✅ 서빙 중 / ⬜ WE-Meet | 2026-11-02 15:08. `/model/merge`(gpu-nf4) → 홈 `~/univus-train-out/models/qwen3-4b-f9-merged-nf4/` 2.66GB(홈 여유 5.35GB) → `/model/load` 4초. 그런데 **같은 13문장을 병합본과 어댑터 방식으로 비교하니 병합본 7/13, 어댑터 10/13** — 병합본은 '이번 주 마감' 을 지난주(10/25~11/1)로, 출석 질문에 도구 대신 과목을 되묻고, 학사일정 삭제 요청에 거절 대신 삭제를 제안(nf4 재양자화 손실). 어댑터 방식은 평가와 같은 구성이라 결과가 compare.md 와 일치. **그래서 지금 서빙은 `/model/load {"source":"adapter","run_name":"qwen3-4b-f9"}`** (적재 1분, VRAM 여유 6.6GiB). 둘 다 틀린 것: '다음 주 목요일' → 이번 주 목요일(11/5), '빈 시간 채워줘' → `list_events`, '수강신청 기간 삭제' 거절 못 함. 지연(서버 측): 어댑터 도구 호출 3~8s, 병합본 2~5s (프롬프트 ≈2,000 tok — 도구 11개 스키마), 도구 없는 49 tok 프롬프트 1.3~1.7s. 도구 결과를 돌려주면 자연어 요약도 됨(학습엔 없던 턴). 테스트: `scripts/f9_chat.py "문장"`. WE-Meet 값은 `LLM_MAIN_BASE_URL=http://127.0.0.1:8600/v1` · `LLM_MAIN_API_KEY=<UNIVUS_API_KEY>` · `LLM_MAIN_MODEL=univus-f9` 인데, 2026-11-02 현재 WE-Meet 저장소에 F9 백엔드가 없음(`/chat` 은 프런트 데모 데이터만, `.env` 파일도 없음) → 넣을 곳이 생기면 연결 |
 | 12 | 3자 비교표(Base / Instruct / 학습 후) | ⬜ | `BASE_MODEL_ID=Qwen/Qwen3-4B-Base bash eval.sh` |
 | 13 | `tools/f9_tools.json` 의 `category`·`kinds` enum 을 WE-Meet C1 실제 값과 맞추기 | ✅ | 2026-11-02. category = C1 `config.py` CATEGORIES(personal·study·team·etc), kinds = 백엔드 `main.py` CALENDAR_SOURCES 의 kind(deadline·academic·class·exam·user·study, todo 제거). `data/f9` 같은 seed 로 재생성 → pod 재배포. 같은 날 2차: 종일 일정 `end` 를 exclusive(다음 날, C1-R14)로 고쳐 다시 재생성(train 1,568쌍 / eval 358쌍, 종일 57건 모두 end=start+1) |
 | 14 | F4 RAG (parse/index/summarize/generate/ask) | ⬜ | 아직 시작 안 함 |
@@ -184,7 +186,9 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 - **홈 10GB**: 2026-10-31 정리로 9.7GB 여유 → 병합본(≈2.8GB)은 홈 `~/univus-train-out/models/` 에 영구 보관 가능(기본 `MODELS_DIR`). 홈을 다시 채우는 범인은 pip 캐시·hf-xet 캐시·`.vscode-server` 이므로, 설치 스크립트는 캐시를 overlay 로 보내고, VS Code Remote 는 꼭 필요한 확장만 설치할 것. overlay 의 옛 팀 venv `~/.venv/univus-ai`(7.9GB)는 홈과 무관해 그대로 둠(재시작 시 소멸).
 - 학습 후 홈에 남는 것: 어댑터 ≈132MB · run.json · 평가 md. `checkpoint-*` 는 업로드 성공 후 자동 삭제.
 - `/train/stop` 은 프로세스 그룹 전체를 종료해야 함(수정 중). 서버 종료 전 학습 중이면 먼저 `/train/stop`.
-- WE-Meet C4 브리핑의 `LLM_TIMEOUT=3`초는 nf4 4B 가 못 맞출 수 있음 → 측정 후 C4 쪽 조정 필요.
+- **서빙은 어댑터 방식**(`/model/load {"source":"adapter","run_name":"qwen3-4b-f9"}`). nf4 병합본은 같은 13문장에서 7/13 vs 어댑터 10/13 로 눈에 띄게 나빴다(§6-11). 병합본은 pod 재시작으로 베이스 캐시가 사라졌을 때의 비상용 — 어댑터 적재에는 overlay 의 Qwen3-4B 캐시(setup prefetch)가 필요하다.
+- 서빙 중에는 학습·병합 불가(상태 기계). 학습하려면 먼저 `POST /model/unload`.
+- WE-Meet C4 브리핑의 `LLM_TIMEOUT=3`초 — 2026-11-02 실측: 도구 없는 49 tok 프롬프트 1.3~1.7s 로 통과, 도구 11개 붙은 ≈2,000 tok 프롬프트(F9)는 어댑터 3~8s / 병합본 2~5s 로 F9 "첫 응답 3초" 미달. 서버는 스트리밍 미지원.
 - `huggingface-cli` 는 없음, CLI 는 `hf` (`hf auth login`, `hf repos create`, `hf upload`, `hf download`).
 - `.gitignore` 는 줄 끝 주석을 지원하지 않음(한 번 당한 버그).
 - 캐글 브랜치: T4 는 bf16 없음(fp16), 세션 12h, 디스크 초기화 → 어댑터 HF push 필수, EPOCHS=1 부터.
@@ -205,8 +209,8 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 
 1. ~~서버 코드 2차 검증 지적 반영 → 커밋 → 병합 → 재배포~~ ✅ (2026-10-31)
 2. ~~서버 기동 → 터널 → `/health` 200~~ ✅ (2026-10-31) — 다시 켤 때: pod `run_server.sh start`, 내 PC `tunnel.ps1` + `run_local.ps1`
-3. 🔄 **2026-11-02 02:33 시작** (`run_name` qwen3-4b-f9). 데이터는 `data/f9`(seed 42, train 1,185 행 = 학습 쌍 1,568 / eval 315 행 = 358 쌍 — enum 동기화 + 종일 end exclusive 반영). 내 PC 에서 `/train/start {"run_name":"qwen3-4b-f9"}` → `/train/status` 로 loss 확인 (수 시간). **학습 중에는 터널과 로컬 서버를 끄지 말 것** (데이터 다운로드는 시작 직후 한 번, 결과 업로드는 끝날 때)
-4. `/model/merge` → `/model/load {"source":"merged"}` → `/v1/chat/completions` 도구 호출 확인 → WE-Meet `.env` 연결
+3. ~~첫 학습 run `qwen3-4b-f9`~~ ✅ (2026-11-02 02:33 → 09:52, 학습·평가·업로드 자동 완료 — §6-10). 데이터는 `data/f9`(seed 42, train 1,185 행 = 학습 쌍 1,568 / eval 315 행 = 358 쌍). 진행 확인은 `scripts/watch_train.py`(게이지) 또는 `GET /train/status`. **학습 중에는 터널과 로컬 서버를 끄지 말 것** (결과 업로드가 끝날 때 있음)
+4. ~~`/model/merge` → `/model/load` → `/v1/chat/completions` 도구 호출 확인~~ ✅ (2026-11-02 — 병합본은 품질이 떨어져 **어댑터 방식**으로 서빙 중, §6-11) → WE-Meet `.env` 연결은 WE-Meet 에 F9 백엔드가 생긴 뒤 (값은 §6-11)
 5. `results/qwen3-4b-f9/compare.md` 로 3자 비교표 정리 (Base 행 추가)
 6. 그다음 F4 RAG 착수 여부 결정
 
@@ -225,3 +229,4 @@ curl -X POST ... -d '{"model":"x","messages":[{"role":"user","content":"이번 �
 | 2026-11-02 | 도구 enum 을 WE-Meet 코드 실제 값으로 (category `etc`, kinds 에서 `todo` 제거) | 임시값으로 학습하면 모델이 앱에 없는 `appointment`·`other` 를 내보낸다. 할 일은 C1 에서 kind=user + isTodo 라 별도 kind 가 없다 |
 | 2026-11-02 | 종일 일정 `end` = 다음 날(exclusive) 로 고친 뒤 학습 시작 (pod 로그 §7-1 의 두 갈래 중 '고친 뒤') | WE-Meet C1-R14 규칙. end=start 로 학습하면 모델이 앱 규칙과 다른 값을 내보낸다. 고치는 비용은 재생성 수 초 + 재배포 1분 |
 | 2026-11-02 | 거절 턴 채점에 거절 표현 조건 추가 | 학습 전 모델이 거절하지 않았는데 100% 로 잡히면 Base/Instruct 행이 부풀려져 비교표 신뢰가 떨어진다(논문 약점) |
+| 2026-11-02 | 서빙은 어댑터 방식(`source: adapter`), nf4 병합본은 비상용 | 병합(어댑터를 4-bit 가중치에 더한 뒤 재양자화)이 학습 결과를 깎는다 — 같은 13문장에서 병합본 7/13, 어댑터 10/13. 어댑터 방식은 평가(compare.md)와 같은 구성이라 수치가 그대로 적용된다. 대신 베이스 캐시(overlay)가 필요하고 턴당 1.5배쯤 느리다 |
