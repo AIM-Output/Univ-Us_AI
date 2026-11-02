@@ -423,8 +423,10 @@ def load_extra(paths: list[str], tools: list[dict]) -> list[dict]:
                 names = {tc["function"]["name"] for m in msgs for tc in (m.get("tool_calls") or []) if "function" in tc}
                 if not r.get("tools") and not names <= ours:
                     continue          # 우리 도구 밖을 부르는데 도구 정의가 없으면 쓸 수 없다
-                rows.append({"id": f"extra-{Path(p).stem}-{i:05d}", "messages": msgs, "tools": tl,
-                             "meta": {"tool": next(iter(names), "none"), "template": "extra", "kind": "extra", "source": str(p)}})
+                # 외부 행에 이미 id·meta 가 있으면 그대로 둔다 (prepare_f9_v2 의 패밀리·kind 를 train 에서도 추적)
+                rows.append({"id": r.get("id") or f"extra-{Path(p).stem}-{i:05d}", "messages": msgs, "tools": tl,
+                             "meta": r["meta"] if isinstance(r.get("meta"), dict) else
+                             {"tool": next(iter(names), "none"), "template": "extra", "kind": "extra", "source": str(p)}})
             elif r.get("instruction") and r.get("output"):
                 user = r["instruction"] + (f"\n\n{r['input']}" if r.get("input") else "")
                 rows.append({"id": f"extra-{Path(p).stem}-{i:05d}", "tools": tools,
