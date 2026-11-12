@@ -6,7 +6,7 @@
 | 모델 | `naver-clova-ix/donut-base` (Swin 인코더 + mBART 4층 디코더, 약 200M) — `config.env` 의 `MODEL_ID` 에만 |
 | 데이터 | `naver-clova-ix/synthdog-ko` — train 23,532행(parquet 4개) · validation 500행. 열 `image`={bytes,path} · `ground_truth`(JSON) |
 | 환경 | A100 MIG `1g.10gb` — **가용 9.5GiB**, bf16 · `HF_HUB_OFFLINE=1` (가중치·데이터는 서버에 미리 받아 둠) |
-| 방식 | 해상도 2560x1920 → **1280x960** · MAX_LEN 768 · fp32 가중치 + bf16 autocast · gradient checkpointing · batch 2 × accum 8 · LR 3e-5 · 8,000행 1 epoch(≈500 step) |
+| 방식 | 해상도 2560x1920 → **1280x960** · MAX_LEN 768 · fp32 가중치 + bf16 autocast · gradient checkpointing · batch 2 × accum 8 · LR 3e-5 · 23,532행 1 epoch(1,471 step · 실측 8.83 s/step · 216.5분 · peak 7.35GiB) |
 
 ## 왜 이 모델인가
 - **논문·데이터가 한 세트** — Donut 논문이 SynthDoG(합성 문서 생성기)와 함께 나왔고, 공개된 SynthDoG-ko 가 바로 그 데이터다.
@@ -37,6 +37,18 @@ OOM 이면 `BATCH=1 GRAD_ACCUM=16 bash train_ocr.sh`(유효 배치 유지) → �
 - **CER** = 편집거리(ref, hyp) / max(1, len(ref)) — 행별 평균. 낮을수록 좋다.
 - **1-NED** = 1 − 편집거리 / max(len(ref), len(hyp)) — 행별 평균(Donut 논문의 정규화 편집거리 기반 정확도). 높을수록 좋다.
 - **정확 일치율** · **문자 가중 CER** = Σ편집거리 / Σlen(ref) · **평균 지연**(s/장, greedy, batch 4, bf16).
+
+## 결과 (2026-11-13 · validation 500행 · greedy · bf16 · 1280x960)
+
+| 지표 | 학습 전 donut-base | 학습 후 | 변화 |
+| --- | --- | --- | --- |
+| CER 평균 ↓ | 60.64% | **5.19%** | -55.44%p |
+| 1-NED 평균 ↑ | 68.64% | **95.25%** | +26.61%p |
+| 정확 일치율 ↑ | 5.40% | 14.60% | +9.20%p |
+| 문자 가중 CER ↓ | 67.93% | 7.51% | -60.42%p |
+| 평균 지연 s/장 ↓ | 0.611 | 0.451 | -0.159s |
+
+최종 loss 0.047. 남은 오류는 긴 문단에서 중간부터 틀리거나 같은 어절을 반복 생성하는 경우(행 CER 100% 초과 4건). 전체 표·최악 10건·무작위 5건은 `eval_finetuned.md` · `compare.md` (내 PC `results/donut-ocr-ko/`).
 
 ## 인용
 - Geewook Kim et al., "OCR-free Document Understanding Transformer", ECCV 2022. arXiv:2111.15664
