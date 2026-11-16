@@ -1,0 +1,8 @@
+# 내 대화 기록 · LLM 키 — 공유하지 않는다
+data/
+.env
+.venv/
+
+__pycache__/
+*.pyc
+.pytest_cache/
