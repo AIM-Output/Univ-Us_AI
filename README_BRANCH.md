@@ -50,6 +50,47 @@ OOM 이면 `BATCH=1 GRAD_ACCUM=16 bash train_ocr.sh`(유효 배치 유지) → �
 
 최종 loss 0.047. 남은 오류는 긴 문단에서 중간부터 틀리거나 같은 어절을 반복 생성하는 경우(행 CER 100% 초과 4건). 전체 표·최악 10건·무작위 5건은 `eval_finetuned.md` · `compare.md` (내 PC `results/donut-ocr-ko/`).
 
+## 백엔드(WE-Meet)에서 쓰기 — `src/infer_ocr.py`
+
+파일 하나(표준 라이브러리 + torch · transformers · Pillow). WE-Meet `osenv.ocr` 과 같은 모양이라 `ocr_engine()` 이 돌려주는 모듈 자리에 그대로 넣을 수 있다.
+
+- **모델**: 내 PC `results/donut-ocr-ko/model/` 또는 릴리스 첨부 `donut-ocr-ko-model.zip`(풀면 `donut-ocr-ko/model/`). bf16 safetensors ≈400MB + processor + tokenizer.
+- **위치 지정**: env `OCR_MODEL_DIR=<…/donut-ocr-ko/model>`. 없으면 `<레포>/outputs/donut-ocr-ko/model` → `<레포>/results/donut-ocr-ko/model`. 못 찾으면 `available()["ok"]` False(이유에 `OCR_MODEL_DIR`), 함수는 None.
+- `UNIVUS_OCR=off` 면 끈다(osenv.ocr 과 같다). GPU 가 있으면 cuda·bf16, 없으면 cpu·fp32. 처음 `available()` 에서 한 번 올린다(≈10s).
+- 생성은 `eval_ocr.py`(CER 5.19%)와 같다 — `<s_synthdog>` 시작 · greedy · max_length 768 · `<unk>` 금지 · 특수 토큰 제거 → `normalize`.
+
+```python
+import infer_ocr as ocr                      # src/ 를 sys.path 에 (또는 파일을 복사)
+st = ocr.available()                         # {"ok","engine":"donut-ocr-ko","lang":"ko","korean","reason","device","model_dir"}
+if st["ok"] and st["korean"]:
+    texts = ocr.image_texts([png_bytes, "scan.jpg", pil_img])   # 이미지마다 str, 못 읽으면 None
+    one = ocr.image_text(png_bytes)
+eng = ocr.DonutOCR("donut-ocr-ko/model", device="cuda", batch=4)  # 모듈 싱글턴 대신 직접
+```
+
+```bash
+python src/infer_ocr.py --model results/donut-ocr-ko/model [--device cuda|cpu] [--batch 4] [--json] a.png b.jpg
+```
+
+| osenv.ocr | infer_ocr | 차이 |
+| --- | --- | --- |
+| `available(refresh=False)` | 같음 | `engine="donut-ocr-ko"` · `lang="ko"` · `device` · `model_dir` 가 더 있다 |
+| `image_texts(list[bytes])` | 같음 | bytes 외에 경로·PIL 도 받는다. 깨진 이미지·15MB 초과는 그 자리만 None |
+| `pdf_text(bytes, pages=3)` | 같음 | `pypdfium2` 가 있을 때만(앞 pages 쪽을 150dpi 로 그려 OCR, 쪽 사이 빈 줄). 없으면 None — 이유는 `pdf_support()`. requirements 에는 넣지 않았다 |
+| — | `image_text(x)` · `DonutOCR` | 한 장 · 모델을 직접 들고 쓰기 |
+
+**실측 (2026-11-16 · 내 PC RTX 4060 Laptop 8GB · 960x1280 합성 공지 3장, 맑은 고딕 36px 6줄 · 157~169자)**
+
+| 장치 | s/장 | 메모리 | CER |
+| --- | --- | --- | --- |
+| cuda bf16 · batch 1 | 1.11~1.19 (첫 장 2.07, 예열) | peak 0.72GiB allocated · 0.83GiB reserved | 0% · 0% · 1.78% |
+| cuda bf16 · batch 3 | 0.52 (첫 묶음 0.75) | peak 1.36GiB allocated · 1.67GiB reserved | 같은 글자 |
+| cpu fp32 · batch 1 | 8.7~10.1 | — | 같은 글자 |
+
+틀린 곳은 3장째 한 줄 끝 `연장되었습니다.` → `연장되었습` 뿐. 모델 올리기 ≈10~12s.
+
+**한계** — SynthDoG(합성 문서 이미지)로만 학습했다. 긴 문단은 중간부터 틀리거나 같은 어절을 반복할 수 있다(검증 500장 중 행 CER 100% 초과 4건). 줄바꿈·표·위치 없이 읽는 순서대로 이은 글자 한 줄만 낸다.
+
 ## 인용
 - Geewook Kim et al., "OCR-free Document Understanding Transformer", ECCV 2022. arXiv:2111.15664
 - 데이터: SynthDoG-ko — Hugging Face `naver-clova-ix/synthdog-ko`
