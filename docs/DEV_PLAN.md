@@ -226,6 +226,8 @@ gantt
     title 1차 개발 (2026-08-10 ~ 09-14)
     dateFormat YYYY-MM-DD
     axisFormat %m/%d
+    tickInterval 1week
+    weekday monday
 
     section 김건희 · LLM
     core — LLM 호출 계층          :crit, b1, 2026-08-10, 12d
