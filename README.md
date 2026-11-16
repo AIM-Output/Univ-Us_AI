@@ -6,7 +6,7 @@
 WE-Meet 쪽 코드는 손대지 않습니다. 앱은 `LLM_MAIN_BASE_URL · LLM_MAIN_API_KEY · LLM_MAIN_MODEL` 세 값만 읽으므로
 학습한 모델을 OpenAI 호환 서버로 띄우고 `.env` 의 `LLM_MAIN_BASE_URL` 을 그 서버로 바꾸면 그대로 붙습니다.
 
-> **이 저장소는 로컬 전용(원격 없음)입니다.** 데이터·학습 결과는 git 에 올라가지 않습니다(`.gitignore`).
+> **코드는 GitHub `logan0741/Univ-Us_AI` 에 브랜치로 올라가 있습니다**(2026-11-16 — `common` · `gpu/qwen3-4b` · `gpu/donut-ocr` · `gpu/hyperclovax-1.5b` · `kaggle/qwen3-8b`). 가중치는 같은 저장소의 **Release `weights-2026-11-13`**, 전체 안내는 그 저장소 `main` 의 README. 데이터·학습 결과는 git 에 올라가지 않습니다(`.gitignore`).
 > 어댑터와 데이터는 HF Hub(private) 로 주고받습니다 → [DATA_FLOW.md](DATA_FLOW.md)
 
 ---
@@ -69,9 +69,9 @@ bash eval.sh                     # 학습 전·후 같은 평가셋으로 채점
 - 모델을 바꿔 보려면 `config.env` 의 `MODEL_ID` 한 줄만 바꿉니다. `src/` 안에는 모델 이름이 없습니다.
 - 내 PC 에서만 쓰는 값(경로·토큰·실험용 모델)은 `config.local.env` 에 씁니다(gitignore). `RUN_NAME=run2 bash train.sh` 처럼 환경변수로 줘도 됩니다(파일보다 우선).
 
-### 서버로 코드 보내기 — 이 저장소에는 원격이 없다
+### 서버로 코드 보내기
 
-`git pull` 할 곳이 없으므로 **브랜치를 체크아웃한 폴더를 그대로 복사**합니다. `.git` `data` `outputs` `.venv` 는 빼고 보냅니다.
+2026-11-16 부터는 GitHub 에서 바로 받습니다 — 서버에서 `git clone -b gpu/qwen3-4b --single-branch https://github.com/logan0741/Univ-Us_AI.git univus-train` (OCR 은 `-b gpu/donut-ocr`). 아래는 원격이 없던 때의 방법으로, 내 PC 의 미커밋 변경을 그대로 보낼 때만 씁니다 — **브랜치를 체크아웃한 폴더를 그대로 복사**합니다. `.git` `data` `outputs` `.venv` 는 빼고 보냅니다.
 
 ```bash
 # 내 PC (Git Bash) — 서버 접속 설정은 docs/SSH-서버-접속-가이드.md 의 host 별칭을 그대로 쓴다
