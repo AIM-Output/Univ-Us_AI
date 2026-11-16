@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420" font-family="'Malgun Gothic','Apple SD Gothic Neo','Noto Sans KR',sans-serif" font-size="13">
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5f6b7a"/></marker>
+    <style>
+      .box{fill:#f7f9fc;stroke:#5f6b7a;stroke-width:1.4;rx:10}
+      .f9{fill:#eef4ff;stroke:#2f5bd1}
+      .ocr{fill:#fff4e8;stroke:#c7641b}
+      .t{fill:#1f2933}.s{fill:#52606d;font-size:11.5px}.h{font-weight:700;font-size:14px}
+      .lane{fill:none;stroke:#cbd2d9;stroke-dasharray:4 4}
+      .arrow{stroke:#5f6b7a;stroke-width:1.6;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="960" height="420" fill="#ffffff"/>
+  <!-- lanes -->
+  <text x="14" y="26" class="t h">① 데이터</text>
+  <text x="206" y="26" class="t h">② 학습 — 학교 GPU pod (A100 MIG 1g.10gb · 9.5GiB)</text>
+  <text x="520" y="26" class="t h">③ 가중치 — GitHub Release</text>
+  <text x="742" y="26" class="t h">④ 서빙 → WE-Meet 백엔드</text>
+  <line x1="196" y1="36" x2="196" y2="400" class="lane"/><line x1="510" y1="36" x2="510" y2="400" class="lane"/><line x1="732" y1="36" x2="732" y2="400" class="lane"/>
+
+  <!-- F9 row -->
+  <text x="14" y="62" class="s">F9 자연어 대화 (Function Calling)</text>
+  <rect x="14" y="70" width="168" height="92" class="box f9"/>
+  <text x="24" y="92" class="t h">합성 대화 데이터</text>
+  <text x="24" y="112" class="s">prepare_f9.py — 1,500건 (seed 42)</text>
+  <text x="24" y="128" class="s">train 1,185 / eval 315행 · 도구 11개</text>
+  <text x="24" y="146" class="s">v2 생성기 +10,000건 (추가 학습용)</text>
+
+  <rect x="210" y="70" width="286" height="92" class="box f9"/>
+  <text x="220" y="92" class="t h">Qwen3-4B · QLoRA(4-bit, r=16)</text>
+  <text x="220" y="112" class="s">train.sh → 3 epoch · 588 step · 6.4h · loss 0.036</text>
+  <text x="220" y="128" class="s">eval.sh → 같은 평가셋으로 학습 전/후 채점</text>
+  <text x="220" y="146" class="s">턴 정확도 33.2% → 77.7% · 도구 선택 91.1%</text>
+
+  <rect x="524" y="70" width="194" height="92" class="box f9"/>
+  <text x="534" y="92" class="t h">qwen3-4b-f9</text>
+  <text x="534" y="112" class="s">adapter.zip  (LoRA, 54MB)</text>
+  <text x="534" y="128" class="s">merged-nf4.zip + .z01  (2.4GB)</text>
+  <text x="534" y="146" class="s">= 베이스+어댑터 병합 4-bit, 단독 서빙</text>
+
+  <rect x="746" y="70" width="200" height="92" class="box f9"/>
+  <text x="756" y="92" class="t h">gpu_server (Flask :8600)</text>
+  <text x="756" y="112" class="s">OpenAI 호환 /v1/chat/completions</text>
+  <text x="756" y="128" class="s">WE-Meet .env: LLM_MAIN_BASE_URL</text>
+  <text x="756" y="146" class="s">F9_Chat_agent → 도구 호출·미리보기</text>
+
+  <!-- OCR row -->
+  <text x="14" y="226" class="s">한국어 문서 OCR</text>
+  <rect x="14" y="234" width="168" height="92" class="box ocr"/>
+  <text x="24" y="256" class="t h">SynthDoG-ko</text>
+  <text x="24" y="276" class="s">합성 한국어 문서 이미지 (naver-clova-ix)</text>
+  <text x="24" y="292" class="s">train 23,532장 (parquet 4/85)</text>
+  <text x="24" y="310" class="s">validation 500장</text>
+
+  <rect x="210" y="234" width="286" height="92" class="box ocr"/>
+  <text x="220" y="256" class="t h">Donut-base (202M) · 전체 미세조정</text>
+  <text x="220" y="276" class="s">train_ocr.sh → 1 epoch · 1,471 step · 3.6h</text>
+  <text x="220" y="292" class="s">1280×960 · bf16 autocast · batch 2×8</text>
+  <text x="220" y="310" class="s">CER 60.6% → 5.2% · 1-NED 95.3%</text>
+
+  <rect x="524" y="234" width="194" height="92" class="box ocr"/>
+  <text x="534" y="256" class="t h">donut-ocr-ko</text>
+  <text x="534" y="276" class="s">model.zip (bf16 safetensors, 321MB)</text>
+  <text x="534" y="292" class="s">+ processor · tokenizer</text>
+  <text x="534" y="310" class="s">+ run.json · train.log</text>
+
+  <rect x="746" y="234" width="200" height="92" class="box ocr"/>
+  <text x="756" y="256" class="t h">src/infer_ocr.py</text>
+  <text x="756" y="276" class="s">available() · image_texts([bytes…])</text>
+  <text x="756" y="292" class="s">= osenv.ocr 과 같은 모양 → 드롭인</text>
+  <text x="756" y="310" class="s">F1 needs_ocr · F11/F12 포스터 읽기</text>
+
+  <!-- arrows -->
+  <path d="M182,116 L208,116" class="arrow"/><path d="M496,116 L522,116" class="arrow"/><path d="M718,116 L744,116" class="arrow"/>
+  <path d="M182,280 L208,280" class="arrow"/><path d="M496,280 L522,280" class="arrow"/><path d="M718,280 L744,280" class="arrow"/>
+
+  <!-- footer -->
+  <text x="14" y="372" class="s">코드는 목적별 브랜치: common(공통 src · gpu_server) · gpu/qwen3-4b(F9) · gpu/donut-ocr(OCR) · wemeet/f9-chat-integration(백엔드 패치)</text>
+  <text x="14" y="392" class="s">pod 는 2026-11-13 까지만 사용 가능했고 그 뒤 소멸 — 재현은 아무 NVIDIA GPU(8GB 이상)에서 같은 명령으로 된다. 평가표: docs/eval/</text>
+</svg>

@@ -1,613 +1,290 @@
-# Univ-Us_AI
+<h1 align="center">Univ-Us AI</h1>
 
-인공지능혁신융합사업단 WE-Meet 프로젝트 **Output** 팀의 Univ-Us 프로젝트 「캠퍼스메이트(CampusMate)」에서
-**AI 에이전트 부분**을 개발하는 저장소입니다.
+<p align="center">
+  <strong>대학생 일정 비서 WE-Meet(유니버스)에 들어갈 AI 를 외부 API 없이 직접 학습한다 —<br>
+  F9 자연어 대화(Function Calling) 모델과 한국어 문서 OCR 모델을 학교 GPU 서버에서 미세조정해, OpenAI 호환 서버·드롭인 모듈로 백엔드에 붙인다</strong>
+</p>
 
----
+<p align="center">
+  <a href="../../releases/tag/weights-2026-11-13"><strong>Weights (Release)</strong></a> ·
+  <a href="../../tree/gpu/qwen3-4b"><strong>F9 학습·서빙</strong></a> ·
+  <a href="../../tree/gpu/donut-ocr"><strong>OCR</strong></a> ·
+  <a href="../../tree/wemeet/f9-chat-integration"><strong>백엔드 연결 패치</strong></a> ·
+  <a href="../../blob/common/HANDOFF.md"><strong>HANDOFF (전체 기록)</strong></a> ·
+  <a href="docs/eval/"><strong>평가 결과</strong></a>
+</p>
 
-## 문서 지도 — 어디서 무엇을 보나
+<p align="center">
+  모델 <strong>Qwen3-4B (QLoRA)</strong> · <strong>Donut-base (전체 미세조정)</strong> · 학습 환경 <strong>A100 MIG 1g.10gb (9.5GiB)</strong> · 수행 김건희 (전남대학교 · WE-Meet Output 팀 AI)
+</p>
 
-읽는 순서가 정해져 있습니다. **아래로 갈수록 구체적**입니다.
+> [!NOTE]
+> `main` 은 **프로젝트 입구**다 — 이 문서와 그림([assets/](assets/))·평가표([docs/eval/](docs/eval/))·팀 규칙([docs/](docs/))만 있고 코드는 없다.
+> **코드는 목적별 브랜치에 있다** — 공통 코드·서버는 [`common`](../../tree/common), F9 학습은 [`gpu/qwen3-4b`](../../tree/gpu/qwen3-4b), OCR 은 [`gpu/donut-ocr`](../../tree/gpu/donut-ocr), WE-Meet 에 붙이는 패치는 [`wemeet/f9-chat-integration`](../../tree/wemeet/f9-chat-integration).
+> 가중치는 GitHub [Release `weights-2026-11-13`](../../releases/tag/weights-2026-11-13). 어느 브랜치를 받아야 하는지는 [저장소 구조](#저장소-구조) 표를 보면 된다.
 
-| 순서 | 문서 | 답해주는 질문 |
-| --- | --- | --- |
-| 1 | **README** (이 문서) | 규칙이 뭔가 — 브랜치·커밋·이슈·환경 설치 |
-| 2 | [**Univ-Us_기능명세서.md**](Univ-Us_기능명세서.md) | **무엇을** 만드는가 — F1~F17 요구사항, 데이터 흐름(DF-1~DF-5), 인수 기준 |
-| 3 | [**Univ-Us_역할별_기능분해서.md**](Univ-Us_역할별_기능분해서.md) | **누가** 만드는가 — AI/BE/FE 역할 경계, 영역 간 인터페이스 계약 |
-| 4 | [**docs/AI_MODULES.md**](docs/AI_MODULES.md) | AI 저장소는 **어떻게** 만드는가 — 9개 기능별 MVP·완료 기준 |
-| 5 | [**docs/DEV_PLAN.md**](docs/DEV_PLAN.md) | **지금 무엇을 하고 있는가** — 1차 개발 계획(~9/14), 역할 분담, 칸반 규칙 |
-| 6 | [**docs/plans/**](docs/plans/) | **내가 어떻게 만들 것인가** — 각자 작성하는 세부 계획 |
+**전체 구조 한 장** — 합성 데이터(①)로 학교 GPU 서버에서 학습(②)한 가중치가 Release(③)에 올라가고, 백엔드는 그것을 OpenAI 호환 서버 또는 파이썬 모듈로 받아 쓴다(④):
 
-**기능 정의가 서로 다르면 2·3번이 기준입니다.** 4번은 그것을 이 저장소의 구현 단위로 옮긴 문서입니다.
+<p align="center">
+  <img src="assets/univus_ai_flow_ko.svg" alt="Univ-Us AI 전체 흐름 — 데이터·학습·가중치·서빙" width="960">
+</p>
 
-> **지금 개발을 시작하는 사람은 [docs/DEV_PLAN.md](docs/DEV_PLAN.md) 부터 보세요.**
-> 내가 뭘 맡았고, 언제까지고, 무엇부터 하면 되는지가 거기 있습니다.
+<br>
 
-위 순서와 별개로, **서버에 접속해야 할 때** 보는 문서가 하나 더 있습니다.
+### Table of Contents
 
-| 문서 | 언제 |
-| --- | --- |
-| [**docs/SSH-서버-접속-가이드.md**](docs/SSH-서버-접속-가이드.md) | 학교 서버에 **접속**할 때 — SSH 설정, VS Code Remote-SSH |
-| [**docs/서버-작업환경-설정.md**](docs/서버-작업환경-설정.md) | 접속한 뒤 **개발 환경을 세팅**할 때 — venv 설치·재설치, GitHub push 용 SSH 키, `gh` 설치, pod 재시작 복구 |
+- [Highlights](#highlights)
+- [결과](#결과)
+- [백엔드에 적용하기](#백엔드에-적용하기)
+  - [A. F9 모델 서버 띄우기](#a-f9-모델-서버-띄우기-nf4-병합본--gpu_server)
+  - [B. WE-Meet 에 F9 대화 붙이기](#b-we-meet-에-f9-대화-붙이기)
+  - [C. OCR 모델 쓰기](#c-ocr-모델-쓰기-srcinfer_ocrpy)
+- [왜 이렇게 만들었나](#왜-이렇게-만들었나)
+- [재현](#재현)
+- [저장소 구조](#저장소-구조)
+- [문서 찾기](#문서-찾기)
+- [모델·데이터·논문](#모델데이터논문)
 
-> 위 문서에 없는 것 — **기술 스택 원칙(4.3), 프로젝트 목표(G1~G4), 협업 규칙(6.2)** — 은
-> 계획서 원본에만 있습니다. 원본은 개인정보가 포함되어 있어 저장소에 두지 않으니 팀 채널에서 받으세요.
+<br>
 
----
+### Highlights
 
-## 목차
+- **F9 Function Calling — 턴 정확도 33.2% → 77.7%.** Qwen3-4B 를 QLoRA(4-bit, r=16)로 3 epoch 학습. 같은 평가셋(315행·358턴)으로 학습 전 Instruct 와 비교해 도구 선택 68.3% → 91.1%, 인자 일치 40.3% → 88.4%. 도구 11개 중 8개는 100%.
+- **9.5GiB 한 조각에서 학습과 서빙을 다 했다.** A100 80GB 의 MIG `1g.10gb` 슬라이스 하나(실제 9.5GiB)가 전부였다. 4B 를 4-bit 로 학습하고, 어댑터를 병합해 **nf4 로 저장(2.65GB)** 하면 같은 GPU 에서 서빙까지 된다. 내 PC 의 RTX 4060 8GB 에서도 33초에 뜬다(아래 A).
+- **학습 데이터는 전부 코드로 만들었다 — 정답에 사람 손이 안 들어간다.** "다음 주 목요일 저녁 8시" 같은 날짜·시각 정답은 생성기가 계산하고, 평가셋은 **말투 패밀리 단위로 분리**해 학습에 절대 들어가지 않는다. 1차 1,500건(seed 42) + 추가 학습용 v2 생성기 **10,000건**(말투 623패밀리 × 슬롯).
+- **백엔드에 실제로 붙여 봤다.** WE-Meet 설치본에 `F9_Chat_agent` 를 끼워 넣고 13문장 서빙 테스트(어댑터 10/13 · 병합본 8/13). 모델은 도구만 고르고, 숫자 계산·날짜 재검증·쓰기 미리보기는 규칙 코드가 한다 — 모델이 틀려도 막힌다.
+- **한국어 문서 OCR — CER 60.6% → 5.2%.** Donut-base(202M)를 SynthDoG-ko 23,532장으로 1 epoch(3.6h) 전체 미세조정. 검증 500장에서 1-NED 68.6% → 95.3%. 깨끗한 공지문 이미지 3장은 CER 0 · 0 · 1.8%(RTX 4060, 1.1 s/장). 논문·데이터·HF 구현이 한 세트라 하루 안에 끝났다.
+- **서버가 사라져도 재현된다.** pod 는 2026-11-13 까지만 쓸 수 있었다. 코드(브랜치)·가중치(Release)·평가표(`docs/eval/`)·결정 이유(`HANDOFF.md`)를 전부 남겨, NVIDIA GPU 8GB 이상이면 같은 명령으로 다시 돈다.
 
-1. [이 저장소의 범위](#1-이-저장소의-범위)
-2. [기능 분해와 담당 브랜치](#2-기능-분해와-담당-브랜치)
-3. [개발 환경 설치](#3-개발-환경-설치)
-4. [브랜치 생성 규칙](#4-브랜치-생성-규칙)
-5. [커밋 메시지 작성법](#5-커밋-메시지-작성법)
-6. [이슈 처리 규칙 (카카오톡 + GitHub Issue)](#6-이슈-처리-규칙-카카오톡--github-issue)
-7. [PR(Pull Request) 규칙](#7-prpull-request-규칙)
-8. [디렉터리 구조](#8-디렉터리-구조)
-9. [자주 막히는 지점](#9-자주-막히는-지점)
+<br>
 
----
+### 결과
 
-## 1. 이 저장소의 범위
+**F9 Function Calling** — `data/f9/eval.jsonl` 315행·358턴, 같은 프롬프트, greedy, 모든 assistant 턴 채점(teacher forcing). 전체·도구별·실패 사례: [docs/eval/f9-qwen3-4b/](docs/eval/f9-qwen3-4b/)
 
-### 여기서 개발하는 것
+| 구분 | 턴 n | 도구 선택 | 인자 일치 | 필드 정확도 | 거절 정확도 | 턴 정확도 | 평균 지연(s, MIG 1g.10gb) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 학습 전 Qwen3-4B Instruct | 358 | 68.3% | 40.3% | 50.0% | 1.5% | 33.2% | 4.44 |
+| **학습 후 (QLoRA 어댑터)** | 358 | **91.1%** | **88.4%** | **90.3%** | 29.2% | **77.7%** | 4.56 |
 
-계획서 4.3의 **AI 계층 전체** — 문서 이해, 구조화 추출, RAG, 도구 호출, 능동 브리핑, 그리고 정확성이 필요한 규칙 기반 계산.
+도구별(학습 후): `create_event` 인자 87.0% · `list_events` 79.7% · `delete_event` `get_attendance` `get_exams` `list_assignments` `navigate` `run_sync` 100% · **`open_placement` 0%**(13턴 전부 `list_events` 등 다른 도구로 — 1차 데이터의 고유 문장이 484개뿐이라 다른 말투에 약했다. v2 데이터 10,000건은 이 도구에 600건, 거절에 1,600건을 배정해 이 구멍을 메우도록 만들었고, 추가 학습은 서버 만료로 아직 돌리지 못했다) · 거절(도구를 부르면 안 되는 질문) 29.2% 가 가장 약하다.
+서빙 상태의 서버에 실제 문장 13개를 보낸 기록은 [serving_test.md](docs/eval/f9-qwen3-4b/serving_test.md) — 어댑터 적재 10/13, nf4 병합본 8/13(병합·재양자화에서 날짜 계산이 조금 흔들린다).
 
-[역할별 분해서 1장](Univ-Us_역할별_기능분해서.md)의 기준으로는 **AI 영역**(정답이 하나로 정해지지 않는 처리) 전부와,
-**BE 영역의 결정적 계산 중 `rule_ai-agent` 부분**입니다.
+**한국어 문서 OCR** — SynthDoG-ko validation 500장, 1280×960, greedy, bf16. 최악 10건·무작위 5건: [docs/eval/donut-ocr-ko/](docs/eval/donut-ocr-ko/)
 
-> 결정적 계산이 왜 AI 저장소에 있는지는 [docs/AI_MODULES.md 의 `rule_ai-agent` 절](docs/AI_MODULES.md)에서 설명합니다.
-> 요약하면 ① 추출 스키마를 공유하고 ② 순수 함수라 테스트가 저장소 안에서 닫히기 때문입니다. **호출은 백엔드가 합니다.**
+| 지표 | 학습 전 `donut-base` | **학습 후** | 변화 |
+| --- | ---: | ---: | ---: |
+| CER 평균 ↓ | 60.64% | **5.19%** | −55.4%p |
+| 1-NED 평균 ↑ | 68.64% | **95.25%** | +26.6%p |
+| 정확 일치율 ↑ | 5.40% | 14.60% | +9.2%p |
+| 문자 가중 CER ↓ | 67.93% | **7.51%** | −60.4%p |
+| 평균 지연 s/장 ↓ (MIG 1g.10gb) | 0.611 | 0.451 | −0.16s |
 
-### 여기서 개발하지 않는 것
+남은 오류는 긴 문단에서 중간부터 틀리거나 같은 어절을 반복 생성하는 경우(500장 중 행 CER 100% 초과 4건). 학습 데이터가 **합성 문서**라 실제 포스터·공지 사진에서는 더 떨어질 수 있다 — 쓰는 쪽(F1·F11·F12)이 'OCR 로 읽음' 을 표시하고 신뢰도를 낮게 두는 WE-Meet 의 기존 규칙을 그대로 따른다.
 
-| 항목 | 담당 |
-| --- | --- |
-| Next.js 대시보드·대화 UI | 프론트엔드 저장소 |
-| FastAPI REST API, 인증, OAuth 연동 | 백엔드 저장소 |
-| F15 주변 맛집 추천 (지도 API 중심) | 백엔드 저장소 |
-| F16 팀플 일정 조율 중 **팀 생성·회의 일정 생성·역할 추적** (공강 교집합 계산만 여기서) | 백엔드 저장소 |
-| F17 사업단 프로젝트 관리 플랫폼 (승인 워크플로) | 백엔드 저장소 |
+<br>
 
-이 저장소는 **"입력을 주면 검증된 결과를 돌려주는 AI 모듈"** 을 만듭니다.
-HTTP 엔드포인트로 감싸는 일은 백엔드 저장소에서 합니다. 우리는 **호출 가능한 함수와 스키마**까지 책임집니다.
+### 백엔드에 적용하기
 
----
+WE-Meet 백엔드(`univ_us_local/backend`, FastAPI)는 LLM 을 **`LLM_MAIN_BASE_URL · LLM_MAIN_API_KEY · LLM_MAIN_MODEL` 세 값**으로만 본다. 그래서 적용은 ① 모델 서버를 띄우고 ② `.env` 세 줄을 바꾸고 ③ F9 대화 코드를 붙이는 것이 전부다. OCR 은 ④ 파이썬 모듈 하나를 기존 `osenv.ocr` 자리에 둔다.
 
-## 2. 기능 분해와 담당 브랜치
+필요한 것: NVIDIA GPU **VRAM 8GB 이상**(nf4 4B 서빙 ≈ 3.5GB · OCR ≈ 1GB), Python 3.11+, CUDA 12 계열 PyTorch. CPU 만으로는 F9 서빙이 안 된다(bitsandbytes 4-bit). 아래 명령은 Windows(Git Bash)·Linux 공통이다 — Windows RTX 4060 8GB 에서 실제로 확인했다.
 
-[기능명세서 3장](Univ-Us_기능명세서.md)의 17개 기능(F1~F17)을 **9개 AI 기능**으로 재편했습니다. 기능마다 메인 브랜치가 1개씩 있습니다.
+#### A. F9 모델 서버 띄우기 (nf4 병합본 + `gpu_server`)
 
-| 기능 메인 브랜치 | 대응 | 하는 일 |
-| --- | --- | --- |
-| `core_ai-agent` | 4.3 나·라 | LLM 호출 추상화, 프롬프트 버전 관리, 응답 캐싱, 토큰 사용량 로깅, 재시도 |
-| `doc_ai-agent` | F1, F6 | 텍스트 문서(강의계획서 PDF·공지·메일) → 일정 JSON 구조화 추출 |
-| `pic_ai-agent` | F1, F6 | 사진·스캔 이미지(시간표 사진, 스캔 강의계획서, 필기) 분석 → 텍스트·표 구조 추출 |
-| `rag_ai-agent` | F4 | 강의자료 청킹·색인·검색, 출처 페이지를 붙인 요약·시험 예상 문제 생성 |
-| `brief_ai-agent` | F10 | 아침 브리핑 텍스트 생성 + 스케줄 실행 |
-| `chat_ai-agent` | F9 | 자연어 입력 → 도구 호출(Function Calling) → 자연어 응답 |
-| `notice_ai-agent` | F11~F13 | 공지 수집, 자격 요건 구조화 추출, 사용자 프로필 매칭 |
-| `rule_ai-agent` | F2·F3·F5·F7·F8·F14·F16 | **LLM을 쓰지 않는** 결정적 계산 (졸업요건, 출결 한도, 우선순위 점수, 학습 블록, 시간표 제약, 공강 교집합). 소요시간·난이도 같은 추정값은 `doc`·`rag`가 만들어 **입력으로 넘깁니다** |
-| `eval_ai-agent` | 4.6 | 테스트셋 구축, 정확도·근거표기율·응답시간 측정, **모델 비교 실험으로 사용 모델 확정** |
+```bash
+# 1) 코드 — F9 브랜치 하나만 받는다 (gpu_server · src · tools 가 들어 있다)
+git clone -b gpu/qwen3-4b --single-branch https://github.com/logan0741/Univ-Us_AI.git univus-f9 && cd univus-f9
+python -m venv .venv && . .venv/Scripts/activate        # Linux: . .venv/bin/activate
+pip install torch --index-url https://download.pytorch.org/whl/cu128     # 자기 CUDA 에 맞는 휠
+pip install -r requirements.txt
 
-기능별 MVP 상세(입력 / 출력 / 완료 기준)는 **[docs/AI_MODULES.md](docs/AI_MODULES.md)** 에 있습니다.
-작업 시작 전에 자기 기능 항목을 먼저 읽으세요.
+# 2) 가중치 — Release 의 nf4 병합본(분할 zip 2개)을 받아 <PERSIST_DIR>/models/ 에 푼다
+R=https://github.com/logan0741/Univ-Us_AI/releases/download/weights-2026-11-13
+curl -LO $R/qwen3-4b-f9-merged-nf4.zip && curl -LO $R/qwen3-4b-f9-merged-nf4.z01 && curl -LO $R/SHA256SUMS
+sha256sum -c SHA256SUMS --ignore-missing
+mkdir -p ~/univus-out/models
+python scripts/unsplit_zip.py extract qwen3-4b-f9-merged-nf4.zip ~/univus-out/models   # 7-Zip 이 있으면 .zip 을 그냥 풀어도 된다
+#   → ~/univus-out/models/qwen3-4b-f9-merged-nf4/{model.safetensors, config.json, tokenizer.json, …}
 
-> **착수 전에 인터페이스 계약부터.** [역할별 분해서 5장](Univ-Us_역할별_기능분해서.md)이 계약 6개를
-> *"기능 착수 전에 확정되어야 한다"* 고 정해두었습니다. 이 저장소가 당사자인 것은 4개입니다 —
-> `추출 출력 스키마`(AI→BE), `도구 목록`(BE→AI), `브리핑 입력`(BE→AI), `검증 실패 규약`(BE→FE).
-> 확정 전이라도 임시 형태를 이슈에 올려두고 시작하세요.
+# 3) 설정 — config.local.env (gitignore) 에 내 컴퓨터 값만 적는다. 모델 이름·RUN_NAME 은 브랜치의 config.env 에 이미 있다
+cat > config.local.env <<EOT
+TARGET=local
+PERSIST_DIR=$HOME/univus-out
+SCRATCH_DIR=$HOME/univus-out/scratch
+UNIVUS_API_KEY=아무-긴-문자열          # 백엔드 .env 의 LLM_MAIN_API_KEY 와 같게
+EOT
 
-### 사용할 AI 모델은 아직 정하지 않았습니다
+# 4) 서버 — 기본 127.0.0.1:8600. 다른 주소로 열려면 --host 와 UNIVUS_API_KEY 가 필수
+python gpu_server/app.py                                  # Linux: bash gpu_server/run_server.sh start
+curl -s -X POST -H "Authorization: Bearer 아무-긴-문자열" -H "Content-Type: application/json" \
+     -d '{"source":"merged"}' http://127.0.0.1:8600/model/load      # RTX 4060 에서 33초, state → serving
+curl -s -H "Authorization: Bearer 아무-긴-문자열" http://127.0.0.1:8600/health | python -m json.tool
 
-계획서 4.3 나의 원칙 — *"LLM 호출부는 OpenAI 호환 인터페이스로 추상화하여 특정 모델에 종속되지 않는 구조로 설계한다"* — 을 그대로 따릅니다.
+# 5) 말 걸어 보기 — tools/f9_tools.json 11개를 붙여 /v1/chat/completions 로 보낸다
+python scripts/f9_chat.py --url http://127.0.0.1:8600 --key 아무-긴-문자열 "내일 오후 3시 스터디 2시간"
+#  → 도구 create_event {"title": "스터디", "start": "…T15:00", "end": "…T17:00", "allDay": false, "category": "study"}
+```
 
-그래서 코드에는 **모델 이름을 직접 쓰지 않고 "슬롯 이름"만 씁니다.**
+백엔드 `.env` 는 세 줄이다 (F9 전용 키 `F9_LLM_*` 를 쓰면 다른 기능의 LLM 설정과 분리된다 — B 참고):
 
-| 슬롯 | 역할 | 요구 조건 |
-| --- | --- | --- |
-| `LLM_MAIN` | 판단·생성·구조화 추출 | JSON 구조화 출력, Function Calling 지원 |
-| `DOC_PARSER` | 문서 레이아웃·표 인식 | PDF·이미지 → 텍스트 + 표 구조 |
-| `VISION` | 이미지 이해 | `pic_ai-agent` 전용. `DOC_PARSER`로 충분하면 안 씀 |
-| `EMBEDDING` | 청크 벡터화 | 한국어 문서 검색 품질 |
-| `RULE` | 결정적 계산 | 모델이 아님. 순수 Python |
+```
+LLM_MAIN_BASE_URL=http://127.0.0.1:8600/v1
+LLM_MAIN_API_KEY=<UNIVUS_API_KEY 와 같은 값>
+LLM_MAIN_MODEL=univus-f9          # 서버는 이 값을 무시한다(적재된 모델 하나뿐). 비우면 '미설정'으로 본다
+```
+
+위 절차를 Windows RTX 4060 Laptop 8GB 에서 그대로 돌린 결과(2026-11-16): 적재 33초(VRAM ≈3.5GB), 5문장 중 도구 선택 5/5 — `내일 오후 3시 스터디 2시간` → `create_event 11-17T15:00~17:00 study` · `학사일정 열어줘` → `navigate /academic` · `졸업까지 몇 학점 남았어?` → `get_graduation` · `오늘 날씨 어때?` → 거절 문장 · `이번 주 마감 뭐 남았어?` → `list_events` 는 맞았으나 기간이 11-14~11-20 으로 이틀 어긋남(병합본의 알려진 약점). 응답 6.6~18초(프롬프트 ≈2,000토큰, 노트북 GPU — A100 MIG 에서는 4.5초).
+
+서버는 OpenAI 호환 `POST /v1/chat/completions`(tools · tool_choice · response_format json 지원, `stream` 미지원)와 `/health` `/model/load|unload` 를 낸다. 학습·병합 API(`/train/*` `/model/merge`)까지 포함한 전체 설명은 [`gpu_server/README.md`](../../blob/common/gpu_server/README.md).
+어댑터로 띄우려면(`{"source":"adapter","run_name":"qwen3-4b-f9"}`) 베이스 `Qwen/Qwen3-4B`(≈8GB)를 HF 에서 받아야 하고 `qwen3-4b-f9-adapter.zip` 을 `<PERSIST_DIR>/outputs/qwen3-4b-f9/adapter/` 에 둔다 — 평가표와 같은 구성이고 서빙 테스트에서 병합본보다 2문장 더 맞았다.
+
+#### B. WE-Meet 에 F9 대화 붙이기
+
+WE-Meet 저장소(`26-WE-Meet-Project` @`8243747`, v0.2.0)에 F9 를 끼워 넣은 코드가 [`wemeet/f9-chat-integration`](../../tree/wemeet/f9-chat-integration) 브랜치에 **그대로** 있다 — 새 폴더 `F9_Chat_agent/`, 백엔드 라우터 `chat.py`, 프론트 `chat.ts` + 기존 파일 12개 패치(`git apply --check` 통과).
+
+```bash
+git clone -b wemeet/f9-chat-integration --single-branch https://github.com/logan0741/Univ-Us_AI.git ../univus-f9-patch
+# WE-Meet 저장소 루트에서
+cp -r ../univus-f9-patch/F9_Chat_agent ./F9_Chat_agent
+cp ../univus-f9-patch/univ_us_local/backend/app/chat.py univ_us_local/backend/app/
+cp ../univus-f9-patch/univ_us_local/frontend/src/lib/chat.ts univ_us_local/frontend/src/lib/
+git apply ../univus-f9-patch/patches/wemeet-f9-chat-integration.patch        # 충돌 시 --3way
+cp F9_Chat_agent/.env.example F9_Chat_agent/.env     # 그리고 값 채우기 — F9_LLM_BASE_URL · F9_LLM_API_KEY · F9_LLM_MODEL
+python -m pytest F9_Chat_agent/tests -q
+```
+
+동작: LLM 은 **도구 11개 중 고르고 인자를 채우는 일만** 한다. 읽기(일정·졸업요건·출결·과제·시험)는 각 기능이 계산한 값을 그대로 쓰고, 쓰기(일정 등록·수정·삭제)는 **미리보기 카드 → 사용자 [확인]** 뒤에만 C1 캘린더에 쓴다. 학사일정·수업·시험은 바꾸지 않고 거절한다. 자세한 순서는 그 브랜치의 [README](../../blob/wemeet/f9-chat-integration/README.md).
+
+#### C. OCR 모델 쓰기 (`src/infer_ocr.py`)
+
+WE-Meet 는 지금 OS 내장 OCR(`C0_Platform_agent/osenv/ocr.py` — Windows WinRT · macOS Vision)로 이미지 공지를 읽는다. 학습한 Donut 모델은 **같은 함수 모양**으로 제공해, 그 자리에 바꿔 끼우거나 OS OCR 이 없는 환경(Linux 서버)의 대체로 쓸 수 있다.
+
+```bash
+git clone -b gpu/donut-ocr --single-branch https://github.com/logan0741/Univ-Us_AI.git univus-ocr && cd univus-ocr
+pip install torch transformers pillow           # 추론만이면 이 셋으로 충분 (editdistance 는 평가 때만)
+curl -LO https://github.com/logan0741/Univ-Us_AI/releases/download/weights-2026-11-13/donut-ocr-ko-model.zip
+unzip donut-ocr-ko-model.zip                    # → donut-ocr-ko/model/ (bf16 safetensors + processor + tokenizer)
+export OCR_MODEL_DIR=$PWD/donut-ocr-ko/model
+python src/infer_ocr.py 공지.png 포스터.jpg       # 이미지마다 읽은 글자와 초 출력 (--json · --device cpu)
+```
 
 ```python
-# ✅ 이렇게
-model = settings.LLM_MAIN_MODEL
-
-# ❌ 이렇게 하지 마세요 — 모델을 바꿀 때 전 파일을 고쳐야 합니다
-model = "solar-pro-3"
+import sys; sys.path.insert(0, "univus-ocr/src")
+import infer_ocr as ocr                          # osenv.ocr 과 같은 이름·반환 모양
+ocr.available()                                  # {"ok": True, "engine": "donut-ocr-ko", "lang": "ko", "korean": True, "device": "cuda", …}
+texts = ocr.image_texts([png_bytes, jpg_bytes])  # 이미지마다 str, 못 읽으면 None
 ```
 
-실제 어떤 모델을 쓸지는 `eval_ai-agent`의 비교 실험 결과로 정합니다.
-정해지면 `.env`와 `requirements.txt`만 바뀌고 나머지 코드는 그대로 갑니다.
-
----
-
-## 3. 개발 환경 설치
-
-> ### 학교 서버에서 개발한다면 — 아래 3-1·3-2 대신 이 두 문서를 보세요
-> | 순서 | 문서 |
-> | --- | --- |
-> | 1 | [docs/SSH-서버-접속-가이드.md](docs/SSH-서버-접속-가이드.md) — 서버에 **접속**하기 |
-> | 2 | [docs/서버-작업환경-설정.md](docs/서버-작업환경-설정.md) — 접속 후 **환경 세팅**하기 |
->
-> 서버에는 conda 가 없고, 설치한 venv 가 **pod 재시작 시 사라지는** 등 조건이 다릅니다.
-> 설치는 아래 절차 대신 `bash scripts/setup-gpu-env.sh` 한 줄이면 끝납니다.
-
-> ### GPU는 필수가 아닙니다
-> 주 경로는 **외부 API 호출 기반**이라 CPU만으로 거의 모든 기능을 개발할 수 있습니다.
-> GPU는 로컬 임베딩·로컬 OCR·모델 비교 실험(`eval_ai-agent`, `pic_ai-agent`)에서만 씁니다.
-> **CUDA 설치가 안 되면 그냥 건너뛰고 3-1까지만 하고 개발을 시작하세요.**
-
-### 3-1. 공통 설치 (전원 필수)
-
-```bash
-# 1) 저장소 클론
-git clone https://github.com/logan0741/Univ-Us_AI.git
-cd Univ-Us_AI
-
-# 2) 프로젝트 전용 conda 환경 생성
-conda create -n univus-ai python=3.11 -y
-conda activate univus-ai
-
-# 3) 패키지 설치
-pip install -r requirements.txt -r requirements-dev.txt
-
-# 4) 환경변수 파일 준비 (.env 는 절대 커밋하지 않습니다)
-cp .env.example .env
-
-# 5) 커밋 메시지 템플릿 등록 (저장소당 1회)
-git config commit.template .gitmessage
-
-# 6) 내 정보 등록 — 이걸 안 하면 git commit 이 실패합니다
-#    이메일은 GitHub 계정에 등록된 것과 같아야 커밋이 내 프로필에 연결됩니다
-git config user.name "본인 GitHub 사용자명"
-git config user.email "본인 GitHub 계정 이메일"
-```
-
-**`conda activate univus-ai` 이후 터미널 프롬프트 맨 앞이 `(univus-ai)` 로 바뀌었는지 확인하세요.**
-`(base)` 상태로 설치하면 안 됩니다.
-
-> #### base 환경에 설치하지 마세요
-> conda의 `base`는 conda 자기 자신이 쓰는 환경입니다. 여기에 프로젝트 패키지를 깔면
-> 다른 프로젝트와 버전이 충돌하고, 한 번 꼬이면 conda를 통째로 다시 설치해야 합니다.
-> **프로젝트마다 환경을 따로 만드는 것이 원칙입니다.**
-
-설치가 됐는지 확인:
-
-```bash
-python -c "import fastapi, pydantic, apscheduler, pypdf; print('설치 완료')"
-```
-
-<details>
-<summary>conda 대신 venv를 쓰고 싶다면</summary>
-
-```bash
-python3.11 -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r requirements.txt -r requirements-dev.txt
-```
-
-`environment.yml` 대신 `requirements*.txt`만 쓰면 되고, 나머지 규칙은 동일합니다.
-</details>
-
-<details>
-<summary>environment.yml 로 한 번에 만들기</summary>
-
-```bash
-conda env create -f environment.yml
-conda activate univus-ai
-```
-
-`requirements.txt` + `requirements-dev.txt`가 함께 설치됩니다.
-</details>
-
-### 3-2. GPU / CUDA 설치 (NVIDIA 그래픽카드 있는 사람만)
-
-#### 먼저 알아둘 것
-
-- **CUDA Toolkit을 따로 설치할 필요가 없습니다.** PyTorch 휠(wheel) 안에 CUDA 런타임이 들어 있습니다.
-  필요한 건 **NVIDIA 그래픽 드라이버 하나**뿐입니다.
-- `nvidia-smi`에 표시되는 CUDA 버전이 설치할 PyTorch의 CUDA 버전보다 **높아도 정상**입니다. 하위 호환됩니다.
-- **Windows에서는 `pip install torch` 만 하면 CPU 전용이 깔립니다.**
-  기본 PyPI의 Windows용 torch에는 CUDA가 들어 있지 않습니다(Linux용에는 들어 있습니다).
-  그래서 `requirements-gpu.txt` 맨 위에 PyTorch 전용 저장소 주소가 들어 있습니다. **그 줄을 지우지 마세요.**
-- **WSL2 사용자**: 드라이버는 **Windows 쪽에만** 설치합니다. WSL 안에서 `apt install nvidia-driver-...` 를 하면 오히려 깨집니다.
-
-#### 설치
-
-```bash
-# 1) 드라이버 확인 — 표가 뜨고 우측 상단 CUDA Version 이 12.x 이상이면 OK
-nvidia-smi
-
-# 2) PyTorch + GPU 패키지 설치 (CUDA 12.9 휠 기준, 약 6GB)
-pip install -r requirements-gpu.txt
-
-# 3) 검증 — True 와 GPU 이름이 나와야 합니다
-python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name(0))"
-```
-
-`nvidia-smi`가 명령을 찾지 못하면 → NVIDIA GPU가 없거나 드라이버가 없는 것입니다. **3-2를 건너뛰세요.**
-
-#### GPU 모니터링 — `nvitop`
-
-`requirements-gpu.txt`에 함께 들어 있습니다. `nvidia-smi`의 대화형 버전으로, **어떤 프로세스가 VRAM을 얼마나 쓰는지**
-실시간으로 보여줍니다. OOM이 났을 때 원인을 찾는 용도입니다.
-
-```bash
-nvitop        # 전체 화면 모니터 (q 로 종료)
-nvitop -1     # 한 번만 출력하고 종료 — 이슈에 붙일 때 이걸 쓰세요
-```
-
-> #### 학교 GPU 서버는 카드 전체가 아닐 수 있습니다
-> A100 같은 카드는 **MIG(Multi-Instance GPU)** 로 쪼개서 여러 명에게 나눠주는 경우가 많습니다.
-> 이때 `nvitop`·`nvidia-smi`에는 **나에게 할당된 슬라이스만** 보입니다. 정상입니다.
->
-> 실측 예 — A100 80GB 카드의 `1g.10gb` 슬라이스를 받으면 **쓸 수 있는 VRAM은 약 9.5GiB** 입니다.
-> `torch.cuda.get_device_name(0)`이 `NVIDIA A100 80GB PCIe MIG 1g.10gb` 처럼 나오면 이 경우입니다.
-> **80GB가 아니라 9.5GB 기준으로 배치 크기를 잡으세요.** 로컬 임베딩·OCR에는 충분하지만 큰 모델 풀 파인튜닝은 어렵습니다.
-
-#### CUDA 버전이 안 맞을 때
-
-`requirements-gpu.txt` 첫 줄의 `cu129` 부분만 바꿉니다.
-
-| 상황 | 값 |
-| --- | --- |
-| 대부분의 경우 | `cu129` (기본값) |
-| `nvidia-smi` 의 CUDA Version 이 13.x | `cu130` |
-| 드라이버가 오래되어 위 둘 다 안 될 때 | `cu126` |
-
-바꿔서 해결됐다면 **어떤 값을 썼는지 이슈로 남겨주세요.** 같은 그래픽카드를 쓰는 팀원이 바로 씁니다.
-최신 설치 명령은 <https://pytorch.org/get-started/locally/> 에서도 확인할 수 있습니다.
-
----
-
-## 4. 브랜치 생성 규칙
-
-### 브랜치 구조
-
-```text
-main                              배포/제출 기준. 직접 커밋 금지
-└── develop                       통합·데모 브랜치
-    ├── pic_ai-agent              ← 기능 메인 브랜치 (이름 없음)
-    │   ├── pic_ai-agent_<영문이름>    ← 개인 작업 브랜치
-    │   └── pic_ai-agent_<영문이름>
-    ├── doc_ai-agent
-    │   └── doc_ai-agent_<영문이름>
-    └── ...
-```
-
-### 이름 규칙
-
-```text
-기능 메인 브랜치    <기능약어>_ai-agent
-개인 작업 브랜치    <기능약어>_ai-agent_<영문이름>
-```
-
-| 예시 | 뜻 |
-| --- | --- |
-| `pic_ai-agent` | 사진 분석 기능의 메인 브랜치 |
-| `pic_ai-agent_myname` | `myname` 이 사진 분석 기능에서 작업하는 브랜치 |
-| `rag_ai-agent_myname` | `myname` 이 RAG 기능에서 작업하는 브랜치 |
-
-**지켜야 할 것**
-
-- 구분자는 두 종류만 씁니다. **`_` 는 덩어리 구분**(기능 / ai-agent / 이름), **`-` 는 단어 구분**(ai-agent).
-- **공백은 절대 쓸 수 없습니다.** git이 브랜치 이름으로 받지 않습니다.
-
-  ```text
-  $ git check-ref-format --branch "pic_ai agent_myname"
-  fatal: 'pic_ai agent_myname' is not a valid branch name
-  ```
-
-- 대문자·한글·마침표(`.`)를 쓰지 않습니다. 전부 **영문 소문자**입니다.
-- 기능 메인 브랜치는 **팀에서 1개만** 만듭니다. 개인이 새로 만들지 않습니다.
-- 개인 브랜치는 **반드시 자기 기능 메인 브랜치에서 분기**합니다. `main`이나 `develop`에서 직접 따지 않습니다.
-
-### `<영문이름>` 부분을 정하는 법
-
-- **GitHub 사용자명을 쓰는 것을 권장합니다.** 중복이 없고, 브랜치 주인이 PR 작성자와 정확히 일치해 추적이 쉽습니다.
-- 로마자 이름을 쓴다면 **한 사람이 항상 같은 표기**를 씁니다.
-  중간에 표기를 바꾸면 브랜치 목록에서 자기 브랜치를 찾기 어려워집니다.
-- 성·이름 순서와 붙여쓰기 방식은 팀에서 하나로 정해 씁니다.
-- 새로 합류하면 **자기 표기를 정해 이슈로 한 번 공유한 뒤** 쓰기 시작합니다.
-
-### 작업 시작할 때 (복붙용)
-
-아래는 `pic` 기능에서 작업하는 예시입니다. `pic` 과 `myname` 을 자기 기능약어·이름으로 바꿔 쓰세요.
-
-```bash
-# 1) 기능 메인 브랜치를 최신 상태로 받아오기
-git fetch origin
-git switch pic_ai-agent
-git pull origin pic_ai-agent
-
-# 2) 내 작업 브랜치 만들기
-git switch -c pic_ai-agent_myname
-
-# 3) 작업 후 커밋 (5장 참고)
-git add .
-git commit
-
-# 4) 원격에 올리기 (처음 한 번만 -u)
-git push -u origin pic_ai-agent_myname
-```
-
-작업 도중 기능 메인 브랜치가 업데이트됐다면, PR 올리기 전에 최신 내용을 가져옵니다.
-
-```bash
-git fetch origin
-git merge origin/pic_ai-agent
-# 충돌이 나면 해결 후 git add → git commit
-```
-
-### 브랜치를 지우는 시점
-
-PR이 병합되면 **개인 작업 브랜치는 지웁니다.** 기능 메인 브랜치는 프로젝트가 끝날 때까지 유지합니다.
-
-```bash
-git switch pic_ai-agent
-git branch -d pic_ai-agent_myname          # 로컬 삭제
-git push origin --delete pic_ai-agent_myname  # 원격 삭제
-```
-
----
-
-## 5. 커밋 메시지 작성법
-
-커밋 메시지는 **제목 한 줄 + 세 개 항목**으로 씁니다.
-
-```text
-[<기능약어>] 한 줄 요약
-
-## 변경사항
-- 기존에 있던 것 중 무엇을 고쳤는지
-
-## 추가 개발 내용
-- 이번에 새로 만든 것
-
-## 앞으로 진행 방향
-- 다음에 무엇을 할 것인지
-
-Issue: #12
-```
-
-### 실제 예시
-
-```text
-[doc] 강의계획서 마감일 추출 스키마 v1 구현
-
-## 변경사항
-- 날짜 파서가 "6/12(목)" 형식을 못 읽던 문제 수정
-- 추출 프롬프트에서 출처 문장을 반드시 반환하도록 지시 추가
-
-## 추가 개발 내용
-- ScheduleItem Pydantic 스키마 정의 (과목/유형/제목/마감일시/비중/출처문장)
-- 추출 결과 검증 로직 추가 (날짜 유효성, 동일 과제 중복 제거)
-- 샘플 강의계획서 3건으로 동작 확인
-
-## 앞으로 진행 방향
-- 표 형태 강의계획서에서 추출률이 낮음 → DOC_PARSER 표 인식 결과를 붙여 재시도
-- 테스트셋 10건 라벨링해서 정확도 측정 (eval 기능과 협의 필요)
-
-Issue: #12
-```
-
-### 규칙
-
-- **제목**은 50자 이내, 마침표 없이, `[기능약어]`로 시작합니다. (`[doc]` `[pic]` `[rag]` `[brief]` `[chat]` `[notice]` `[rule]` `[eval]` `[core]` `[docs]` `[chore]`)
-- **세 항목은 지우지 않습니다.** 해당 없으면 `- 없음` 이라고 적습니다.
-  → "이번엔 변경사항이 없었다"는 것도 정보입니다. 항목을 지우면 다음 사람이 빠뜨린 건지 없었던 건지 알 수 없습니다.
-- **"앞으로 진행 방향"이 이 규칙의 핵심입니다.** 며칠 뒤 다시 붙을 때, 그리고 다른 사람이 이어받을 때
-  마지막 커밋만 보면 어디서부터 하면 되는지 알 수 있어야 합니다.
-- 관련 이슈가 있으면 마지막 줄에 `Issue: #번호` 를 적습니다.
-
-### 템플릿 자동으로 띄우기
-
-아래를 저장소당 한 번만 실행하면, `git commit` 할 때 에디터에 위 양식이 자동으로 채워집니다.
-
-```bash
-git config commit.template .gitmessage
-```
-
-이후에는 `-m` 옵션 **없이** 커밋합니다.
-
-```bash
-git commit        # ✅ 템플릿이 뜹니다
-git commit -m "수정"   # ❌ 템플릿이 무시됩니다
-```
-
-### 커밋 단위
-
-- **한 커밋에 한 가지 일**만 담습니다. "이것저것 수정" 같은 커밋은 나중에 되돌릴 수 없습니다.
-- 하루 작업을 마지막에 한 번에 몰아 커밋하지 않습니다. 기능 하나가 동작하면 그때 커밋합니다.
-- **`.env`, 개인 데이터, API 키가 들어갔는지 커밋 전에 확인합니다.** `git status`로 올라가는 파일 목록을 눈으로 봅니다.
-
----
-
-## 6. 이슈 처리 규칙 (카카오톡 + GitHub Issue)
-
-막히는 게 생기면 **카카오톡으로 묻고, GitHub Issue에도 남깁니다. 둘 다 합니다.**
-
-```text
-1. 카카오톡 팀 채널에 질문한다.            ← 빠르게 답을 받기 위해
-2. 같은 내용을 GitHub Issue 로 등록한다.    ← 기록을 남기기 위해
-3. 카톡에서 답을 받으면 그 답을 Issue 코멘트로 옮겨 적는다.
-4. 해결되면 "어떻게 해결했는지"를 코멘트로 남기고 Issue 를 close 한다.
-5. 관련 커밋 메시지 마지막 줄에 Issue: #번호 를 적는다.
-```
-
-### 왜 두 번 적나요
-
-카카오톡은 **검색이 안 되고 스크롤에 묻힙니다.** 지금 해결한 문제를 두 달 뒤에 다른 사람이 똑같이 겪고,
-그때는 아무도 그 대화를 못 찾습니다. 실제로 팀 프로젝트에서 같은 질문이 반복되는 이유가 이것입니다.
-
-계획서 6.2 나에도 *"결정 사항은 문서로 기록"* 이 협업 원칙으로 들어가 있습니다. 이 규칙은 그걸 실행하는 방법입니다.
-
-**Issue 하나를 남기는 데 2분 걸리고, 같은 문제를 두 번째 사람이 다시 푸는 데는 반나절이 걸립니다.**
-
-### Issue 종류
-
-저장소의 [New Issue] 버튼을 누르면 템플릿 3개가 나옵니다.
-
-| 템플릿 | 언제 |
-| --- | --- |
-| **질문 / 막힌 것** | 카톡에 물어본 내용을 기록할 때. 환경 설치 실패, 에러, 방향 판단이 안 설 때 |
-| **작업(Task)** | 기능 개발 단위를 등록할 때. 스프린트 백로그가 됩니다 |
-| **버그** | 동작하던 게 깨졌을 때 |
-
-### 질문 Issue에 꼭 넣을 것
-
-- 무엇을 하려던 중이었는지
-- **실행한 명령어 원문**
-- **에러 메시지 전문** (요약하지 말고 그대로 복사)
-- 이미 시도해 본 것
-- 카톡에 질문한 시각 (대화를 다시 찾을 수 있게)
-
-에러 메시지를 "그냥 안 돼요"로 줄이면 답을 줄 수 없습니다. **터미널 출력을 통째로 붙여 넣으세요.**
-
-### 라벨
-
-| 라벨 | 뜻 |
-| --- | --- |
-| `question` | 질문 |
-| `bug` | 버그 |
-| `task` | 작업 단위 |
-| `env` | 환경·설치 문제 |
-| `blocked` | 이것 때문에 진행이 멈춤 — **우선 처리** |
-| `pic` `doc` `rag` `brief` `chat` `notice` `rule` `eval` `core` | 해당 기능 |
-
-`blocked` 라벨이 붙은 이슈는 팀 회의에서 먼저 다룹니다. **막혔으면 혼자 하루 이상 붙잡지 말고 이 라벨을 붙이세요.**
-
----
-
-## 7. PR(Pull Request) 규칙
-
-```text
-개인 작업 브랜치  →  기능 메인 브랜치  →  develop  →  main
-```
-
-- 개인 브랜치를 `develop`이나 `main`으로 **직접 PR하지 않습니다.** 반드시 자기 기능 메인 브랜치로 보냅니다.
-- PR 본문은 커밋과 같은 3단 구조(`변경사항` / `추가 개발 내용` / `앞으로 진행 방향`)로 씁니다. 템플릿이 자동으로 뜹니다.
-- **리뷰어를 최소 1명 지정**합니다. 자기 PR을 자기가 병합하지 않습니다.
-- 리뷰는 "잘못 찾기"가 아니라 **"내가 이 코드를 이어받을 수 있는가"** 를 보는 것입니다.
-  이해가 안 되는 부분이 있으면 그대로 질문으로 남기면 됩니다.
-- PR 크기는 작게 유지합니다. 파일 20개짜리 PR은 아무도 제대로 리뷰하지 못합니다.
-
-### PR 올리기 전 체크
-
-```bash
-ruff check .          # 코드 스타일 검사
-pytest                # 테스트 (테스트가 있는 기능만)
-git status            # .env / 개인 데이터가 섞이지 않았는지 눈으로 확인
-```
-
----
-
-## 8. 디렉터리 구조
-
-9개 기능이 동시에 진행되므로, **각자 자기 폴더 안에서만 작업**해서 충돌을 구조적으로 줄입니다.
-
-```text
-Univ-Us_AI/
-├── src/
-│   ├── core/          공통 LLM 호출·설정·로깅        (core_ai-agent)
-│   ├── doc/           문서 → 일정 추출              (doc_ai-agent)
-│   ├── pic/           이미지 분석                   (pic_ai-agent)
-│   ├── rag/           강의자료 RAG                  (rag_ai-agent)
-│   ├── brief/         아침 브리핑                   (brief_ai-agent)
-│   ├── chat/          대화형 에이전트               (chat_ai-agent)
-│   ├── notice/        공지 수집·매칭                (notice_ai-agent)
-│   ├── rule/          규칙 기반 계산                (rule_ai-agent)
-│   ├── eval/          평가·모델 비교                (eval_ai-agent)
-│   └── schemas/       기능 간 공유 Pydantic 스키마   ⚠️ 공용
-├── prompts/           프롬프트 (버전 관리 대상)
-├── tests/             테스트
-├── data/              샘플·테스트셋              🚫 git에 올라가지 않음
-├── docs/
-│   ├── AI_MODULES.md  기능별 MVP 상세
-│   ├── DEV_PLAN.md    1차 개발 계획 (~9/14) · 역할 분담 · 칸반 규칙
-│   ├── SSH-서버-접속-가이드.md   학교 서버 SSH 접속 설정
-│   ├── 서버-작업환경-설정.md      venv·gh·GitHub 키·재시작 복구
-│   └── plans/         각자의 세부 계획 (_TEMPLATE.md 복사해서 작성)
-├── scripts/
-│   ├── setup-gpu-env.sh 개발 환경 설치·재설치 (재시작 후 이것만 돌리면 됨)
-│   └── setup-kanban.sh  라벨·백로그 이슈 생성 (최초 1회)
-├── Univ-Us_기능명세서.md          F1~F17 요구사항·데이터 흐름·인수 기준   📌 기준 문서
-├── Univ-Us_역할별_기능분해서.md    AI/BE/FE 역할 경계·인터페이스 계약      📌 기준 문서
-├── requirements.txt
-├── requirements-dev.txt
-├── requirements-gpu.txt
-├── environment.yml
-├── .env.example
-└── .gitmessage
-```
-
-### 📌 기준 문서 2종은 함부로 고치지 않습니다
-
-`Univ-Us_기능명세서.md`와 `Univ-Us_역할별_기능분해서.md`는 **BE·FE 저장소도 함께 보는 문서**입니다.
-여기를 고치면 세 저장소의 인식이 어긋납니다. 수정이 필요하면 **이슈로 먼저 공유하고 합의한 뒤에** 고칩니다.
-`docs/AI_MODULES.md`는 이 저장소 전용이라 상대적으로 자유롭게 고쳐도 됩니다.
-
-### ⚠️ `src/core/` 와 `src/schemas/` 는 공용입니다
-
-여러 기능이 같이 씁니다. 여기를 고치면 **다른 사람 코드가 조용히 깨집니다.**
-수정이 필요하면 **먼저 Issue를 열어 공유하고 합의한 뒤에** 고칩니다.
-
-### 프롬프트는 코드처럼 관리합니다
-
-계획서 4.3 라 원칙 — 프롬프트를 코드 안에 문자열로 박아두지 말고 `prompts/` 아래 파일로 두고 버전 관리합니다.
-프롬프트를 바꿨으면 **테스트셋 정확도가 좋아졌을 때만** 반영하고, 커밋 메시지에 수치 변화를 적습니다.
-
-### `data/` 폴더
-
-팀원 개인의 강의계획서·이수내역·메일이 들어가는 곳이라 **git에 올라가지 않도록 막아두었습니다**(`.gitignore`).
-개인정보가 포함된 데이터는 본인 동의 하에서만 사용하고 외부에 공개하지 않습니다
-(계획서 4.2 · [기능명세서](Univ-Us_기능명세서.md) 1.3 "개인정보 최소 수집" · 4장 "개인정보"·"데이터 삭제").
-
----
-
-## 9. 자주 막히는 지점
-
-| 증상 | 원인과 해결 |
-| --- | --- |
-| `fatal: 'xxx' is not a valid branch name` | 브랜치 이름에 **공백**이 들어갔습니다. `_`와 `-`만 씁니다 → [4장](#4-브랜치-생성-규칙) |
-| `git commit` 해도 템플릿이 안 뜸 | `git config commit.template .gitmessage` 를 실행하지 않았거나, `-m` 옵션을 썼습니다 |
-| `ModuleNotFoundError` | conda 환경을 켜지 않았습니다. 프롬프트에 `(univus-ai)` 가 보이는지 확인하세요 |
-| `pip install` 이 `(base)` 에서 실행됨 | `conda activate univus-ai` 를 먼저 합니다. base에 설치된 건 `pip uninstall` 로 정리하세요 |
-| `torch.cuda.is_available()` 이 `False` | ① `nvidia-smi` 가 되는지 확인 ② CPU용 torch가 먼저 깔렸을 수 있음 → `pip uninstall torch torchvision -y` 후 `pip install -r requirements-gpu.txt` 재실행 |
-| `nvidia-smi: command not found` | NVIDIA GPU가 없거나 드라이버 미설치입니다. **GPU 없이 개발 가능합니다.** [3-1](#3-1-공통-설치-전원-필수)까지만 하세요 |
-| `CERTIFICATE_VERIFY_FAILED: unable to get local issuer certificate` | 파이썬이 시스템 CA 인증서 위치를 못 찾는 경우입니다. **`export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt`** 로 해결됩니다 (아래 설명 참고) |
-| 실수로 `.env` 를 커밋함 | **즉시 팀에 알리고 API 키를 재발급받으세요.** 커밋을 지워도 기록은 남습니다 |
-| `main`에 직접 커밋함 | 병합하지 말고 이슈로 공유하세요. 되돌리는 걸 같이 처리합니다 |
-
-### CA 인증서 오류가 헷갈리는 이유
-
-`pip install`은 잘 되는데 코드에서만 HTTPS가 실패하는 경우가 있습니다. **둘이 서로 다른 인증서 목록을 쓰기 때문**입니다.
-
-| 무엇을 쓸 때 | CA 출처 | 이 오류가 나나 |
+| `osenv.ocr` (WE-Meet 현재) | `infer_ocr` (학습 모델) | 비고 |
 | --- | --- | --- |
-| `pip` · `requests` · `httpx` | 패키지에 포함된 `certifi` | 안 남 |
-| 표준 라이브러리 `urllib` · `ssl` | **시스템 CA 경로** | **남** |
+| `available(refresh=False) -> dict` | 같음 | `UNIVUS_OCR=off` 로 끄는 것도 같다. 모델 폴더는 `OCR_MODEL_DIR` |
+| `image_texts(list[bytes]) -> list[str \| None]` | 같음 (+ 파일 경로·PIL 이미지도 받음) | 배치 추론, GPU 가 있으면 bf16 |
+| `pdf_text(bytes, pages=3)` | `pypdfium2` 가 있을 때만 | 없으면 None (OS OCR 과 같은 계약) |
 
-그래서 "pip은 되는데 크롤링 코드만 안 되는" 상황이 생깁니다. 특히 `notice_ai-agent`의 게시판 수집에서 터지기 쉽습니다.
+실측(RTX 4060 Laptop 8GB): 모델 적재 10~12초, **1.1 s/장**(배치 1) · 0.52 s/장(배치 3), VRAM 0.7~1.4GiB. CPU 만이면 9~10 s/장(결과 텍스트는 같다). Malgun Gothic 으로 그린 공지문 3장(각 6줄)은 CER 0% · 0% · 1.8%.
+한계: 합성 문서로 학습했으므로 사진 왜곡·손글씨·표 구조는 약하고, 읽기 순서 텍스트만 돌려준다(레이아웃 없음). 세부는 [`gpu/donut-ocr` README](../../blob/gpu/donut-ocr/README_BRANCH.md).
+
+<br>
+
+### 왜 이렇게 만들었나
+
+| 결정 | 이유 (자세한 경위는 [HANDOFF §9](../../blob/common/HANDOFF.md)) |
+| --- | --- |
+| **F9 를 학습 대상으로** (OCR·RAG 대신) | 도구 11개로 범위가 닫혀 있고, 모델이 틀려도 백엔드 날짜 재검증 + 쓰기 미리보기로 막힌다. 공개 한국어 function-calling 데이터가 있어 바로 학습 가능했다 |
+| **Qwen3-4B** (HyperCLOVAX-1.5B · Qwen3-8B 비교 브랜치 있음) | 9.5GiB 에서 QLoRA 학습과 nf4 서빙을 **둘 다** 할 수 있는 유일한 크기. tool calling 템플릿 내장. 8B 는 캐글 T4×2 에서만 |
+| **합성 데이터 + 패밀리 분리 평가** | 날짜 정답을 사람이 쓰면 틀린다. 생성기가 계산하고, 같은 말투 패밀리는 train/eval 한쪽에만 → 외운 문장이 아니라 일반화를 잰다. seed 고정으로 모델 간 비교 가능 |
+| **서빙은 어댑터 방식, nf4 병합본은 단독 배포용** | 어댑터는 54MB 로 가볍고 평가와 같은 구성. 병합본은 베이스 다운로드 없이 2.65GB 로 혼자 뜨지만 재양자화로 정확도가 약간 떨어진다(13문장 중 10 vs 8) |
+| **OCR = Donut + SynthDoG-ko** (TrOCR·PaddleOCR·VLM 대신) | 하루 안에 끝내야 했다. 논문(ECCV 2022)·한국어 데이터·HF 구현이 한 세트, 202M 이라 9.5GiB 에서 전체 미세조정, `<s_synthdog>` 사전학습 태스크로 **학습 전 기준선이 같은 프롬프트로 정의**된다 |
+| **코드에 모델 이름을 쓰지 않는다** | 모델 이름은 각 브랜치 `config.env` 의 `MODEL_ID` 한 줄에만. 모델을 바꾸면 그 줄만 바꾸고 `src/` 는 그대로 |
+| **pod 에는 코드와 4-bit 가중치만** | 홈 10GB 중 3GB 만 남았고 열린 포트가 SSH 뿐이어서, 데이터·결과는 내 PC 가 들고 SSH 터널 하나로 모든 통신(`gpu_server` ↔ `local_server`) |
+
+<br>
+
+### 재현
+
+**F9 (학교 서버 또는 아무 NVIDIA GPU, 9.5GiB 이상)** — `gpu/qwen3-4b` 브랜치 하나로 데이터 생성 → 학습 → 평가가 돈다. 자세한 절차·운영은 그 브랜치의 [README_BRANCH.md](../../blob/gpu/qwen3-4b/README_BRANCH.md) 와 [gpu_server/README.md](../../blob/common/gpu_server/README.md).
 
 ```bash
-# 진단 — 경로가 실제로 존재하는지 확인
-python -c "import ssl; print(ssl.get_default_verify_paths())"
-
-# 해결 — 셸 설정(.bashrc 등)에 넣어두면 매번 안 해도 됩니다
-export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+git clone -b gpu/qwen3-4b --single-branch https://github.com/logan0741/Univ-Us_AI.git univus-f9 && cd univus-f9
+bash setup.sh                                   # venv + torch + requirements + 베이스 가중치 prefetch
+python src/prepare_f9.py --n 1500 --seed 42     # data/f9/train.jsonl · eval.jsonl (패밀리 분리). seed 를 바꾸면 이전 실험과 비교 불가
+python src/prepare_f9_v2.py --n 10000 --seed 7 && python src/prepare_f9.py --n 1500 --seed 42 --extra data/f9/extra_v2.jsonl   # 2차 학습용 11,185행
+bash train.sh                                   # QLoRA 3 epoch → outputs/qwen3-4b-f9/adapter  (MIG 1g.10gb 에서 6.4h · v2 포함이면 ≈52h)
+bash eval.sh                                    # 학습 전/후 같은 평가셋 → outputs/qwen3-4b-f9/compare.md
 ```
 
-> **`verify=False` 로 우회하지 마세요.** 인증서 검증을 끄면 통신 상대가 진짜인지 확인할 수 없게 됩니다.
-> 경로만 알려주면 되는 문제라 우회할 이유가 없습니다.
+**OCR** — `gpu/donut-ocr` 브랜치. SynthDoG-ko parquet 4개(≈1.9GB)와 `donut-base` 를 미리 받아 `config.env` 의 경로에 둔다.
 
----
+```bash
+git clone -b gpu/donut-ocr --single-branch https://github.com/logan0741/Univ-Us_AI.git univus-ocr && cd univus-ocr
+bash train_ocr.sh --prepare     # 스키마·길이·이미지 크기 통계
+bash train_ocr.sh --smoke       # 16행 4 step — s/step·메모리 먼저 확인
+bash train_ocr.sh               # 1 epoch 1,471 step (9.5GiB 에서 3.6h)  → outputs/donut-ocr-ko/model
+bash eval_ocr.sh                # 학습 전 → 후 → compare.md (validation 500장)
+```
 
-여기에 없는 문제는 **[6장](#6-이슈-처리-규칙-카카오톡--github-issue) 규칙대로** 카톡 + Issue로 남겨주세요.
-반복되는 문제는 이 표에 추가됩니다.
+OOM 이면 `BATCH=1 GRAD_ACCUM=16 bash train_ocr.sh`. 두 파이프라인 모두 **학습 중 같은 GPU 로 서빙은 못 한다**(9.5GiB 를 못 나눈다 — `/model/unload` 가 아니라 서버를 내려야 VRAM 이 비는 것까지 겪었다, HANDOFF §6-19).
+
+<br>
+
+### 저장소 구조
+
+#### GitHub 브랜치
+
+목적별로 나뉘어 있다. **하나만 받으면 그 일은 끝까지 된다.** 공통 코드(`src/` `gpu_server/` `tools/`)는 `common` 에서 고치고 모델 브랜치에서 `git merge common` 한다 — 모델 브랜치에서 바뀌는 것은 `config.env` · `setup.sh` · `README_BRANCH.md` 뿐이다.
+
+| 브랜치 | 무엇을 하나 | 시작점 |
+| --- | --- | --- |
+| **[`gpu/qwen3-4b`](../../tree/gpu/qwen3-4b)** | **F9 학습·서빙** — Qwen3-4B QLoRA. 데이터 생성기(`prepare_f9.py` · `prepare_f9_v2.py`), `train.sh` · `eval.sh`, OpenAI 호환 `gpu_server/`, 내 PC 쪽 `local_server/` · 터널·배포 스크립트 | `README_BRANCH.md` → `gpu_server/README.md` |
+| **[`gpu/donut-ocr`](../../tree/gpu/donut-ocr)** | **한국어 문서 OCR** — Donut-base × SynthDoG-ko 전체 미세조정. `train_ocr.sh` · `eval_ocr.sh` · 추론 모듈 `src/infer_ocr.py` | `README_BRANCH.md` |
+| **[`wemeet/f9-chat-integration`](../../tree/wemeet/f9-chat-integration)** | **WE-Meet 백엔드에 F9 붙이기** — `F9_Chat_agent/` + backend/frontend 패치 (기준 `8243747`) | `README.md` |
+| [`common`](../../tree/common) | 모델 브랜치들의 공통 조상 — `src/` `tools/` `gpu_server/` `local_server/` `scripts/`, **`HANDOFF.md`**(결정·실측·사고 기록 전부), `DATA_FLOW.md` | `README.md` → `HANDOFF.md` |
+| [`gpu/hyperclovax-1.5b`](../../tree/gpu/hyperclovax-1.5b) · [`kaggle/qwen3-8b`](../../tree/kaggle/qwen3-8b) | 비교 후보 — 한국어 특화 1.5B(bf16 LoRA) · 8B(캐글 T4×2, fp16). `config.env` 만 다르다 | `README_BRANCH.md` |
+| [`collect_ai-agent_logan0741`](../../tree/collect_ai-agent_logan0741) | 2026-09 1차 개발 — 공지 수집 크롤러 · 학습 폴더 초안 | `README.md` |
+| [`feature/pic_ai-agent`](../../tree/feature/pic_ai-agent) | 2026-09 강의계획서 OCR 골격(Donut) — **제품에서 강의계획서가 빠져 폐기**, 참고용 | — |
+| `main` | 프로젝트 입구(이 문서) · 그림 · 평가표 · 팀 규칙. 코드 없음 | — |
+
+```bash
+R=https://github.com/logan0741/Univ-Us_AI.git
+git clone -b gpu/qwen3-4b --single-branch $R univus-f9          # F9 학습·서빙
+git clone -b gpu/donut-ocr --single-branch $R univus-ocr        # OCR
+git clone -b wemeet/f9-chat-integration --single-branch $R univus-f9-patch   # WE-Meet 패치
+```
+
+#### Release — 가중치
+
+[`weights-2026-11-13`](../../releases/tag/weights-2026-11-13) — 서버에서 그대로 내려받은 파일이며 `SHA256SUMS` 로 검증한다. GitHub 파일당 2GiB 제한 때문에 nf4 병합본은 분할 zip 이다(7-Zip 으로 `.zip` 을 열거나 `common` 의 `scripts/unsplit_zip.py` — 표준 라이브러리만).
+
+| 파일 | 크기 | 내용 | 어디에 두나 |
+| --- | ---: | --- | --- |
+| `qwen3-4b-f9-adapter.zip` | 54MB | LoRA 어댑터(r=16) + 토크나이저 — 평가표와 같은 구성. 베이스 `Qwen/Qwen3-4B` 가 따로 필요 | `<PERSIST_DIR>/outputs/qwen3-4b-f9/adapter/` |
+| `qwen3-4b-f9-merged-nf4.zip` + `.z01` | 0.44 + 1.99GB | 베이스+어댑터 병합 **nf4 4-bit** 가중치(2.65GB) + 토크나이저 — 베이스 없이 단독 서빙 | `<PERSIST_DIR>/models/qwen3-4b-f9-merged-nf4/` |
+| `donut-ocr-ko-model.zip` | 321MB | Donut OCR bf16 safetensors + processor + tokenizer + `run.json` · `train.log` | 아무 곳 → `OCR_MODEL_DIR` |
+| `SHA256SUMS` | — | 위 파일들의 sha256 | `sha256sum -c SHA256SUMS --ignore-missing` |
+
+학습 데이터(`data/f9/*.jsonl`)는 올리지 않았다 — 생성기와 seed 로 **같은 파일이 다시 만들어진다**(위 재현). SynthDoG-ko 는 HF `naver-clova-ix/synthdog-ko`.
+
+<br>
+
+### 문서 찾기
+
+| 문서 | 무엇을 찾을 때 |
+| --- | --- |
+| [`common/HANDOFF.md`](../../blob/common/HANDOFF.md) | **전체 경위** — 프로젝트 맥락, 브랜치 지도, 데이터 설계, 실험 1~20 의 설정·실측·사고와 해결, 결정 이유(§9). 인수인계는 이것 하나로 |
+| [`common/README.md`](../../blob/common/README.md) · [`DATA_FLOW.md`](../../blob/common/DATA_FLOW.md) | 학습 저장소 사용법 — 브랜치 쓰는 법, 평가 원칙, 데이터가 어디서 어디로 가는지 |
+| [`common/gpu_server/README.md`](../../blob/common/gpu_server/README.md) | 서버 상태 기계 · API 전부(`/train` `/model/merge` `/model/load` `/v1/chat/completions`) · 저장 공간 · pod 재시작 복구 |
+| [`gpu/qwen3-4b/README_BRANCH.md`](../../blob/gpu/qwen3-4b/README_BRANCH.md) · [`gpu/donut-ocr/README_BRANCH.md`](../../blob/gpu/donut-ocr/README_BRANCH.md) | 각 모델의 설정값과 실행 순서, OCR 추론 모듈 사용법 |
+| [`wemeet/f9-chat-integration/README.md`](../../blob/wemeet/f9-chat-integration/README.md) · [`F9_Chat_agent/README.md`](../../blob/wemeet/f9-chat-integration/F9_Chat_agent/README.md) | WE-Meet 에 붙이는 순서 · F9 대화 모듈의 구조와 `.env` |
+| [`docs/eval/`](docs/eval/) | 평가 원본 — `compare.md`(표) · `eval_*.md`(도구별·실패 사례·최악 10건) · `eval_*.json`(행별 결과) · `run.json`(학습 설정·소요) |
+| [`docs/개발-규칙.md`](docs/개발-규칙.md) · [`docs/DEV_PLAN.md`](docs/DEV_PLAN.md) · [`docs/AI_MODULES.md`](docs/AI_MODULES.md) | 2026-09 1차 개발 때의 팀 규칙(브랜치·커밋·이슈·환경 설치) · 계획 · 기능별 MVP 정의 |
+| [`Univ-Us_기능명세서.md`](Univ-Us_기능명세서.md) · [`Univ-Us_역할별_기능분해서.md`](Univ-Us_역할별_기능분해서.md) | 📌 기준 문서 — F1~F17 요구사항, AI/BE/FE 역할 경계 (BE·FE 저장소와 공유) |
+
+<br>
+
+### 모델·데이터·논문
+
+- **Qwen3-4B** — Qwen Team, *Qwen3 Technical Report*, 2025. arXiv:2505.09388. HF `Qwen/Qwen3-4B` (Apache-2.0). 학습: QLoRA (Dettmers et al., *QLoRA: Efficient Finetuning of Quantized LLMs*, NeurIPS 2023, arXiv:2305.14314) — `peft` + `bitsandbytes` nf4.
+- **Donut** — Geewook Kim et al., *OCR-free Document Understanding Transformer*, ECCV 2022. arXiv:2111.15664. HF `naver-clova-ix/donut-base` (MIT). 데이터 **SynthDoG-ko** — 같은 논문의 합성 문서 생성기로 만든 한국어 셋, HF `naver-clova-ix/synthdog-ko`.
+- **비교 후보** — `naver-hyperclovax/HyperCLOVAX-SEED-Text-Instruct-1.5B`(HF gated) · `Qwen/Qwen3-8B`.
+- F9 학습 데이터는 이 저장소의 생성기가 만든 **합성 데이터**이며 개인 정보가 없다. WE-Meet 요구사항정의서 F9 §5 의 도구 11개 계약(`tools/f9_tools.json`)을 그대로 따른다.
