@@ -1,0 +1,27 @@
+# ── 데이터·학습 결과 — 용량·개인정보. HF Hub(private) 로 주고받는다 ──
+data/
+outputs/
+logs/
+results/
+models/
+# 학습 결과 사본 · nf4 병합본 · 서버 pidfile
+*.pid
+
+# ── 환경 ──
+.venv/
+venv/
+__pycache__/
+*.pyc
+.cache/
+hf_cache/
+.ipynb_checkpoints/
+wandb/
+
+# ── 비밀 ──
+*.pem
+.env
+kaggle.json
+# 내 PC 전용 덮어쓰기 (config.env 는 브랜치별로 추적한다)
+config.local.env
+# SSH 접속 정보 · API 키 (server.env.example 만 추적)
+scripts/server.env
