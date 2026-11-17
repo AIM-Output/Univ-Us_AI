@@ -14,7 +14,7 @@ WE-Meet 저장소에는 커밋되지 않았기 때문에 **적용용 패치**로
 
 ```bash
 # 0) 이 브랜치를 옆에 받는다
-git clone -b wemeet/f9-chat-integration --single-branch https://github.com/logan0741/Univ-Us_AI.git ../univus-f9
+git clone -b wemeet/f9-chat-integration --single-branch https://github.com/AIM-Output/Univ-Us_AI.git ../univus-f9
 
 # 1) 새 폴더·파일 복사
 cp -r ../univus-f9/F9_Chat_agent ./F9_Chat_agent
