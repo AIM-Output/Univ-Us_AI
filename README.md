@@ -94,13 +94,13 @@ WE-Meet 백엔드(`univ_us_local/backend`, FastAPI)는 LLM 을 **`LLM_MAIN_BASE_
 
 ```bash
 # 1) 코드 — F9 브랜치 하나만 받는다 (gpu_server · src · tools 가 들어 있다)
-git clone -b gpu/qwen3-4b --single-branch https://github.com/logan0741/Univ-Us_AI.git univus-f9 && cd univus-f9
+git clone -b gpu/qwen3-4b --single-branch https://github.com/AIM-Output/Univ-Us_AI.git univus-f9 && cd univus-f9
 python -m venv .venv && . .venv/Scripts/activate        # Linux: . .venv/bin/activate
 pip install torch --index-url https://download.pytorch.org/whl/cu128     # 자기 CUDA 에 맞는 휠
 pip install -r requirements.txt
 
 # 2) 가중치 — Release 의 nf4 병합본(분할 zip 2개)을 받아 <PERSIST_DIR>/models/ 에 푼다
-R=https://github.com/logan0741/Univ-Us_AI/releases/download/weights-2026-11-13
+R=https://github.com/AIM-Output/Univ-Us_AI/releases/download/weights-2026-11-13
 curl -LO $R/qwen3-4b-f9-merged-nf4.zip && curl -LO $R/qwen3-4b-f9-merged-nf4.z01 && curl -LO $R/SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing
 mkdir -p ~/univus-out/models
@@ -144,7 +144,7 @@ LLM_MAIN_MODEL=univus-f9          # 서버는 이 값을 무시한다(적재된 
 WE-Meet 저장소(`26-WE-Meet-Project` @`8243747`, v0.2.0)에 F9 를 끼워 넣은 코드가 [`wemeet/f9-chat-integration`](../../tree/wemeet/f9-chat-integration) 브랜치에 **그대로** 있다 — 새 폴더 `F9_Chat_agent/`, 백엔드 라우터 `chat.py`, 프론트 `chat.ts` + 기존 파일 12개 패치(`git apply --check` 통과).
 
 ```bash
-git clone -b wemeet/f9-chat-integration --single-branch https://github.com/logan0741/Univ-Us_AI.git ../univus-f9-patch
+git clone -b wemeet/f9-chat-integration --single-branch https://github.com/AIM-Output/Univ-Us_AI.git ../univus-f9-patch
 # WE-Meet 저장소 루트에서
 cp -r ../univus-f9-patch/F9_Chat_agent ./F9_Chat_agent
 cp ../univus-f9-patch/univ_us_local/backend/app/chat.py univ_us_local/backend/app/
@@ -161,9 +161,9 @@ python -m pytest F9_Chat_agent/tests -q
 WE-Meet 는 지금 OS 내장 OCR(`C0_Platform_agent/osenv/ocr.py` — Windows WinRT · macOS Vision)로 이미지 공지를 읽는다. 학습한 Donut 모델은 **같은 함수 모양**으로 제공해, 그 자리에 바꿔 끼우거나 OS OCR 이 없는 환경(Linux 서버)의 대체로 쓸 수 있다.
 
 ```bash
-git clone -b gpu/donut-ocr --single-branch https://github.com/logan0741/Univ-Us_AI.git univus-ocr && cd univus-ocr
+git clone -b gpu/donut-ocr --single-branch https://github.com/AIM-Output/Univ-Us_AI.git univus-ocr && cd univus-ocr
 pip install torch transformers pillow           # 추론만이면 이 셋으로 충분 (editdistance 는 평가 때만)
-curl -LO https://github.com/logan0741/Univ-Us_AI/releases/download/weights-2026-11-13/donut-ocr-ko-model.zip
+curl -LO https://github.com/AIM-Output/Univ-Us_AI/releases/download/weights-2026-11-13/donut-ocr-ko-model.zip
 unzip donut-ocr-ko-model.zip                    # → donut-ocr-ko/model/ (bf16 safetensors + processor + tokenizer)
 export OCR_MODEL_DIR=$PWD/donut-ocr-ko/model
 python src/infer_ocr.py 공지.png 포스터.jpg       # 이미지마다 읽은 글자와 초 출력 (--json · --device cpu)
@@ -206,7 +206,7 @@ texts = ocr.image_texts([png_bytes, jpg_bytes])  # 이미지마다 str, 못 읽�
 **F9 (학교 서버 또는 아무 NVIDIA GPU, 9.5GiB 이상)** — `gpu/qwen3-4b` 브랜치 하나로 데이터 생성 → 학습 → 평가가 돈다. 자세한 절차·운영은 그 브랜치의 [README_BRANCH.md](../../blob/gpu/qwen3-4b/README_BRANCH.md) 와 [gpu_server/README.md](../../blob/common/gpu_server/README.md).
 
 ```bash
-git clone -b gpu/qwen3-4b --single-branch https://github.com/logan0741/Univ-Us_AI.git univus-f9 && cd univus-f9
+git clone -b gpu/qwen3-4b --single-branch https://github.com/AIM-Output/Univ-Us_AI.git univus-f9 && cd univus-f9
 bash setup.sh                                   # venv + torch + requirements + 베이스 가중치 prefetch
 python src/prepare_f9.py --n 1500 --seed 42     # data/f9/train.jsonl · eval.jsonl (패밀리 분리). seed 를 바꾸면 이전 실험과 비교 불가
 python src/prepare_f9_v2.py --n 10000 --seed 7 && python src/prepare_f9.py --n 1500 --seed 42 --extra data/f9/extra_v2.jsonl   # 2차 학습용 11,185행
@@ -217,7 +217,7 @@ bash eval.sh                                    # 학습 전/후 같은 평가�
 **OCR** — `gpu/donut-ocr` 브랜치. SynthDoG-ko parquet 4개(≈1.9GB)와 `donut-base` 를 미리 받아 `config.env` 의 경로에 둔다.
 
 ```bash
-git clone -b gpu/donut-ocr --single-branch https://github.com/logan0741/Univ-Us_AI.git univus-ocr && cd univus-ocr
+git clone -b gpu/donut-ocr --single-branch https://github.com/AIM-Output/Univ-Us_AI.git univus-ocr && cd univus-ocr
 bash train_ocr.sh --prepare     # 스키마·길이·이미지 크기 통계
 bash train_ocr.sh --smoke       # 16행 4 step — s/step·메모리 먼저 확인
 bash train_ocr.sh               # 1 epoch 1,471 step (9.5GiB 에서 3.6h)  → outputs/donut-ocr-ko/model
@@ -240,13 +240,11 @@ OOM 이면 `BATCH=1 GRAD_ACCUM=16 bash train_ocr.sh`. 두 파이프라인 모두
 | **[`gpu/donut-ocr`](../../tree/gpu/donut-ocr)** | **한국어 문서 OCR** — Donut-base × SynthDoG-ko 전체 미세조정. `train_ocr.sh` · `eval_ocr.sh` · 추론 모듈 `src/infer_ocr.py` | `README_BRANCH.md` |
 | **[`wemeet/f9-chat-integration`](../../tree/wemeet/f9-chat-integration)** | **WE-Meet 백엔드에 F9 붙이기** — `F9_Chat_agent/` + backend/frontend 패치 (기준 `8243747`) | `README.md` |
 | [`common`](../../tree/common) | 모델 브랜치들의 공통 조상 — `src/` `tools/` `gpu_server/` `local_server/` `scripts/`, **`HANDOFF.md`**(결정·실측·사고 기록 전부), `DATA_FLOW.md` | `README.md` → `HANDOFF.md` |
-| [`gpu/hyperclovax-1.5b`](../../tree/gpu/hyperclovax-1.5b) · [`kaggle/qwen3-8b`](../../tree/kaggle/qwen3-8b) | 비교 후보 — 한국어 특화 1.5B(bf16 LoRA) · 8B(캐글 T4×2, fp16). `config.env` 만 다르다 | `README_BRANCH.md` |
-| [`collect_ai-agent_logan0741`](../../tree/collect_ai-agent_logan0741) | 2026-09 1차 개발 — 공지 수집 크롤러 · 학습 폴더 초안 | `README.md` |
-| [`feature/pic_ai-agent`](../../tree/feature/pic_ai-agent) | 2026-09 강의계획서 OCR 골격(Donut) — **제품에서 강의계획서가 빠져 폐기**, 참고용 | — |
+| [`archive`](../../tree/archive) | 지운 과거 브랜치 4개를 폴더로 묶음(2026-11-17) — `gpu-hyperclovax-1.5b/` `kaggle-qwen3-8b/`(F9 비교 후보, 결과 없음) · `feature-pic_ai-agent/`(강의계획서 OCR 골격, 폐기) · `collect_ai-agent_logan0741/`(2026-09 1차 개발). 커밋 이력은 merge 부모로 보존 | `README.md` |
 | `main` | 프로젝트 입구(이 문서) · 그림 · 평가표 · 팀 규칙. 코드 없음 | — |
 
 ```bash
-R=https://github.com/logan0741/Univ-Us_AI.git
+R=https://github.com/AIM-Output/Univ-Us_AI.git
 git clone -b gpu/qwen3-4b --single-branch $R univus-f9          # F9 학습·서빙
 git clone -b gpu/donut-ocr --single-branch $R univus-ocr        # OCR
 git clone -b wemeet/f9-chat-integration --single-branch $R univus-f9-patch   # WE-Meet 패치
