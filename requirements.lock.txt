@@ -1,0 +1,17 @@
+# AI 팀 1차 학습(qwen3-4b-f9, 2026-11-02)의 run.json 에 찍힌 라이브러리 버전.
+# 환경을 만든 뒤(setup_local.ps1 또는 setup.sh) 이 파일을 한 번 더 설치하면 같은 버전으로 맞춰진다:
+#
+#   Windows :  .\.venv\Scripts\python.exe -m pip install -r requirements.lock.txt
+#   RunPod  :  /workspace/scratch/.venv/bin/pip install -r requirements.lock.txt
+#
+# torch 는 여기 없다 — CUDA 빌드가 환경마다 달라 setup 스크립트가 깐 것을 그대로 쓴다.
+#   · AI 팀 학교 서버(Linux): torch 2.13.0+cu129
+#   · Windows 는 cu129 index 에 2.9.0 까지만 있다(2026-11-18 확인) → setup_local.ps1 이 2.9.0+cu129 를 깐다.
+#     RTX 50 시리즈는 CUDA 12.8 이상 빌드면 된다.
+# 2026-11-18 에 PyPI 에 이 버전들이 있는 것만 확인했다(bitsandbytes 는 win_amd64 휠 있음). 실제 설치·학습은 아직 돌려 보지 못했다.
+transformers==5.22.1
+peft==0.21.2
+trl==1.17.1
+datasets==5.1.0
+accelerate==1.15.0
+bitsandbytes==0.50.2

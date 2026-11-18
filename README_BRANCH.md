@@ -1,44 +1,55 @@
-# gpu/qwen3-4b — Qwen3-4B · 학교 GPU 서버 · QLoRA
+# gpu/qwen3-4b-v2 — AI 팀 F9 모델(Qwen3-4B QLoRA) 이어서 학습
+
+**처음이면 [docs/F9_학습_가이드.md](docs/F9_학습_가이드.md) 부터 읽는다.** 사람별 할 일, 데이터 쓰는 법, 학습 방법이 거기에 있다.
 
 | 항목 | 값 |
 | --- | --- |
-| 모델 | `Qwen/Qwen3-4B` (tool calling 템플릿 내장 → `render_chat` 네이티브 모드) |
-| 환경 | 학교 서버 A100 MIG `1g.10gb` — **가용 9.5GiB**, bf16 지원 |
-| 방식 | 4-bit(nf4) QLoRA · LoRA r=16 · bf16 compute · MAX_SEQ 2560 · batch 1 × accum 8 · completion-only 손실 |
-| 산출물 | `outputs/qwen3-4b-f9/adapter/` (→ `$PERSIST_DIR/outputs/…`, pod 재시작 후에도 남음) |
+| 출발점 | `gpu/qwen3-4b` (`f69b052`) — 코드와 학습 설정은 그대로 두고 **데이터를 늘려** 다시 학습한다 |
+| 모델 | `Qwen/Qwen3-4B` · 4-bit(nf4) QLoRA · LoRA r=16 · MAX_SEQ 2560 · batch 1 × accum 8 · completion-only 손실 |
+| 학습 데이터 | v1(AI 팀, seed 42) + v2(AI 팀, seed 7, 1만 행 — 이번에 처음 학습) + v3(우리 말투 틀, seed 11) |
+| 시험 | `eval.jsonl`(AI 팀 358턴, 기준선 77.7%) + `real_dev` · `real_test`(우리가 쓴 실제 문장) |
+| 학습 장소 | 하람 데스크톱(RTX 5060 8GB). 8GB 에 안 들어가면 RunPod (가이드 8장 · 부록 C) |
+| 기록 | [docs/f9/RESULTS.md](docs/f9/RESULTS.md) · `docs/eval/<run>/` · Release `<run>` |
 
-## 메모리 예산 (GPU-환경과-모델-선정.md 1장)
+## 이 브랜치에서 더한 것
 
-| 항목 | 크기 |
+| 파일 | 무엇 |
 | --- | --- |
-| 4B 가중치 4-bit | ~2.5GB |
-| 활성화(2560 토큰, gradient checkpointing 켬) + 런타임 오버헤드 | 3~5GB |
-| LoRA 파라미터·옵티마이저(8-bit paged) | <1GB |
-| **합계** | **6~8GB / 9.5GiB** ✅ |
+| `data_src/real/<이름>.tsv` | 사람이 쓴 실제 문장 — 시험 문제(학습에 넣지 않는다) |
+| `data_src/frames/<이름>.tsv` | 사람이 쓴 말투 틀 — v3 학습 데이터의 재료 |
+| `src/make_real.py` | 실제 문장 검사(`--check`) · 검수용 표(`--show`) · `real_dev.jsonl` / `real_test.jsonl` 만들기 |
+| `src/prepare_f9_v3.py` | 말투 틀 검사(`--check`) · 표본 보기(`--show`) · `extra_v3.jsonl` 만들기 — 정답 계산은 v2 의 함수를 쓴다 |
+| `src/datasrc.py` | 위 두 스크립트가 같이 쓰는 TSV 읽기 · 표기 도우미 |
+| `scripts/peek_rows.py` | 데이터 파일에서 문장을 뽑아 표로 보기 (생성 문장 검수) |
+| `scripts/peek_fail.py` | 평가 결과에서 틀린 턴만 뽑아 보기 (실패 분석) |
+| `tests/test_f9_data_tools.py` | 위 도구들의 자가 점검 — `python -m unittest discover -s tests` |
+| `.github/workflows/f9-data-check.yml` | `data_src/` 를 고친 PR 을 자동 검사 |
+| `requirements.lock.txt` | AI 팀 1차 학습 때의 라이브러리 버전 |
+| `docs/` | 가이드 · 성적표 |
 
-**토큰 예산:** system + 도구 11개 정의만 **약 1,950 토큰** → 한 행 2,000~2,200 토큰. `MAX_SEQ` 는 **2304 이상**(기본 2560). 더 줄이면 정답이 잘려 `train.py` 가 그 행을 버린다.
-OOM 이 나면 `config.env` 에서 **이 순서로**: `LORA_R` 16→8 → (`BATCH` 는 이미 1) → 그래도면 `tools/f9_tools.json` 의 description 을 줄여 토큰을 아낀다(단, 평가 프롬프트도 같이 바뀌므로 이전 결과와 비교 불가).
-학습 중에는 추론 서버를 내려야 한다 — 같은 9.5GiB 를 나눠 쓸 수 없다.
-
-## 실행 순서
+## 자주 쓰는 명령
 
 ```bash
-bash setup.sh     # 처음 1회 + pod 재시작 후 (venv·가중치 재설치가 정상 동작)
-bash train.sh     # 데이터 없으면 합성 생성 → 학습 → outputs/qwen3-4b-f9/adapter
-bash eval.sh      # 학습 전·후 비교표 → outputs/qwen3-4b-f9/compare.md
+# 데이터 (순서 그대로 — v2 는 eval.jsonl 이 먼저 있어야 한다)
+python src/prepare_f9.py --n 1500 --seed 42
+python src/prepare_f9_v2.py --n 10000 --seed 7
+python src/prepare_f9_v3.py --n 3000 --seed 11
+python src/prepare_f9.py --n 1500 --seed 42 --extra data/f9/extra_v2.jsonl data/f9/extra_v3.jsonl
+python src/make_real.py
+
+# 검사
+python src/make_real.py --check
+python src/prepare_f9_v3.py --check
+python -m unittest discover -s tests
+
+# 학습 · 평가 (Git Bash)
+RUN_NAME=f9-r1 bash train.sh
+RUN_NAME=f9-r1 bash eval.sh
 ```
 
-긴 작업은 세션과 분리: `setsid nohup bash train.sh > $HOME/univus-train-out/logs/train.log 2>&1 < /dev/null &`
+## AI 팀 브랜치(`gpu/qwen3-4b`)와 다른 점
 
-## 영속성 — 홈 10GB 한도
-
-| 경로 | 남나 | 내용 |
-| --- | :---: | --- |
-| `$PERSIST_DIR` = `~/univus-train-out` | ✅ | `data/` `outputs/` `logs/` — `train.sh` 가 저장소의 `data` `outputs` 를 여기로 심볼릭 링크 |
-| `$SCRATCH_DIR` = `~/.venv/univus-train` | ❌ | `.venv/`(~8GB) · `hf_cache/`(가중치 ~8GB) — 재시작 후 `setup.sh` |
-
-홈이 10GB 뿐이라 **체크포인트가 쌓이면 꽉 찬다** → `train.py` 가 `save_total_limit=2` 로 최근 2개만 남긴다. 끝난 run 의 `checkpoint-*` 는 지워도 된다(어댑터는 `adapter/` 에 따로 있다).
-
-## 3자 비교의 Base 행
-
-`BASE_MODEL_ID=Qwen/Qwen3-4B-Base bash eval.sh` 로 학습 전 Base 모델 행까지 한 표에 넣는다(개발계획서 7.2).
+- `config.env`: `TARGET=local` · `EPOCHS=1` · `SAVE_STEPS=100` · `RUN_NAME=f9-dev`. 나머지 학습 설정은 같다.
+- 기존 공통 파일(`src/common.py` · `prepare_f9.py` · `prepare_f9_v2.py` · `train.py` · `eval.py` · `train.sh` · `eval.sh` · setup 스크립트 · `tools/`)은 **고치지 않았다.** 그래서 `git merge common` 이 그대로 된다.
+- 새 도구는 이 브랜치에만 있다. 다른 모델 브랜치에서도 쓰게 되면 `common` 으로 옮긴다.
+- AI 팀의 이 브랜치 설명(학교 서버 메모리 예산 등)은 `git show gpu/qwen3-4b:README_BRANCH.md` 로 볼 수 있다.
