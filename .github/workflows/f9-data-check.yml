@@ -1,0 +1,57 @@
+# data_src(실제 문장 · 말투 틀)를 고친 PR 을 자동으로 검사한다 — 내 PC 에 파이썬이 없어도(웹에서만 고쳐도) 검사가 된다.
+# 표준 라이브러리만 쓰고, 모델·GPU 는 쓰지 않는다. 1분 안에 끝난다.
+name: F9 데이터 검사
+
+on:
+  pull_request:
+    branches: ["gpu/qwen3-4b-v2"]
+    paths: ["data_src/**", "src/**", "scripts/**", "tests/**", "tools/**", ".github/workflows/f9-data-check.yml"]
+  push:
+    branches: ["gpu/qwen3-4b-v2"]
+    paths: ["data_src/**", "src/**", "scripts/**", "tests/**", "tools/**", ".github/workflows/f9-data-check.yml"]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  PYTHONUTF8: "1"
+
+jobs:
+  check:
+    name: 실제 문장 · 말투 틀 검사
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 생성 데이터 만들기 (겹침 검사에 쓴다)
+        run: |
+          python src/prepare_f9.py --n 1500 --seed 42
+          python src/prepare_f9_v2.py --n 10000 --seed 7
+          python src/prepare_f9.py --n 1500 --seed 42 --extra data/f9/extra_v2.jsonl
+          sha256sum data/f9/*.jsonl | cut -c1-12,65-
+          test "$(sha256sum data/f9/eval.jsonl | cut -c1-12)" = "e53cf213e1d9"
+
+      - name: 실제 문장 검사 (data_src/real)
+        run: |
+          echo '### 실제 문장 검사' >> "$GITHUB_STEP_SUMMARY"
+          python src/make_real.py --check | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: 말투 틀 검사 (data_src/frames)
+        run: |
+          echo '### 말투 틀 검사' >> "$GITHUB_STEP_SUMMARY"
+          python src/prepare_f9_v3.py --check | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: 도구 자가 점검
+        run: |
+          python src/common.py
+          python src/make_real.py --check data_src/examples/real_example.tsv > /dev/null
+          python src/prepare_f9_v3.py --check data_src/examples/frames_example.tsv > /dev/null
+          python -m unittest discover -s tests

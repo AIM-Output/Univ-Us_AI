@@ -1,0 +1,35 @@
+id	기준시각	문장	정답	메모
+ex-001	2026-11-18 14:00	담주 목요일 저녁 8시 발표 리허설 2시간 잡아줘	create_event {"title": "발표 리허설", "start": "2026-11-26T20:00", "end": "2026-11-26T22:00", "allDay": false, "category": "personal"}	길이를 말함
+ex-002	2026-11-18 14:00	다음 주 수요일 오후 2시부터 4시까지 캡스톤 회의	create_event {"title": "캡스톤 회의", "start": "2026-11-25T14:00", "end": "2026-11-25T16:00", "allDay": false, "category": "team"}	끝 시각을 말함
+ex-003	2026-11-18 14:00	금요일 하루 종일 MT 있어 넣어줘	create_event {"title": "MT", "start": "2026-11-20", "end": "2026-11-21", "allDay": true, "category": "personal"}	종일 — end 는 다음 날
+ex-004	2026-11-18 14:00	11월 27일부터 29일까지 동아리 MT	create_event {"title": "동아리 MT", "start": "2026-11-27", "end": "2026-11-30", "allDay": true, "category": "personal"}	여러 날 — end 는 마지막 날의 다음 날
+ex-005	2026-11-18 14:00	매주 화요일 저녁 7시 자료구조 스터디 반복으로	create_event {"title": "자료구조 스터디", "start": "2026-11-24T19:00", "end": "2026-11-24T20:00", "allDay": false, "category": "study", "repeat": "weekly:TU"}	반복 — 첫 날짜는 오늘 다음의 첫 화요일
+ex-006	2026-11-18 14:00	이번주 마감 머 남음?	list_events {"from": "2026-11-16", "to": "2026-11-22", "kinds": ["deadline"]}	
+ex-007	2026-11-18 14:00	다음 주 시험이랑 마감 같이 보여줘	list_events {"from": "2026-11-23", "to": "2026-11-29", "kinds": ["deadline", "exam"]}	
+ex-008	2026-11-18 14:00	이번 주말 약속 뭐 있어?	list_events {"from": "2026-11-21", "to": "2026-11-22", "kinds": ["user"]}	
+ex-009	2026-11-18 14:00	이번 달 학사일정 뭐 있어?	list_events {"from": "2026-11-01", "to": "2026-11-30", "kinds": ["academic"]}	기간을 말하면 조회
+ex-010	2026-11-18 14:00	토요일 팀 회의 저녁 6시로 옮겨줘	list_events {"from": "2026-11-21", "to": "2026-11-21"}	수정 — 첫 단계만
+ex-011	2026-11-18 14:00	내일 병원 예약 취소해줘	list_events {"from": "2026-11-19", "to": "2026-11-19"}	삭제 — 첫 단계만
+ex-012	2026-11-18 14:00	운영체제 과제 마감 내일로 미뤄줘	거절	e클래스 마감
+ex-013	2026-11-18 14:00	수강신청 기간 좀 바꿔줄래	거절	학사일정
+ex-014	2026-11-18 14:00	금요일 데이터베이스 수업 지워줘	거절	수업
+ex-015	2026-11-18 14:00	졸업요건 화면 열어줘	navigate {"route": "/graduation"}	
+ex-016	2026-11-18 14:00	출결 보러 가자	navigate {"route": "/attendance"}	
+ex-017	2026-11-18 14:00	이클래스 새로고침 좀	run_sync {"source": "eclass"}	
+ex-018	2026-11-18 14:00	장학 공지 다시 받아와	run_sync {"source": "scholarship"}	
+ex-019	2026-11-18 14:00	졸업까지 몇 학점 남았더라	get_graduation {}	
+ex-020	2026-11-18 14:00	운영체제 결석 몇 번 했어?	get_attendance {"course": "운영체제"}	
+ex-021	2026-11-18 14:00	F 위험한 과목 있어?	get_attendance {}	
+ex-022	2026-11-18 14:00	다음 시험 언제야?	get_exams {"upcoming": true}	
+ex-023	2026-11-18 14:00	시험 공부 계획 보여줘	get_exams {}	
+ex-024	2026-11-18 14:00	당장 급한 과제 뭐야	list_assignments {"group": "now"}	
+ex-025	2026-11-18 14:00	이번 주 과제 뭐 있어?	list_assignments {"group": "this_week"}	'과제'로 물으면 과제 목록
+ex-026	2026-11-18 14:00	천천히 해도 되는 과제 있어?	list_assignments {"group": "later"}	
+ex-027	2026-11-18 14:00	과제 목록 다 보여줘	list_assignments {}	
+ex-028	2026-11-18 14:00	이번 주 빈 시간 공부로 채워줘	open_placement {"range": "this_week"}	
+ex-029	2026-11-18 14:00	다음 주 공강 배치해줘	open_placement {"range": "next_week"}	
+ex-030	2026-11-18 14:00	공강에 공부 넣어줘	open_placement {}	주를 말하지 않음
+ex-031	2026-11-18 14:00	오늘 저녁 뭐 먹지	거절	앱이 못 하는 일
+ex-032	2026-11-18 14:00	내일 뭐 있지	list_events {"from": "2026-11-19", "to": "2026-11-19"}	
+ex-033	2026-11-18 14:00	이번 주 일정 알려줘	list_events {"from": "2026-11-16", "to": "2026-11-22"}	
+ex-034	2026-11-18 14:00	내일 오후 3시에 치과 예약 넣어줘	create_event {"title": "치과 예약", "start": "2026-11-19T15:00", "end": "2026-11-19T16:00", "allDay": false, "category": "personal"}	길이를 말하지 않으면 1시간
