@@ -1,1 +1,41 @@
 id	기준시각	문장	정답	메모
+sb-001	2026-11-18 14:00	졸업요건 페이지 좀 띄워줘	navigate {"route": "/graduation"}	
+sb-002	2026-11-18 14:00	출석 화면으로 이동해줘	navigate {"route": "/attendance"}	
+sb-003	2026-11-18 14:00	강의자료 탭 열어줘	navigate {"route": "/courses"}	
+sb-004	2026-11-18 14:00	장학금 화면 띄워줘	navigate {"route": "/scholarships"}	
+sb-005	2026-11-18 14:00	공모전 정보 있는 화면으로 고	navigate {"route": "/opportunities"}	
+sb-006	2026-11-18 14:00	알림 설정 열어줘	navigate {"route": "/settings/notifications"}	
+sb-007	2026-11-18 14:00	메인 화면으로 돌아가자	navigate {"route": "/"}	
+sb-008	2026-11-18 14:00	이클래스 최신으로 받아와줘	run_sync {"source": "eclass"}	
+sb-009	2026-11-18 14:00	장학 공지 새로 불러와줘	run_sync {"source": "scholarship"}	
+sb-010	2026-11-18 14:00	공모전 정보 동기화 좀 해줘	run_sync {"source": "activity"}	
+sb-011	2026-11-18 14:00	나 졸업까지 학점 얼마나 남았지	get_graduation {}	
+sb-012	2026-11-18 14:00	졸업하려면 몇 학점 더 들어야 돼?	get_graduation {}	
+sb-013	2026-11-18 14:00	졸업요건 얼마나 채웠는지 알려줘	get_graduation {}	
+sb-014	2026-11-18 14:00	졸업 학점 부족한 거 있어?	get_graduation {}	
+sb-015	2026-11-18 14:00	운영체제 결석 몇 번 했더라ㅠㅠ	get_attendance {"course": "운영체제"}	
+sb-016	2026-11-18 14:00	알고리즘 출석 몇 번 빠졌어?	get_attendance {"course": "알고리즘"}	
+sb-017	2026-11-18 14:00	한국사 결석 몇 번 했는지 알려줘	get_attendance {"course": "한국사"}	
+sb-018	2026-11-18 14:00	출석 위험한 과목 있나?	get_attendance {}	
+sb-019	2026-11-18 14:00	이번 학기 출결 상황 알려줘	get_attendance {}	
+sb-020	2026-11-18 14:00	시험 며칠 남았지	get_exams {"upcoming": true}	
+sb-021	2026-11-18 14:00	곧 있을 시험 알려줘	get_exams {"upcoming": true}	
+sb-022	2026-11-18 14:00	논리회로 시험 언제야?	get_exams {"upcoming": true}	
+sb-023	2026-11-18 14:00	시험 공부 계획 좀 알려줘	get_exams {}	
+sb-024	2026-11-18 14:00	당장 해야 되는 과제 뭐야	list_assignments {"group": "now"}	
+sb-025	2026-11-18 14:00	급한 과제부터 알려줘	list_assignments {"group": "now"}	
+sb-026	2026-11-18 14:00	이번 주에 해야 할 과제 뭐 있어?	list_assignments {"group": "this_week"}	
+sb-027	2026-11-18 14:00	급하지 않은 과제는 뭐 있어?	list_assignments {"group": "later"}	
+sb-028	2026-11-18 14:00	과제 뭐 뭐 있는지 전부 알려줘	list_assignments {}	
+sb-029	2026-11-18 14:00	이번 주 공강에 공부 넣어줘	open_placement {"range": "this_week"}	
+sb-030	2026-11-18 14:00	다음 주 공강 시간에 공부 배치해줘	open_placement {"range": "next_week"}	
+sb-031	2026-11-18 14:00	담주 빈 시간 채워줘	open_placement {"range": "next_week"}	
+sb-032	2026-11-18 14:00	비는 시간에 공부 좀 넣어줘	open_placement {}	
+sb-033	2026-11-18 14:00	내일 날씨 어때?	거절	
+sb-034	2026-11-18 14:00	요즘 볼 만한 영화 추천해줘	거절	
+sb-035	2026-11-18 14:00	이 문장 영어로 번역 좀 해줘	거절	
+sb-036	2026-11-18 14:00	주식 시세 알려줘	거절	
+sb-037	2026-11-18 14:00	낼 뭐 있지	list_events {"from": "2026-11-19", "to": "2026-11-19"}	
+sb-038	2026-11-18 14:00	다음 주 일정 뭐 있어?	list_events {"from": "2026-11-23", "to": "2026-11-29"}	
+sb-039	2026-11-18 14:00	내일 오후 2시에 팀 회의 잡아줘	create_event {"title": "팀 회의", "start": "2026-11-19T14:00", "end": "2026-11-19T15:00", "allDay": false, "category": "team"}	
+sb-040	2026-11-18 14:00	모레 저녁 7시에 스터디 추가해줘	create_event {"title": "스터디", "start": "2026-11-20T19:00", "end": "2026-11-20T20:00", "allDay": false, "category": "study"}	
