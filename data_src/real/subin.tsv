@@ -38,4 +38,44 @@ sb-036	2026-11-18 14:00	주식 시세 알려줘	거절
 sb-037	2026-11-18 14:00	낼 뭐 있지	list_events {"from": "2026-11-19", "to": "2026-11-19"}	
 sb-038	2026-11-18 14:00	다음 주 일정 뭐 있어?	list_events {"from": "2026-11-23", "to": "2026-11-29"}	
 sb-039	2026-11-18 14:00	내일 오후 2시에 팀 회의 잡아줘	create_event {"title": "팀 회의", "start": "2026-11-19T14:00", "end": "2026-11-19T15:00", "allDay": false, "category": "team"}	
-sb-040	2026-11-18 14:00	모레 저녁 7시에 스터디 추가해줘	create_event {"title": "스터디", "start": "2026-11-20T19:00", "end": "2026-11-20T20:00", "allDay": false, "category": "study"}	
+sb-040	2026-11-18 14:00	모레 저녁 7시에 스터디 추가해줘	create_event {"title": "스터디", "start": "2026-11-20T19:00", "end": "2026-11-20T20:00", "allDay": false, "category": "study"}
+sb-041	2026-11-18 14:00	학사일정 화면으로 ㄱㄱ	navigate {"route": "/academic"}	
+sb-042	2026-11-18 14:00	과제 화면 열어	navigate {"route": "/assignments"}	
+sb-043	2026-11-18 14:00	시험 탭으로 기기	navigate {"route": "/exams"}	
+sb-044	2026-11-18 14:00	브리핑 화면 띄워줘	navigate {"route": "/briefing"}	
+sb-045	2026-11-18 14:00	내 프필 설정 좀 열어줘	navigate {"route": "/settings/profile"}	
+sb-046	2026-11-18 14:00	계정 연동 설정하는 데로 가자	navigate {"route": "/settings/sources"}	
+sb-047	2026-11-18 14:00	공강 시간 설정 화면 열어봐	navigate {"route": "/settings/availability"}	
+sb-048	2026-11-18 14:00	학사일정 새로 동기화	run_sync {"source": "academic"}	
+sb-049	2026-11-18 14:00	이클 데이터 다시 가져와줘	run_sync {"source": "eclass"}	
+sb-050	2026-11-18 14:00	대외활동 정보 업뎃 좀	run_sync {"source": "activity"}	
+sb-051	2026-11-18 14:00	졸업하려면 학점 몇 개 남았냐	get_graduation {}	
+sb-052	2026-11-18 14:00	나 졸업요건 몇퍼 채움?	get_graduation {}	
+sb-053	2026-11-18 14:00	졸업하려면 뭐가 더 필요해?	get_graduation {}	
+sb-054	2026-11-18 14:00	졸업 학점 다 채웠는지 봐봐	get_graduation {}	
+sb-055	2026-11-18 14:00	자료구조 출석 현황 알려줘	get_attendance {"course": "자료구조"}	
+sb-056	2026-11-18 14:00	선형대수 결석 몇 번이야?	get_attendance {"course": "선형대수"}	
+sb-057	2026-11-18 14:00	생활영어 결석 몇 번 했지ㅠㅠ	get_attendance {"course": "생활영어"}	
+sb-058	2026-11-18 14:00	결석 젤 많이 한 과목 뭐야	get_attendance {}	
+sb-059	2026-11-18 14:00	전체 출석 상황 싹 알려줘	get_attendance {}	
+sb-060	2026-11-18 14:00	기말 며칠 남음?	get_exams {"upcoming": true}	
+sb-061	2026-11-18 14:00	이번에 볼 시험 뭐뭐 있어?	get_exams {"upcoming": true}	
+sb-062	2026-11-18 14:00	선형대수 시험 날짜가 언제더라	get_exams {"upcoming": true}	
+sb-063	2026-11-18 14:00	시험 공부 플랜 어떻게 되고 있어?	get_exams {}	
+sb-064	2026-11-18 14:00	지금 젤 급한 과제가 뭐지	list_assignments {"group": "now"}	
+sb-065	2026-11-18 14:00	바로 해야 되는 과제 알려줘	list_assignments {"group": "now"}	
+sb-066	2026-11-18 14:00	이번 주 과제 리스트 싹 뽑아봐	list_assignments {"group": "this_week"}	
+sb-067	2026-11-18 14:00	미뤄도 되는 과제 뭐 있어?	list_assignments {"group": "later"}	
+sb-068	2026-11-18 14:00	내 과제 싹 다 알려줘	list_assignments {}	
+sb-069	2026-11-18 14:00	이번 주 공강 시간 공부로 채워줘	open_placement {"range": "this_week"}	
+sb-070	2026-11-18 14:00	다음 주 공강 배치 짜줘	open_placement {"range": "next_week"}	
+sb-071	2026-11-18 14:00	담주 공강 시간에 공부 넣어줘	open_placement {"range": "next_week"}	
+sb-072	2026-11-18 14:00	공강 시간 공부로 배치 ㄱㄱ	open_placement {}	
+sb-073	2026-11-18 14:00	학교 근처 맛집 ㅊㅊ좀	거절	
+sb-074	2026-11-18 14:00	오늘 주요 뉴스 알려줘	거절	
+sb-075	2026-11-18 14:00	이 수학 문제 풀어줘	거절	
+sb-076	2026-11-18 14:00	이번 주말 날씨 어때?	거절	
+sb-077	2026-11-18 14:00	오늘 일정 뭐 있어?	list_events {"from": "2026-11-18", "to": "2026-11-18"}	
+sb-078	2026-11-18 14:00	이번 주에 뭐 있지	list_events {"from": "2026-11-16", "to": "2026-11-22"}	
+sb-079	2026-11-18 14:00	모레 오전 10시에 팀플 미팅 넣어줘	create_event {"title": "팀플 미팅", "start": "2026-11-20T10:00", "end": "2026-11-20T11:00", "allDay": false, "category": "team"}	
+sb-080	2026-11-18 14:00	낼 저녁 6시에 헬스 일정 추가 기	create_event {"title": "헬스", "start": "2026-11-19T18:00", "end": "2026-11-19T19:00", "allDay": false, "category": "personal"}	
