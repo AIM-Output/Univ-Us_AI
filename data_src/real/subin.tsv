@@ -79,3 +79,43 @@ sb-077	2026-11-18 14:00	오늘 일정 뭐 있어?	list_events {"from": "2026-11-
 sb-078	2026-11-18 14:00	이번 주에 뭐 있지	list_events {"from": "2026-11-16", "to": "2026-11-22"}	
 sb-079	2026-11-18 14:00	모레 오전 10시에 팀플 미팅 넣어줘	create_event {"title": "팀플 미팅", "start": "2026-11-20T10:00", "end": "2026-11-20T11:00", "allDay": false, "category": "team"}	
 sb-080	2026-11-18 14:00	낼 저녁 6시에 헬스 일정 추가 기	create_event {"title": "헬스", "start": "2026-11-19T18:00", "end": "2026-11-19T19:00", "allDay": false, "category": "personal"}	
+sb-081	2026-11-18 14:00	채팅 화면으로 넘어가즈아	navigate {"route": "/chat"}	
+sb-082	2026-11-18 14:00	졸업요건 기준 설정 화면 열어줘	navigate {"route": "/settings/requirements"}	
+sb-083	2026-11-18 14:00	대시보드 열어줭	navigate {"route": "/"}	
+sb-084	2026-11-18 14:00	장학금 쪽으로 이동	navigate {"route": "/scholarships"}	
+sb-085	2026-11-18 14:00	출결 화면 좀 열어봐	navigate {"route": "/attendance"}	
+sb-086	2026-11-18 14:00	강의자료 있는 화면으로 가줘	navigate {"route": "/courses"}	
+sb-087	2026-11-18 14:00	대외활동 탭 열어줘	navigate {"route": "/opportunities"}	
+sb-088	2026-11-18 14:00	학사일정 최신으로 업뎃	run_sync {"source": "academic"}	
+sb-089	2026-11-18 14:00	LMS 데이터 새로 불러와줘	run_sync {"source": "eclass"}	
+sb-090	2026-11-18 14:00	장학금 정보 업데이트 한번 돌려줘	run_sync {"source": "scholarship"}	
+sb-091	2026-11-18 14:00	졸업까지 몇 학점 모자라?	get_graduation {}	
+sb-092	2026-11-18 14:00	졸업요건 진행 상황 알려줘	get_graduation {}	
+sb-093	2026-11-18 14:00	졸업하려면 부족한 영역 머야	get_graduation {}	
+sb-094	2026-11-18 14:00	졸업 가능한지 학점 확인해줘	get_graduation {}	
+sb-095	2026-11-18 14:00	컴퓨터구조 결석 횟수 알려줘	get_attendance {"course": "컴퓨터구조"}	
+sb-096	2026-11-18 14:00	데이터베이스 출석 몇 번 빠졌지?	get_attendance {"course": "데이터베이스"}	
+sb-097	2026-11-18 14:00	이산수학 결석 벌써 몇 번이지ㅠㅠ	get_attendance {"course": "이산수학"}	
+sb-098	2026-11-18 14:00	결석 위험선 넘은 과목 있어?	get_attendance {}	
+sb-099	2026-11-18 14:00	과목별 출석률 알려줘	get_attendance {}	
+sb-100	2026-11-18 14:00	다음 시험은 언제 봐?	get_exams {"upcoming": true}	
+sb-101	2026-11-18 14:00	남은 시험 몇 개야?	get_exams {"upcoming": true}	
+sb-102	2026-11-18 14:00	데이터베이스 시험 날짜 알려줘	get_exams {"upcoming": true}	
+sb-103	2026-11-18 14:00	시험 대비 공부 계획 확인할래	get_exams {}	
+sb-104	2026-11-18 14:00	발등에 불 떨어진 과제 뭐야	list_assignments {"group": "now"}	
+sb-105	2026-11-18 14:00	시급한 과제부터 알려줘ㅜㅜ	list_assignments {"group": "now"}	
+sb-106	2026-11-18 14:00	이번 주 안에 해야 되는 과제 알려줘	list_assignments {"group": "this_week"}	
+sb-107	2026-11-18 14:00	여유 있게 해도 되는 과제는?	list_assignments {"group": "later"}	
+sb-108	2026-11-18 14:00	내가 해야 하는 과제 전부 알려줘	list_assignments {}	
+sb-109	2026-11-18 14:00	이번 주 빈 시간에 공부 배치해줘	open_placement {"range": "this_week"}	
+sb-110	2026-11-18 14:00	다음 주 빈 시간 공부로 채워줘	open_placement {"range": "next_week"}	
+sb-111	2026-11-18 14:00	담주엔 공강마다 공부 배치해죠	open_placement {"range": "next_week"}	
+sb-112	2026-11-18 14:00	비어 있는 공강에 공부 끼워줘	open_placement {}	
+sb-113	2026-11-18 14:00	오늘 저녁 뭐 먹을지 추천해줘	거절	
+sb-114	2026-11-18 14:00	이 영어 문단 한국어로 번역해줘	거절	
+sb-115	2026-11-18 14:00	삼성전자 주가 알려줘	거절	
+sb-116	2026-11-18 14:00	이 코딩 숙제 대신 풀어줘	거절	
+sb-117	2026-11-18 14:00	내일 일정 뭐 있는지 알려줘	list_events {"from": "2026-11-19", "to": "2026-11-19"}	
+sb-118	2026-11-18 14:00	모레 뭐 있지?	list_events {"from": "2026-11-20", "to": "2026-11-20"}	
+sb-119	2026-11-18 14:00	내일 오전 11시에 도서관 공부 넣어줘	create_event {"title": "도서관 공부", "start": "2026-11-19T11:00", "end": "2026-11-19T12:00", "allDay": false, "category": "study"}	
+sb-120	2026-11-18 14:00	모레 오후 4시에 치과 예약 추가해줘	create_event {"title": "치과 예약", "start": "2026-11-20T16:00", "end": "2026-11-20T17:00", "allDay": false, "category": "personal"}	
