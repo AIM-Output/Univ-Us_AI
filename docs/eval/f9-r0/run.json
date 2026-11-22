@@ -1,0 +1,56 @@
+{
+  "model_id": "Qwen/Qwen3-4B",
+  "args": {
+    "model_id": "Qwen/Qwen3-4B",
+    "data_dir": "data/f9",
+    "tools": "C:\\HARAM\\Univ-Us_AI\\tools\\f9_tools.json",
+    "output_dir": "outputs/f9-r0",
+    "load_4bit": 1,
+    "compute_dtype": "bf16",
+    "max_seq": 2560,
+    "loss": "completion",
+    "batch": 1,
+    "grad_accum": 8,
+    "lora_r": 16,
+    "epochs": 3.0,
+    "lr": 0.0002,
+    "save_steps": 100,
+    "logging_steps": 5,
+    "seed": 42,
+    "max_steps": -1,
+    "max_train_rows": 0,
+    "resume": false,
+    "push_to_hub": "",
+    "low_vram": 1
+  },
+  "render_mode": "native",
+  "device": "NVIDIA GeForce RTX 5060",
+  "dtype": "bf16",
+  "n_rows": 1185,
+  "n_rows_dropped_over_max_seq": 0,
+  "loss": "completion",
+  "n_pairs": 1568,
+  "n_fulltext_fallback_rows": 0,
+  "low_vram": {
+    "labels_only_head": "on",
+    "sdpa_same_heads": "on"
+  },
+  "token_len": {
+    "p50": 2082,
+    "p95": 2208,
+    "max": 2340
+  },
+  "train_loss": 0.03566405783178915,
+  "global_step": 588,
+  "elapsed_s": 14844.6,
+  "versions": {
+    "torch": "2.9.0+cu129",
+    "transformers": "5.22.1",
+    "peft": "0.21.2",
+    "trl": "1.17.1",
+    "datasets": "5.1.0",
+    "accelerate": "1.15.0",
+    "bitsandbytes": "0.50.2"
+  },
+  "finished_at": "2026-11-22T20:20:13"
+}
