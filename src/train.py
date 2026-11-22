@@ -57,6 +57,9 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--max_train_rows", type=int, default=0, help="0=전부")
     ap.add_argument("--resume", action="store_true", help="output_dir 의 마지막 체크포인트에서 이어서")
     ap.add_argument("--push_to_hub", default="", help="비우지 않으면 어댑터를 이 HF repo(private) 에 올린다")
+    ap.add_argument("--low_vram", type=int, default=0,
+                    help="1=그래픽 메모리 8GB 카드(Windows)용 — LM head 는 라벨 위치만, 어텐션은 mem-efficient 커널로 "
+                         "(src/low_vram.py). 켠 run 은 AI 팀 재현으로 점수를 확인할 것")
     return ap.parse_args()
 
 
@@ -223,6 +226,11 @@ def main() -> None:
         # 학습 **중**에도 체크포인트가 Hub 에 올라가게 (캐글: 세션이 끊겨도 last-checkpoint 가 남는다). 마지막 어댑터는 아래서 따로 올린다
         sft_kwargs.update(push_to_hub=True, hub_model_id=args.push_to_hub, hub_strategy="checkpoint", hub_private_repo=True)
     cfg = build_sft_config(SFTConfig, **sft_kwargs)
+    low_vram = {}
+    if args.low_vram:
+        from low_vram import enable as enable_low_vram
+        low_vram = enable_low_vram(model)
+        print(f"low_vram: {low_vram}")
     try:
         trainer = SFTTrainer(model=model, args=cfg, train_dataset=ds, processing_class=tok)
     except TypeError:
@@ -239,6 +247,7 @@ def main() -> None:
     run = {"model_id": args.model_id, "args": vars(args), "render_mode": mode, "device": device_name,
            "dtype": args.compute_dtype, "n_rows": len(rows), "n_rows_dropped_over_max_seq": dropped,
            "loss": args.loss, "n_pairs": n_pairs, "n_fulltext_fallback_rows": n_fallback,
+           "low_vram": low_vram,
            "token_len": {"p50": p50, "p95": p95, "max": mx},
            "train_loss": getattr(result, "training_loss", None), "global_step": getattr(result, "global_step", None),
            "elapsed_s": round(time.time() - t0, 1), "versions": lib_versions(),
