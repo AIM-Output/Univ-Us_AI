@@ -12,6 +12,9 @@
 손실(--loss):
   · completion(기본) — assistant 턴마다 (prompt, completion) 쌍을 만들어 **정답 토큰에만** 손실. 두 단계 행은 쌍 2개
   · full             — 대화 전체 텍스트에 손실
+시작점(--init_adapter):
+  · 비움(기본)      — 새 LoRA 어댑터로 시작
+  · 어댑터 폴더     — 그 어댑터 가중치에서 시작(다른 run 에 이어서 학습). run.json 의 init_adapter 에 경로·sha256 이 남는다
 토큰 예산: system + 도구 11개 정의만 약 1,950 토큰이라 --max_seq 는 2304 이상이어야 한다.
   렌더 길이가 --max_seq 를 넘는 행은 **버린다**(잘린 정답으로 학습하지 않는다). 남는 행이 없으면 멈춘다.
 산출물: <output_dir>/adapter/ (LoRA 어댑터 + 토크나이저) · <output_dir>/run.json
@@ -56,6 +59,9 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--max_steps", type=int, default=-1, help="양수면 epochs 대신 step 수로 (스모크)")
     ap.add_argument("--max_train_rows", type=int, default=0, help="0=전부")
     ap.add_argument("--resume", action="store_true", help="output_dir 의 마지막 체크포인트에서 이어서")
+    ap.add_argument("--init_adapter", default="",
+                    help="비우지 않으면 새 어댑터 대신 이 폴더의 어댑터 가중치에서 시작한다(다른 run 에 이어서 학습). "
+                         "데이터·옵티마이저·스케줄은 새 run 의 것 — 멈춘 run 을 그대로 이어 가는 --resume 과 다르다")
     ap.add_argument("--push_to_hub", default="", help="비우지 않으면 어댑터를 이 HF repo(private) 에 올린다")
     ap.add_argument("--low_vram", type=int, default=0,
                     help="1=그래픽 메모리 8GB 카드(Windows)용 — LM head 는 라벨 위치만, 어텐션은 mem-efficient 커널로 "
@@ -73,6 +79,31 @@ def from_pretrained_compat(cls, model_id: str, dtype, **kw):
         return cls.from_pretrained(model_id, dtype=dtype, **kw)
     except TypeError:
         return cls.from_pretrained(model_id, torch_dtype=dtype, **kw)
+
+
+def check_init_adapter(path: str, model_id: str, lora_r: int) -> dict:
+    """--init_adapter 폴더를 모델을 올리기 전에 확인한다 → run.json 에 적을 정보(경로 · 가중치 sha256 · r).
+
+    베이스 모델이 다르면 멈춘다. r 과 대상 모듈은 어댑터에 저장된 값을 따른다(--lora_r 은 쓰이지 않는다).
+    """
+    import hashlib
+    d = Path(path)
+    cfg_path, w_path = d / "adapter_config.json", d / "adapter_model.safetensors"
+    if not (cfg_path.exists() and w_path.exists()):
+        sys.exit(f"[중단] --init_adapter: {d} 에 adapter_config.json · adapter_model.safetensors 가 없다")
+    cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
+    base = cfg.get("base_model_name_or_path")
+    if base != model_id:
+        sys.exit(f"[중단] --init_adapter: 이 어댑터의 베이스 모델({base})이 --model_id({model_id})와 다르다")
+    h = hashlib.sha256()
+    with open(w_path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    info = {"path": d.as_posix(), "sha256": h.hexdigest(), "r": cfg.get("r")}
+    print(f"시작 어댑터 {info['path']} · sha256 {info['sha256'][:12]} · r={info['r']} (이어서 학습 — 새 어댑터를 만들지 않는다)")
+    if cfg.get("r") != lora_r:
+        print(f"  알림: --lora_r {lora_r} 은 쓰이지 않는다 — 시작 어댑터의 r={cfg.get('r')} 를 따른다")
+    return info
 
 
 def strip_turn_newline(text: str, eos: str | None) -> str:
@@ -123,6 +154,7 @@ def build_sft_config(SFTConfig, **wanted):
 def main() -> None:
     args = parse_args()
     t0 = time.time()
+    init_adapter = check_init_adapter(args.init_adapter, args.model_id, args.lora_r) if args.init_adapter else None
     import torch
     from datasets import Dataset
     from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
@@ -196,14 +228,19 @@ def main() -> None:
         model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=use_gc)
     elif use_gc:
         model.enable_input_require_grads()
-    lora = LoraConfig(r=args.lora_r, lora_alpha=args.lora_r * 2, lora_dropout=0.05, bias="none",
-                      task_type="CAUSAL_LM", target_modules=LORA_TARGETS)
-    try:
-        model = get_peft_model(model, lora)
-    except ValueError as e:  # 모듈 이름이 다른 아키텍처
-        print(f"  LoRA 대상 모듈을 못 찾음({str(e)[:80]}) → all-linear 로 재시도")
-        lora = dataclasses.replace(lora, target_modules="all-linear")
-        model = get_peft_model(model, lora)
+    if init_adapter:
+        # 다른 run 의 어댑터에서 시작 — 설정(r · alpha · dropout · 대상 모듈)은 그 어댑터에 저장된 것을 그대로 쓴다
+        from peft import PeftModel
+        model = PeftModel.from_pretrained(model, args.init_adapter, is_trainable=True)
+    else:
+        lora = LoraConfig(r=args.lora_r, lora_alpha=args.lora_r * 2, lora_dropout=0.05, bias="none",
+                          task_type="CAUSAL_LM", target_modules=LORA_TARGETS)
+        try:
+            model = get_peft_model(model, lora)
+        except ValueError as e:  # 모듈 이름이 다른 아키텍처
+            print(f"  LoRA 대상 모듈을 못 찾음({str(e)[:80]}) → all-linear 로 재시도")
+            lora = dataclasses.replace(lora, target_modules="all-linear")
+            model = get_peft_model(model, lora)
     model.print_trainable_parameters()
 
     # ── 학습 설정 ──────────────────────────────────────────────
@@ -247,7 +284,7 @@ def main() -> None:
     run = {"model_id": args.model_id, "args": vars(args), "render_mode": mode, "device": device_name,
            "dtype": args.compute_dtype, "n_rows": len(rows), "n_rows_dropped_over_max_seq": dropped,
            "loss": args.loss, "n_pairs": n_pairs, "n_fulltext_fallback_rows": n_fallback,
-           "low_vram": low_vram,
+           "low_vram": low_vram, "init_adapter": init_adapter,
            "token_len": {"p50": p50, "p95": p95, "max": mx},
            "train_loss": getattr(result, "training_loss", None), "global_step": getattr(result, "global_step", None),
            "elapsed_s": round(time.time() - t0, 1), "versions": lib_versions(),
