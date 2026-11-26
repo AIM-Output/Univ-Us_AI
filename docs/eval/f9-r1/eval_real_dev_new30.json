@@ -1,0 +1,804 @@
+{
+  "summary": {
+    "label": "f9-r1 real_dev new30",
+    "model_id": "Qwen/Qwen3-4B",
+    "adapter": "outputs/f9-r1/adapter",
+    "render_mode": "native",
+    "n_rows": 30,
+    "n_turns": 30,
+    "n_tool_turns": 27,
+    "n_refusal_turns": 3,
+    "n_answer_turns": 0,
+    "tool_name_acc": 100.0,
+    "arg_exact_acc": 96.29629629629629,
+    "field_acc": 98.94736842105263,
+    "refusal_acc": 100.0,
+    "text_turn_acc": 100.0,
+    "turn_acc": 96.66666666666667,
+    "latency_mean_s": 15.560375920931499,
+    "latency_p95_s": 23.19499397277832,
+    "versions": {
+      "torch": "2.9.0+cu129",
+      "transformers": "5.22.1",
+      "peft": "0.21.2",
+      "trl": "1.17.1",
+      "datasets": "5.1.0",
+      "accelerate": "1.15.0",
+      "bitsandbytes": "0.50.2"
+    },
+    "finished_at": "2026-11-27T01:19:43"
+  },
+  "per_tool": {
+    "create_event": {
+      "n": 14,
+      "name_ok": 14,
+      "exact_ok": 13,
+      "f_ok": 71,
+      "f_tot": 72
+    },
+    "list_events": {
+      "n": 7,
+      "name_ok": 7,
+      "exact_ok": 7,
+      "f_ok": 18,
+      "f_tot": 18
+    },
+    "run_sync": {
+      "n": 1,
+      "name_ok": 1,
+      "exact_ok": 1,
+      "f_ok": 1,
+      "f_tot": 1
+    },
+    "get_attendance": {
+      "n": 2,
+      "name_ok": 2,
+      "exact_ok": 2,
+      "f_ok": 1,
+      "f_tot": 1
+    },
+    "get_exams": {
+      "n": 1,
+      "name_ok": 1,
+      "exact_ok": 1,
+      "f_ok": 1,
+      "f_tot": 1
+    },
+    "list_assignments": {
+      "n": 1,
+      "name_ok": 1,
+      "exact_ok": 1,
+      "f_ok": 1,
+      "f_tot": 1
+    },
+    "navigate": {
+      "n": 1,
+      "name_ok": 1,
+      "exact_ok": 1,
+      "f_ok": 1,
+      "f_tot": 1
+    }
+  },
+  "results": [
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "hr-002#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "모레 오후 4시부터 6시까지 캡스톤 회의 캘린더에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "캡스톤 회의",
+          "start": "2026-11-18T16:00",
+          "end": "2026-11-18T18:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2026-11-18T18:00\", \"start\": \"2026-11-18T16:00\", \"title\": \"캡스톤 회의\"}}</tool_call>",
+      "sec": 23.61,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 4,
+      "text_ok": null,
+      "id": "hr-003#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 화요일 19시에 토익 스터디 2시간짜리로 잡아줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "토익 스터디",
+          "start": "2026-11-24T19:00",
+          "end": "2026-11-24T21:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-11-24T23:00\", \"start\": \"2026-11-24T19:00\", \"title\": \"토익 스터디\"}}</tool_call>",
+      "sec": 20.77,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 6,
+      "field_ok": 6,
+      "text_ok": null,
+      "id": "hr-005#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "매주 수요일 아침 8시에 수영 강습 있어 반복 등록해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "수영 강습",
+          "start": "2026-11-18T08:00",
+          "end": "2026-11-18T09:00",
+          "allDay": false,
+          "category": "personal",
+          "repeat": "weekly:WE"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-11-18T09:00\", \"repeat\": \"weekly:WE\", \"start\": \"2026-11-18T08:00\", \"title\": \"수영 강습\"}}</tool_call>",
+      "sec": 23.19,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "list_events",
+      "pred_tool": "list_events",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 3,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "hr-006#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "이번 주 안에 보는 시험 있나?",
+      "expected": {
+        "name": "list_events",
+        "arguments": {
+          "from": "2026-11-16",
+          "to": "2026-11-22",
+          "kinds": [
+            "exam"
+          ]
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-11-16\", \"kinds\": [\"exam\"], \"to\": \"2026-11-22\"}}</tool_call>",
+      "sec": 15.97,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "list_events",
+      "pred_tool": "list_events",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 3,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "hr-008#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내일 수업 몇 개 있어?",
+      "expected": {
+        "name": "list_events",
+        "arguments": {
+          "from": "2026-11-17",
+          "to": "2026-11-17",
+          "kinds": [
+            "class"
+          ]
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-11-17\", \"kinds\": [\"class\"], \"to\": \"2026-11-17\"}}</tool_call>",
+      "sec": 15.48,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "run_sync",
+      "pred_tool": "run_sync",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 1,
+      "field_ok": 1,
+      "text_ok": null,
+      "id": "hr-013#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "장학 공지 새로 올라온 거 있나 다시 불러와줘",
+      "expected": {
+        "name": "run_sync",
+        "arguments": {
+          "source": "scholarship"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"run_sync\", \"arguments\": {\"source\": \"scholarship\"}}</tool_call>",
+      "sec": 8.97,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "get_attendance",
+      "pred_tool": "get_attendance",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 1,
+      "field_ok": 1,
+      "text_ok": null,
+      "id": "hr-014#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "컴퓨터네트워크 출석 몇 번 인정됐는지 봐줘",
+      "expected": {
+        "name": "get_attendance",
+        "arguments": {
+          "course": "컴퓨터네트워크"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"get_attendance\", \"arguments\": {\"course\": \"컴퓨터네트워크\"}}</tool_call>",
+      "sec": 9.62,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "hr-016#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "낼 점심 12시에 교수님 면담 잡혔어 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "교수님 면담",
+          "start": "2026-11-19T12:00",
+          "end": "2026-11-19T13:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-11-19T13:00\", \"start\": \"2026-11-19T12:00\", \"title\": \"교수님 면담\"}}</tool_call>",
+      "sec": 22.53,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "hr-018#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 월요일 밤 9시부터 11시까지 해커톤 준비 회의 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "해커톤 준비 회의",
+          "start": "2026-11-23T21:00",
+          "end": "2026-11-23T23:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2026-11-23T23:00\", \"start\": \"2026-11-23T21:00\", \"title\": \"해커톤 준비 회의\"}}</tool_call>",
+      "sec": 23.17,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "hr-019#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "12월 4일에 기업 설명회 있는데 시간은 아직 몰라 일단 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "기업 설명회",
+          "start": "2026-12-04",
+          "end": "2026-12-05",
+          "allDay": true,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": true, \"category\": \"etc\", \"end\": \"2026-12-05\", \"start\": \"2026-12-04\", \"title\": \"기업 설명회\"}}</tool_call>",
+      "sec": 18.29,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 6,
+      "field_ok": 6,
+      "text_ok": null,
+      "id": "hr-020#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "매주 목요일 저녁 6시 반 농구 동아리 반복 일정으로 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "농구 동아리",
+          "start": "2026-11-19T18:30",
+          "end": "2026-11-19T19:30",
+          "allDay": false,
+          "category": "personal",
+          "repeat": "weekly:TH"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-11-19T19:30\", \"repeat\": \"weekly:TH\", \"start\": \"2026-11-19T18:30\", \"title\": \"농구 동아리\"}}</tool_call>",
+      "sec": 23.33,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "list_events",
+      "pred_tool": "list_events",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 3,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "hr-022#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "12월 학사일정 뭐 있는지 알려줘",
+      "expected": {
+        "name": "list_events",
+        "arguments": {
+          "from": "2026-12-01",
+          "to": "2026-12-31",
+          "kinds": [
+            "academic"
+          ]
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-12-01\", \"kinds\": [\"academic\"], \"to\": \"2026-12-31\"}}</tool_call>",
+      "sec": 16.06,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "list_events",
+      "pred_tool": "list_events",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 2,
+      "field_ok": 2,
+      "text_ok": null,
+      "id": "hr-024#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내일 운영체제 과제 하기 일정 2시간 뒤로 미뤄줘",
+      "expected": {
+        "name": "list_events",
+        "arguments": {
+          "from": "2026-11-19",
+          "to": "2026-11-19"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-11-19\", \"to\": \"2026-11-19\"}}</tool_call>",
+      "sec": 13.9,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": null,
+      "pred_tool": null,
+      "name_ok": false,
+      "exact_ok": false,
+      "field_total": 0,
+      "field_ok": 0,
+      "text_ok": true,
+      "id": "hr-027#t0",
+      "turn": 0,
+      "turn_type": "refusal",
+      "user": "기말고사 기간 일주일만 뒤로 밀어줘ㅠㅠ",
+      "expected": "(거절) 도구를 부르지 않고 '…수 없습니다' 처럼 답해야 합니다.",
+      "pred_text": "학사일정·수업은 바꿀 수 없습니다. 학교에서 가져온 일정이라 원본을 따릅니다.",
+      "sec": 11.29,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "hr-032#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "일요일 낮 1시에 자료구조 복습 잡아줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "자료구조 복습",
+          "start": "2026-11-22T13:00",
+          "end": "2026-11-22T14:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-11-22T14:00\", \"start\": \"2026-11-22T13:00\", \"title\": \"자료구조 복습\"}}</tool_call>",
+      "sec": 22.1,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "hr-035#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "12/12~12/14 제주도 여행 일정 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "제주도 여행",
+          "start": "2026-12-12",
+          "end": "2026-12-15",
+          "allDay": true,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": true, \"category\": \"personal\", \"end\": \"2026-12-15\", \"start\": \"2026-12-12\", \"title\": \"제주도 여행\"}}</tool_call>",
+      "sec": 19.85,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "list_events",
+      "pred_tool": "list_events",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 2,
+      "field_ok": 2,
+      "text_ok": null,
+      "id": "hr-036#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주말에 나 시간 비어? 일정 좀 봐줘",
+      "expected": {
+        "name": "list_events",
+        "arguments": {
+          "from": "2026-11-28",
+          "to": "2026-11-29"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-11-28\", \"to\": \"2026-11-29\"}}</tool_call>",
+      "sec": 14.42,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "list_events",
+      "pred_tool": "list_events",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 2,
+      "field_ok": 2,
+      "text_ok": null,
+      "id": "hr-040#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 월요일 데이터베이스 스터디 빼줘",
+      "expected": {
+        "name": "list_events",
+        "arguments": {
+          "from": "2026-11-23",
+          "to": "2026-11-23"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-11-23\", \"to\": \"2026-11-23\"}}</tool_call>",
+      "sec": 13.34,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": null,
+      "pred_tool": null,
+      "name_ok": false,
+      "exact_ok": false,
+      "field_total": 0,
+      "field_ok": 0,
+      "text_ok": true,
+      "id": "hr-041#t0",
+      "turn": 0,
+      "turn_type": "refusal",
+      "user": "다음 주 월요일 소프트웨어공학 수업 지워줘",
+      "expected": "(거절) 도구를 부르지 않고 '…수 없습니다' 처럼 답해야 합니다.",
+      "pred_text": "학사일정·수업은 바꿀 수 없습니다. 학교에서 가져온 일정이라 원본을 따릅니다.",
+      "sec": 6.71,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "get_exams",
+      "pred_tool": "get_exams",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 1,
+      "field_ok": 1,
+      "text_ok": null,
+      "id": "hr-044#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다가오는 시험 중에 제일 빠른 게 뭐야",
+      "expected": {
+        "name": "get_exams",
+        "arguments": {
+          "upcoming": true
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"get_exams\", \"arguments\": {\"upcoming\": true}}</tool_call>",
+      "sec": 5.36,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "list_assignments",
+      "pred_tool": "list_assignments",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 1,
+      "field_ok": 1,
+      "text_ok": null,
+      "id": "hr-045#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "급하지 않은 과제 몇 개 남았어?",
+      "expected": {
+        "name": "list_assignments",
+        "arguments": {
+          "group": "later"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"list_assignments\", \"arguments\": {\"group\": \"later\"}}</tool_call>",
+      "sec": 5.82,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "hr-046#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내일 아침 9시 반 은행 가기 일정 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "은행 가기",
+          "start": "2026-11-23T09:30",
+          "end": "2026-11-23T10:30",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2026-11-23T10:30\", \"start\": \"2026-11-23T09:30\", \"title\": \"은행 가기\"}}</tool_call>",
+      "sec": 18.71,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "hr-047#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "모레 오후 1시부터 1시간 반 동안 조별 과제 모임 잡아줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "조별 과제 모임",
+          "start": "2026-11-24T13:00",
+          "end": "2026-11-24T14:30",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2026-11-24T14:30\", \"start\": \"2026-11-24T13:00\", \"title\": \"조별 과제 모임\"}}</tool_call>",
+      "sec": 19.22,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "hr-048#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 수요일 정오에 멘토링 있어요 등록해 주세요",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "멘토링",
+          "start": "2026-11-25T12:00",
+          "end": "2026-11-25T13:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2026-11-25T13:00\", \"start\": \"2026-11-25T12:00\", \"title\": \"멘토링\"}}</tool_call>",
+      "sec": 17.35,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "hr-049#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "5일 뒤 밤 10시에 온라인 스터디 있어 추가해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "온라인 스터디",
+          "start": "2026-11-27T22:00",
+          "end": "2026-11-27T23:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-11-27T23:00\", \"start\": \"2026-11-27T22:00\", \"title\": \"온라인 스터디\"}}</tool_call>",
+      "sec": 20.65,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "hr-050#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 달 5일 워크숍 종일 일정으로 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "워크숍",
+          "start": "2026-12-05",
+          "end": "2026-12-06",
+          "allDay": true,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": true, \"category\": \"etc\", \"end\": \"2026-12-06\", \"start\": \"2026-12-05\", \"title\": \"워크숍\"}}</tool_call>",
+      "sec": 18.3,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "list_events",
+      "pred_tool": "list_events",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 3,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "hr-051#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "이번주 마감 놓친 거 없나 보여줘",
+      "expected": {
+        "name": "list_events",
+        "arguments": {
+          "from": "2026-11-16",
+          "to": "2026-11-22",
+          "kinds": [
+            "deadline"
+          ]
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-11-16\", \"kinds\": [\"deadline\"], \"to\": \"2026-11-22\"}}</tool_call>",
+      "sec": 13.14,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": null,
+      "pred_tool": null,
+      "name_ok": false,
+      "exact_ok": false,
+      "field_total": 0,
+      "field_ok": 0,
+      "text_ok": true,
+      "id": "hr-056#t0",
+      "turn": 0,
+      "turn_type": "refusal",
+      "user": "수강 정정 기간 하루만 늘려주면 안 돼?",
+      "expected": "(거절) 도구를 부르지 않고 '…수 없습니다' 처럼 답해야 합니다.",
+      "pred_text": "학사일정·수업은 바꿀 수 없습니다. 학교에서 가져온 일정이라 원본을 따릅니다.",
+      "sec": 10.09,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "navigate",
+      "pred_tool": "navigate",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 1,
+      "field_ok": 1,
+      "text_ok": null,
+      "id": "hr-059#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "공강 시간 설정하는 데로 가 주세요",
+      "expected": {
+        "name": "navigate",
+        "arguments": {
+          "route": "/settings/availability"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"navigate\", \"arguments\": {\"route\": \"/settings/availability\"}}</tool_call>",
+      "sec": 8.28,
+      "template": "real_hr"
+    },
+    {
+      "expected_tool": "get_attendance",
+      "pred_tool": "get_attendance",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 0,
+      "field_ok": 0,
+      "text_ok": null,
+      "id": "hr-060#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "결석 때문에 F 뜰 것 같은 과목 있어?",
+      "expected": {
+        "name": "get_attendance",
+        "arguments": {}
+      },
+      "pred_text": "<tool_call>{\"name\": \"get_attendance\", \"arguments\": {}}</tool_call>",
+      "sec": 7.29,
+      "template": "real_hr"
+    }
+  ]
+}
