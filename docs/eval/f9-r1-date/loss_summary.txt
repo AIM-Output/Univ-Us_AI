@@ -1,0 +1,23 @@
+loss 줄 88 (5 step 마다 한 줄)
+NaN·튀는 값 0
+처음 5줄 loss: [0.00712, 0.01078, 0.01043, 0.00793, 0.01445]
+끝 5줄 loss  : [0.00313, 0.00453, 0.00717, 0.00561, 0.00313]
+가장 큰 loss 0.02336 (step 60 근처) · 가장 작은 loss 0.002009
+mean_token_accuracy 최소 0.9926 · 평균 0.9971
+grad_norm 최대 0.7617
+
+40 step 묶음별 평균 loss · 학습률(묶음 끝)
+  step   1~ 40: loss 0.01195 · 토큰 정확도 0.9959 · lr 1.98e-04
+  step  41~ 80: loss 0.01453 · 토큰 정확도 0.9954 · lr 1.89e-04
+  step  81~120: loss 0.01472 · 토큰 정확도 0.9957 · lr 1.71e-04
+  step 121~160: loss 0.01306 · 토큰 정확도 0.9966 · lr 1.48e-04
+  step 161~200: loss 0.01331 · 토큰 정확도 0.9968 · lr 1.21e-04
+  step 201~240: loss 0.00938 · 토큰 정확도 0.9974 · lr 9.12e-05
+  step 241~280: loss 0.00789 · 토큰 정확도 0.9974 · lr 6.26e-05
+  step 281~320: loss 0.00641 · 토큰 정확도 0.9978 · lr 3.72e-05
+  step 321~360: loss 0.00532 · 토큰 정확도 0.9980 · lr 1.73e-05
+  step 361~400: loss 0.00423 · 토큰 정확도 0.9987 · lr 4.54e-06
+  step 401~440: loss 0.00428 · 토큰 정확도 0.9986 · lr 2.72e-09
+
+'Warning' 가 든 줄 1:
+    Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.

@@ -1,0 +1,56 @@
+== 정답에 규칙 적용 — data/f9/train.jsonl · 11185행
+  create_event     턴  2491 · same 2179 · skip:날짜 2개 이상 60 · skip:반복 252
+  delete_event     턴   414 · none 414
+  get_attendance   턴   565 · none 565
+  get_exams        턴   423 · none 423
+  get_graduation   턴   429 · none 429
+  list_assignments 턴   622 · none 622
+  list_events      턴  2694 · same 2694
+  navigate         턴   892 · none 892
+  open_placement   턴   640 · none 640
+  run_sync         턴   568 · none 568
+  update_event     턴   508 · none 439 · same 69
+  날짜가 들어가는 도구 턴 5693 · 규칙이 날짜를 정한 턴 4942 · 그중 정답과 같음 4942 · 정답을 바꿈 0
+
+== 정답에 규칙 적용 — data/f9/eval.jsonl · 315행
+  create_event     턴    46 · same 46
+  delete_event     턴    24 · none 24
+  get_attendance   턴    20 · none 20
+  get_exams        턴    11 · none 11
+  get_graduation   턴    11 · none 11
+  list_assignments 턴    20 · none 20
+  list_events      턴    69 · same 69
+  navigate         턴    39 · none 39
+  open_placement   턴    13 · none 13
+  run_sync         턴    21 · none 21
+  update_event     턴    19 · none 19
+  날짜가 들어가는 도구 턴 134 · 규칙이 날짜를 정한 턴 115 · 그중 정답과 같음 115 · 정답을 바꿈 0
+
+== 정답에 규칙 적용 — outputs/date_probe/probe_dates.jsonl · 180행
+  create_event     턴   180 · same 180
+  날짜가 들어가는 도구 턴 180 · 규칙이 날짜를 정한 턴 180 · 그중 정답과 같음 180 · 정답을 바꿈 0
+
+== 정답에 규칙 적용 — data/f9/real_dev.jsonl · 189행
+  create_event     턴    53 · none 3 · same 41 · skip:날짜 2개 이상 3 · skip:반복 6
+  get_attendance   턴    11 · none 11
+  get_exams        턴    12 · none 12
+  get_graduation   턴    11 · none 11
+  list_assignments 턴     8 · none 8
+  list_events      턴    46 · none 1 · same 45
+  navigate         턴    12 · none 12
+  open_placement   턴     8 · none 8
+  run_sync         턴     5 · none 5
+  날짜가 들어가는 도구 턴 99 · 규칙이 날짜를 정한 턴 86 · 그중 정답과 같음 86 · 정답을 바꿈 0
+
+== 정답에 규칙 적용 — data/f9/real_test.jsonl · 191행
+  create_event     턴    35 · none 1 · same 29 · skip:날짜 2개 이상 1 · skip:반복 4
+  get_attendance   턴    11 · none 11
+  get_exams        턴     5 · none 5
+  get_graduation   턴     6 · none 6
+  list_assignments 턴    14 · none 14
+  list_events      턴    50 · none 1 · same 49
+  navigate         턴    18 · none 18
+  open_placement   턴     9 · none 9
+  run_sync         턴     8 · none 8
+  날짜가 들어가는 도구 턴 85 · 규칙이 날짜를 정한 턴 78 · 그중 정답과 같음 78 · 정답을 바꿈 0
+

@@ -1,0 +1,4722 @@
+{
+  "summary": {
+    "label": "r1 probe",
+    "model_id": "Qwen/Qwen3-4B",
+    "adapter": "outputs/f9-r1/adapter",
+    "render_mode": "native",
+    "n_rows": 180,
+    "n_turns": 180,
+    "n_tool_turns": 180,
+    "n_refusal_turns": 0,
+    "n_answer_turns": 0,
+    "tool_name_acc": 100.0,
+    "arg_exact_acc": 76.66666666666667,
+    "field_acc": 90.77777777777777,
+    "refusal_acc": NaN,
+    "text_turn_acc": NaN,
+    "turn_acc": 76.66666666666667,
+    "latency_mean_s": 9.593733766343858,
+    "latency_p95_s": 10.367560863494873,
+    "versions": {
+      "torch": "2.9.0+cu129",
+      "transformers": "5.22.1",
+      "peft": "0.21.2",
+      "trl": "1.17.1",
+      "datasets": "5.1.0",
+      "accelerate": "1.15.0",
+      "bitsandbytes": "0.50.2"
+    },
+    "finished_at": "2026-11-23T11:58:08"
+  },
+  "per_tool": {
+    "create_event": {
+      "n": 180,
+      "name_ok": 180,
+      "exact_ok": 138,
+      "f_ok": 817,
+      "f_tot": 900
+    }
+  },
+  "results": [
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0001#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 금요일 아침 7시에 정보보호개론 복습 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "정보보호개론 복습",
+          "start": "2027-04-02T07:00",
+          "end": "2027-04-02T08:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-04-02T08:00\", \"start\": \"2027-04-02T07:00\", \"title\": \"정보보호개론 복습\"}}</tool_call>",
+      "sec": 10.37,
+      "template": "next_wd|cross|wd4|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0002#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "캘린더에 내주 금요일 오후 3시 카페 알바 추가!",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "카페 알바",
+          "start": "2027-07-30T15:00",
+          "end": "2027-07-30T16:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2027-07-30T16:00\", \"start\": \"2027-07-30T15:00\", \"title\": \"카페 알바\"}}</tool_call>",
+      "sec": 9.62,
+      "template": "next_wd|d30of31|wd6|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0003#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 월요일 오후 2시 자료구조 시험 공부 있어 캘린더에 넣어줄 수 있어?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "자료구조 시험 공부",
+          "start": "2027-08-30T14:00",
+          "end": "2027-08-30T15:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-08-30T15:00\", \"start\": \"2027-08-30T14:00\", \"title\": \"자료구조 시험 공부\"}}</tool_call>",
+      "sec": 10.07,
+      "template": "next_wd|d30of31|wd4|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0004#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 일요일 정오에 필라테스 하나만 넣자",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "필라테스",
+          "start": "2027-02-21T12:00",
+          "end": "2027-02-21T13:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-02-21T13:00\", \"start\": \"2027-02-21T12:00\", \"title\": \"필라테스\"}}</tool_call>",
+      "sec": 9.78,
+      "template": "next_wd|mid|wd5|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0005#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 수요일 저녁 7시 반 토익 공부 있어 캘린더에 넣어주세요",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "토익 공부",
+          "start": "2027-06-30T19:30",
+          "end": "2027-06-30T20:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-06-30T20:30\", \"start\": \"2027-06-30T19:30\", \"title\": \"토익 공부\"}}</tool_call>",
+      "sec": 10.11,
+      "template": "next_wd|end30|wd1|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0006#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "일정 하나 추가: 담주 일요일 15시 시험 공부",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "시험 공부",
+          "start": "2026-11-01T15:00",
+          "end": "2026-11-01T16:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-10-25T16:00\", \"start\": \"2026-10-25T15:00\", \"title\": \"시험 공부\"}}</tool_call>",
+      "sec": 9.53,
+      "template": "next_wd|d01|wd5|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0007#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 금요일 오후 2시 45분에 이산수학 예습 있어 1시간 동안",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "이산수학 예습",
+          "start": "2027-04-30T14:45",
+          "end": "2027-04-30T15:45",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-04-30T15:45\", \"start\": \"2027-04-30T14:45\", \"title\": \"이산수학 예습\"}}</tool_call>",
+      "sec": 9.89,
+      "template": "next_wd|end30|wd2|+9"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0008#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "생일 파티 넣어줘. 날짜는 다음 주 목요일이고 시간은 밤 9시",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "생일 파티",
+          "start": "2026-12-31T21:00",
+          "end": "2026-12-31T22:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-12-31T22:00\", \"start\": \"2026-12-31T21:00\", \"title\": \"생일 파티\"}}</tool_call>",
+      "sec": 9.9,
+      "template": "next_wd|d31|wd2|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0009#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "컴퓨터구조 예습 13일 뒤 오후 1시 반 있음 저장해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "컴퓨터구조 예습",
+          "start": "2027-03-31T13:30",
+          "end": "2027-03-31T14:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-03-31T14:30\", \"start\": \"2027-03-31T13:30\", \"title\": \"컴퓨터구조 예습\"}}</tool_call>",
+      "sec": 10.2,
+      "template": "n_days|d31|wd3|+13"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0010#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "3일 후 아침 9시 컴퓨터네트워크 복습 넣어놔ㅠㅠ",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "컴퓨터네트워크 복습",
+          "start": "2026-11-08T09:00",
+          "end": "2026-11-08T10:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-11-08T10:00\", \"start\": \"2026-11-08T09:00\", \"title\": \"컴퓨터네트워크 복습\"}}</tool_call>",
+      "sec": 10.37,
+      "template": "n_days|mid|wd3|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0011#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "5일 뒤 일정 추가할게 오전 10시 영어회화 시험 공부",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "영어회화 시험 공부",
+          "start": "2027-01-03T10:00",
+          "end": "2027-01-03T11:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-01-03T11:00\", \"start\": \"2027-01-03T10:00\", \"title\": \"영어회화 시험 공부\"}}</tool_call>",
+      "sec": 10.14,
+      "template": "n_days|cross|wd1|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0012#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "7일 후 저녁 여덟 시 반 인턴 면접 잡아줘 3시간",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "인턴 면접",
+          "start": "2027-01-31T20:30",
+          "end": "2027-01-31T23:30",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2027-02-01T23:30\", \"start\": \"2027-02-01T20:30\", \"title\": \"인턴 면접\"}}</tool_call>",
+      "sec": 9.73,
+      "template": "n_days|d31|wd6|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0013#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "나 6일 후 오후 5시 30분에 영화 보기 있어. 추가해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "영화 보기",
+          "start": "2027-01-30T17:30",
+          "end": "2027-01-30T18:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-02-01T18:30\", \"start\": \"2027-02-01T17:30\", \"title\": \"영화 보기\"}}</tool_call>",
+      "sec": 9.61,
+      "template": "n_days|d30of31|wd6|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0014#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "2일 후 16시로 컴퓨터네트워크 복습 일정 만들어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "컴퓨터네트워크 복습",
+          "start": "2027-01-31T16:00",
+          "end": "2027-01-31T17:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-01-31T17:00\", \"start\": \"2027-01-31T16:00\", \"title\": \"컴퓨터네트워크 복습\"}}</tool_call>",
+      "sec": 10.23,
+      "template": "n_days|d31|wd4|+2"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0015#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "야 10일 뒤 낮 12시 카페 알바 일정 추가",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "카페 알바",
+          "start": "2026-12-03T12:00",
+          "end": "2026-12-03T13:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2026-12-03T13:00\", \"start\": \"2026-12-03T12:00\", \"title\": \"카페 알바\"}}</tool_call>",
+      "sec": 9.64,
+      "template": "n_days|cross|wd0|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0016#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 일요일 낮 2시에 영어회화 시험 공부가 생겼어 일정에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "영어회화 시험 공부",
+          "start": "2026-11-08T14:00",
+          "end": "2026-11-08T15:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-11-08T15:00\", \"start\": \"2026-11-08T14:00\", \"title\": \"영어회화 시험 공부\"}}</tool_call>",
+      "sec": 10.13,
+      "template": "next_wd|cross|wd2|+11"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0017#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 금요일 일정 추가할게 오전 10시 필라테스",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "필라테스",
+          "start": "2026-10-30T10:00",
+          "end": "2026-10-30T11:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-10-30T11:00\", \"start\": \"2026-10-30T10:00\", \"title\": \"필라테스\"}}</tool_call>",
+      "sec": 9.89,
+      "template": "next_wd|d30of31|wd0|+11"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0018#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "토익 스피킹 연습 넣어줘. 날짜는 다음주 목요일이고 시간은 오전 11시",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "토익 스피킹 연습",
+          "start": "2027-07-01T11:00",
+          "end": "2027-07-01T12:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-07-01T12:00\", \"start\": \"2027-07-01T11:00\", \"title\": \"토익 스피킹 연습\"}}</tool_call>",
+      "sec": 10.84,
+      "template": "next_wd|d01|wd3|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0019#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "6일 뒤 정오에 미시경제학 팀플 회의 좀 넣어주실래요?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "미시경제학 팀플 회의",
+          "start": "2027-07-31T12:00",
+          "end": "2027-07-31T13:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-07-31T13:00\", \"start\": \"2027-07-31T12:00\", \"title\": \"미시경제학 팀플 회의\"}}</tool_call>",
+      "sec": 10.58,
+      "template": "n_days|d31|wd6|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0020#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 토요일 오전 9시 반 축구 스케줄 등록",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "축구",
+          "start": "2027-07-31T09:30",
+          "end": "2027-07-31T10:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-07-31T10:30\", \"start\": \"2027-07-31T09:30\", \"title\": \"축구\"}}</tool_call>",
+      "sec": 9.64,
+      "template": "next_wd|d31|wd5|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0021#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "프로그래밍언어론 예습 넣어줘. 날짜는 다음 주 수요일이고 시간은 오후 5시 반",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "프로그래밍언어론 예습",
+          "start": "2027-03-31T17:30",
+          "end": "2027-03-31T18:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-04-07T18:30\", \"start\": \"2027-04-07T17:30\", \"title\": \"프로그래밍언어론 예습\"}}</tool_call>",
+      "sec": 10.42,
+      "template": "next_wd|d31|wd4|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0022#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 수요일 오전 10시 반 축구, 3시간",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "축구",
+          "start": "2027-03-31T10:30",
+          "end": "2027-03-31T13:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-04-07T13:30\", \"start\": \"2027-04-07T10:30\", \"title\": \"축구\"}}</tool_call>",
+      "sec": 9.56,
+      "template": "next_wd|d31|wd5|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0023#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 금요일 오전 10시에 수영 잡혔어 기록해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "수영",
+          "start": "2027-02-19T10:00",
+          "end": "2027-02-19T11:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-02-19T11:00\", \"start\": \"2027-02-19T10:00\", \"title\": \"수영\"}}</tool_call>",
+      "sec": 9.63,
+      "template": "next_wd|mid|wd0|+11"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0024#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 월요일 밤 9시에 CS 스터디 하나만 넣자",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "CS 스터디",
+          "start": "2027-05-31T21:00",
+          "end": "2027-05-31T22:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-05-31T22:00\", \"start\": \"2027-05-31T21:00\", \"title\": \"CS 스터디\"}}</tool_call>",
+      "sec": 9.7,
+      "template": "next_wd|d31|wd4|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0025#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 금요일 오전 10시 반에 채용 설명회 잡혔어 기록해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "채용 설명회",
+          "start": "2027-07-30T10:30",
+          "end": "2027-07-30T11:30",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2027-07-30T11:30\", \"start\": \"2027-07-30T10:30\", \"title\": \"채용 설명회\"}}</tool_call>",
+      "sec": 10.0,
+      "template": "next_wd|d30of31|wd5|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0026#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "음 5일 뒤 아침 7시에 데이터마이닝 스터디 박아줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "데이터마이닝 스터디",
+          "start": "2027-06-30T07:00",
+          "end": "2027-06-30T08:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-07-01T08:00\", \"start\": \"2027-07-01T07:00\", \"title\": \"데이터마이닝 스터디\"}}</tool_call>",
+      "sec": 10.25,
+      "template": "n_days|end30|wd4|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0027#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "프로그래밍언어론 과제 하기 잡아줘 다음 주 월요일 오전 열한 시",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "프로그래밍언어론 과제 하기",
+          "start": "2027-05-31T11:00",
+          "end": "2027-05-31T12:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-05-31T12:00\", \"start\": \"2027-05-31T11:00\", \"title\": \"프로그래밍언어론 과제 하기\"}}</tool_call>",
+      "sec": 10.54,
+      "template": "next_wd|d31|wd5|+2"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0028#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "4일 뒤 낮 2시에 콘서트가 생겼어 일정에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "콘서트",
+          "start": "2026-12-30T14:00",
+          "end": "2026-12-30T15:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-01-01T15:00\", \"start\": \"2027-01-01T14:00\", \"title\": \"콘서트\"}}</tool_call>",
+      "sec": 9.76,
+      "template": "n_days|d30of31|wd5|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0029#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "7일 뒤에 생일 파티 있는데 낮 2시야. 등록 좀",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "생일 파티",
+          "start": "2026-11-30T14:00",
+          "end": "2026-11-30T15:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-12-01T15:00\", \"start\": \"2026-12-01T14:00\", \"title\": \"생일 파티\"}}</tool_call>",
+      "sec": 9.78,
+      "template": "n_days|end30|wd0|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0030#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 토요일 밤 10시 반 심리학개론 과제 하기 스케줄 등록..",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "심리학개론 과제 하기",
+          "start": "2027-05-01T22:30",
+          "end": "2027-05-01T23:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-04-30T23:30\", \"start\": \"2027-04-30T22:30\", \"title\": \"심리학개론 과제 하기\"}}</tool_call>",
+      "sec": 10.55,
+      "template": "next_wd|d01|wd2|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0031#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "스터디 추가해줘 다음 주 수요일 오전 9시",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "스터디",
+          "start": "2027-03-31T09:00",
+          "end": "2027-03-31T10:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-04-07T10:00\", \"start\": \"2027-04-07T09:00\", \"title\": \"스터디\"}}</tool_call>",
+      "sec": 9.89,
+      "template": "next_wd|d31|wd5|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0032#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "코딩 테스트 준비 14일 뒤 저녁 6시 반에 있음 저장해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "코딩 테스트 준비",
+          "start": "2027-08-09T18:30",
+          "end": "2027-08-09T19:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-08-10T19:30\", \"start\": \"2027-08-10T18:30\", \"title\": \"코딩 테스트 준비\"}}</tool_call>",
+      "sec": 10.27,
+      "template": "n_days|cross|wd0|+14"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0033#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 금요일 코딩 연습 낮 1시 시작 4시간",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "코딩 연습",
+          "start": "2027-02-12T13:00",
+          "end": "2027-02-12T17:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-02-12T17:00\", \"start\": \"2027-02-12T13:00\", \"title\": \"코딩 연습\"}}</tool_call>",
+      "sec": 9.35,
+      "template": "next_wd|mid|wd4|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0034#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "5일 뒤 노트 정리 밤 9시 시작 2시간 반",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "노트 정리",
+          "start": "2027-03-02T21:00",
+          "end": "2027-03-02T23:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-03-01T23:30\", \"start\": \"2027-03-01T21:00\", \"title\": \"노트 정리\"}}</tool_call>",
+      "sec": 9.39,
+      "template": "n_days|cross|wd3|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0035#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "야 일정 하나 추가: 2일 뒤 낮 한 시 컴퓨터구조 시험 공부",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "컴퓨터구조 시험 공부",
+          "start": "2027-05-31T13:00",
+          "end": "2027-05-31T14:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-06-01T14:00\", \"start\": \"2027-06-01T13:00\", \"title\": \"컴퓨터구조 시험 공부\"}}</tool_call>",
+      "sec": 10.49,
+      "template": "n_days|d31|wd5|+2"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0036#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "13일 후 저녁 7시부터 한 시간 반 동안 자료구조 예습 일정 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "자료구조 예습",
+          "start": "2027-06-21T19:00",
+          "end": "2027-06-21T20:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-06-21T20:30\", \"start\": \"2027-06-21T19:00\", \"title\": \"자료구조 예습\"}}</tool_call>",
+      "sec": 9.62,
+      "template": "n_days|mid|wd1|+13"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0037#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "저기 3일 뒤 오후 5시 30분에 수영 있어 두 시간 동안",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "수영",
+          "start": "2027-03-31T17:30",
+          "end": "2027-03-31T19:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-04-01T19:30\", \"start\": \"2027-04-01T17:30\", \"title\": \"수영\"}}</tool_call>",
+      "sec": 9.2,
+      "template": "n_days|d31|wd6|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0038#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "특강 다음 주 토요일 저녁 8시부터 1시간 반 잡아놔",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "특강",
+          "start": "2026-10-31T20:00",
+          "end": "2026-10-31T21:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-11-07T21:30\", \"start\": \"2026-11-07T20:00\", \"title\": \"특강\"}}</tool_call>",
+      "sec": 8.86,
+      "template": "next_wd|d31|wd6|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0039#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "6일 뒤 오후 한 시 소프트웨어공학 시험 공부, 1시간",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "소프트웨어공학 시험 공부",
+          "start": "2026-10-31T13:00",
+          "end": "2026-10-31T14:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-10-31T14:00\", \"start\": \"2026-10-31T13:00\", \"title\": \"소프트웨어공학 시험 공부\"}}</tool_call>",
+      "sec": 10.2,
+      "template": "n_days|d31|wd6|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0040#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 토요일 저녁 7시 토익 공부 넣어놔",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "토익 공부",
+          "start": "2027-01-30T19:00",
+          "end": "2027-01-30T20:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-01-30T20:00\", \"start\": \"2027-01-30T19:00\", \"title\": \"토익 공부\"}}</tool_call>",
+      "sec": 9.28,
+      "template": "next_wd|d30of31|wd5|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0041#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 일요일 저녁 여섯 시 반 영화 보기 스케줄 등록",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "영화 보기",
+          "start": "2027-01-31T18:30",
+          "end": "2027-01-31T19:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-02-01T19:30\", \"start\": \"2027-02-01T18:30\", \"title\": \"영화 보기\"}}</tool_call>",
+      "sec": 9.16,
+      "template": "next_wd|d31|wd6|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0042#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 금요일 오후 3시 반에 데이트 하나만 넣자",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "데이트",
+          "start": "2027-07-09T15:30",
+          "end": "2027-07-09T16:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-07-09T16:30\", \"start\": \"2027-07-09T15:30\", \"title\": \"데이트\"}}</tool_call>",
+      "sec": 9.2,
+      "template": "next_wd|cross|wd1|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0043#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 금요일 오후 2시에 데이터베이스 시험 공부 넣어줘..",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "데이터베이스 시험 공부",
+          "start": "2027-04-30T14:00",
+          "end": "2027-04-30T15:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-05-07T15:00\", \"start\": \"2027-05-07T14:00\", \"title\": \"데이터베이스 시험 공부\"}}</tool_call>",
+      "sec": 9.8,
+      "template": "next_wd|end30|wd4|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0044#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 금요일 낮 1시에 병원 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "병원",
+          "start": "2026-10-30T13:00",
+          "end": "2026-10-30T14:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-10-30T14:00\", \"start\": \"2026-10-30T13:00\", \"title\": \"병원\"}}</tool_call>",
+      "sec": 9.34,
+      "template": "next_wd|d30of31|wd3|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0045#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "11일 뒤 일정 추가할게 낮 2시 심리학개론 예습",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "심리학개론 예습",
+          "start": "2027-07-01T14:00",
+          "end": "2027-07-01T15:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-06-31T15:00\", \"start\": \"2027-06-31T14:00\", \"title\": \"심리학개론 예습\"}}</tool_call>",
+      "sec": 9.66,
+      "template": "n_days|d01|wd6|+11"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0046#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 금요일 낮 1시에 운전면허 학원 있어 두 시간 동안",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "운전면허 학원",
+          "start": "2027-01-01T13:00",
+          "end": "2027-01-01T15:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-01-01T15:00\", \"start\": \"2027-01-01T13:00\", \"title\": \"운전면허 학원\"}}</tool_call>",
+      "sec": 9.83,
+      "template": "next_wd|d01|wd4|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0047#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "야 14일 후 낮 12시 반에 독서 박아줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "독서",
+          "start": "2027-03-31T12:30",
+          "end": "2027-03-31T13:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-03-31T13:30\", \"start\": \"2027-03-31T12:30\", \"title\": \"독서\"}}</tool_call>",
+      "sec": 9.33,
+      "template": "n_days|d31|wd2|+14"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0048#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "7일 뒤 오전 10시부터 45분 동안 조별 과제 모임 일정 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "조별 과제 모임",
+          "start": "2027-04-30T10:00",
+          "end": "2027-04-30T10:45",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-05-01T10:45\", \"start\": \"2027-05-01T10:00\", \"title\": \"조별 과제 모임\"}}</tool_call>",
+      "sec": 9.75,
+      "template": "n_days|end30|wd4|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0049#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "2일 뒤 오전 9시에 영어 단어 암기 세 시간만 잡아줄 수 있어?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "영어 단어 암기",
+          "start": "2027-06-20T09:00",
+          "end": "2027-06-20T12:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-06-20T12:00\", \"start\": \"2027-06-20T09:00\", \"title\": \"영어 단어 암기\"}}</tool_call>",
+      "sec": 9.73,
+      "template": "n_days|mid|wd4|+2"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0050#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "모바일프로그래밍 과제 하기 추가해줘 10일 뒤 오전 11시",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "모바일프로그래밍 과제 하기",
+          "start": "2026-10-31T11:00",
+          "end": "2026-10-31T12:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-10-31T12:00\", \"start\": \"2026-10-31T11:00\", \"title\": \"모바일프로그래밍 과제 하기\"}}</tool_call>",
+      "sec": 10.22,
+      "template": "n_days|d31|wd2|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0051#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "미적분학 스터디 12일 후 낮 2시에 있음 저장해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "미적분학 스터디",
+          "start": "2027-07-06T14:00",
+          "end": "2027-07-06T15:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-07-06T15:00\", \"start\": \"2027-07-06T14:00\", \"title\": \"미적분학 스터디\"}}</tool_call>",
+      "sec": 9.68,
+      "template": "n_days|cross|wd3|+12"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0052#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "캘린더에 담주 일요일 오전 9시 기계학습 복습 추가",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "기계학습 복습",
+          "start": "2027-08-15T09:00",
+          "end": "2027-08-15T10:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-08-15T10:00\", \"start\": \"2027-08-15T09:00\", \"title\": \"기계학습 복습\"}}</tool_call>",
+      "sec": 9.82,
+      "template": "next_wd|mid|wd4|+9"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0053#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 일요일 오전 열 시 미시경제학 복습 넣어놔",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "미시경제학 복습",
+          "start": "2027-01-31T10:00",
+          "end": "2027-01-31T11:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-01-31T11:00\", \"start\": \"2027-01-31T10:00\", \"title\": \"미시경제학 복습\"}}</tool_call>",
+      "sec": 9.79,
+      "template": "next_wd|d31|wd2|+11"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0054#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "팀 코드 리뷰 6일 뒤 15시 반에 있음 저장해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "팀 코드 리뷰",
+          "start": "2026-10-31T15:30",
+          "end": "2026-10-31T16:30",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2026-10-31T16:30\", \"start\": \"2026-10-31T15:30\", \"title\": \"팀 코드 리뷰\"}}</tool_call>",
+      "sec": 9.74,
+      "template": "n_days|d31|wd6|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0055#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "12일 뒤에 헬스 있는데 낮 1시야. 등록 좀",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "헬스",
+          "start": "2027-07-15T13:00",
+          "end": "2027-07-15T14:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-07-15T14:00\", \"start\": \"2027-07-15T13:00\", \"title\": \"헬스\"}}</tool_call>",
+      "sec": 9.21,
+      "template": "n_days|mid|wd5|+12"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0056#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "6일 후 저녁 6시에 선형대수 과제 하기 있을 예정이야 넣어둬",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "선형대수 과제 하기",
+          "start": "2026-11-01T18:00",
+          "end": "2026-11-01T19:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-11-01T19:00\", \"start\": \"2026-11-01T18:00\", \"title\": \"선형대수 과제 하기\"}}</tool_call>",
+      "sec": 10.13,
+      "template": "n_days|d01|wd0|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0057#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "12일 후 생일 파티 1시간 넣어줄래? 아침 9시부터",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "생일 파티",
+          "start": "2026-12-30T09:00",
+          "end": "2026-12-30T10:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-12-30T10:00\", \"start\": \"2026-12-30T09:00\", \"title\": \"생일 파티\"}}</tool_call>",
+      "sec": 9.3,
+      "template": "n_days|d30of31|wd4|+12"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 4,
+      "text_ok": null,
+      "id": "probe-0058#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "7일 후 컴파일러 시험 공부 오후 5시 15분 시작 한 시간 반",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "컴파일러 시험 공부",
+          "start": "2027-07-07T17:15",
+          "end": "2027-07-07T18:45",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-07-07T18:15\", \"start\": \"2027-07-07T17:15\", \"title\": \"컴파일러 시험 공부\"}}</tool_call>",
+      "sec": 9.92,
+      "template": "n_days|cross|wd2|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0059#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 토요일 도서관 공부 1시간 반 넣어줄래? 밤 9시부터",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "도서관 공부",
+          "start": "2027-03-13T21:00",
+          "end": "2027-03-13T22:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-03-13T22:30\", \"start\": \"2027-03-13T21:00\", \"title\": \"도서관 공부\"}}</tool_call>",
+      "sec": 9.49,
+      "template": "next_wd|mid|wd2|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0060#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 일요일 안경 맞추기 반 시간 넣어줄래? 오후 3시부터",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "안경 맞추기",
+          "start": "2027-01-31T15:00",
+          "end": "2027-01-31T15:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-01-31T15:30\", \"start\": \"2027-01-31T15:00\", \"title\": \"안경 맞추기\"}}</tool_call>",
+      "sec": 9.31,
+      "template": "next_wd|d31|wd1|+12"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0061#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "음 8일 후 아침 8시에 영화 보기 박아줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "영화 보기",
+          "start": "2027-07-31T08:00",
+          "end": "2027-07-31T09:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-07-31T09:00\", \"start\": \"2027-07-31T08:00\", \"title\": \"영화 보기\"}}</tool_call>",
+      "sec": 8.93,
+      "template": "n_days|d31|wd4|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0062#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "4일 후 19시에 미시경제학 시험 공부가 생겼어 일정에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "미시경제학 시험 공부",
+          "start": "2026-12-30T19:00",
+          "end": "2026-12-30T20:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-01-01T20:00\", \"start\": \"2027-01-01T19:00\", \"title\": \"미시경제학 시험 공부\"}}</tool_call>",
+      "sec": 9.69,
+      "template": "n_days|d30of31|wd5|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0063#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "14일 뒤 13시에 토익 공부 2시간 반만 잡아줄래?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "토익 공부",
+          "start": "2027-07-31T13:00",
+          "end": "2027-07-31T15:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-07-31T15:30\", \"start\": \"2027-07-31T13:00\", \"title\": \"토익 공부\"}}</tool_call>",
+      "sec": 9.29,
+      "template": "n_days|d31|wd5|+14"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0064#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 화요일 낮 2시 시작으로 치과 예약 일정 잡아줄래?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "치과 예약",
+          "start": "2027-08-31T14:00",
+          "end": "2027-08-31T15:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-08-31T15:00\", \"start\": \"2027-08-31T14:00\", \"title\": \"치과 예약\"}}</tool_call>",
+      "sec": 9.35,
+      "template": "next_wd|d31|wd4|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0065#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 금요일 아침 9시 반에 전공 공부 있어 세 시간 동안",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "전공 공부",
+          "start": "2027-07-02T09:30",
+          "end": "2027-07-02T12:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-07-02T12:30\", \"start\": \"2027-07-02T09:30\", \"title\": \"전공 공부\"}}</tool_call>",
+      "sec": 9.39,
+      "template": "next_wd|cross|wd1|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0066#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 일요일 오후 2시에 30분만 전시회 보기 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "전시회 보기",
+          "start": "2027-01-31T14:00",
+          "end": "2027-01-31T14:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-01-31T14:30\", \"start\": \"2027-01-31T14:00\", \"title\": \"전시회 보기\"}}</tool_call>",
+      "sec": 9.29,
+      "template": "next_wd|d31|wd4|+9"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0067#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "12일 후 오전 9시 반에 웹프로그래밍 과제 하기가 생겼어 일정에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "웹프로그래밍 과제 하기",
+          "start": "2027-07-31T09:30",
+          "end": "2027-07-31T10:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-07-31T10:30\", \"start\": \"2027-07-31T09:30\", \"title\": \"웹프로그래밍 과제 하기\"}}</tool_call>",
+      "sec": 9.65,
+      "template": "n_days|d31|wd0|+12"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0068#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "14일 후 소프트웨어공학 팀플 회의 4시간 넣어줄래? 오후 3시 반부터",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "소프트웨어공학 팀플 회의",
+          "start": "2027-03-09T15:30",
+          "end": "2027-03-09T19:30",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-03-09T19:30\", \"start\": \"2027-03-09T15:30\", \"title\": \"소프트웨어공학 팀플 회의\"}}</tool_call>",
+      "sec": 9.99,
+      "template": "n_days|cross|wd1|+14"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0069#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 월요일 저녁 7시 반 영어 회화 연습이 생겼어 일정에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "영어 회화 연습",
+          "start": "2027-08-30T19:30",
+          "end": "2027-08-30T20:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-08-30T20:30\", \"start\": \"2027-08-30T19:30\", \"title\": \"영어 회화 연습\"}}</tool_call>",
+      "sec": 9.38,
+      "template": "next_wd|d30of31|wd5|+2"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0070#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "혹시 6일 후 밤 10시에 편의점 알바 등록해줄 수 있어?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "편의점 알바",
+          "start": "2027-03-31T22:00",
+          "end": "2027-03-31T23:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2027-04-03T23:00\", \"start\": \"2027-04-03T22:00\", \"title\": \"편의점 알바\"}}</tool_call>",
+      "sec": 9.37,
+      "template": "n_days|d31|wd3|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0071#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "나 다음주 금요일 아침 여덟 시에 회계원리 스터디 있어. 추가해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "회계원리 스터디",
+          "start": "2027-07-30T08:00",
+          "end": "2027-07-30T09:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-07-30T09:00\", \"start\": \"2027-07-30T08:00\", \"title\": \"회계원리 스터디\"}}</tool_call>",
+      "sec": 9.54,
+      "template": "next_wd|d30of31|wd4|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0072#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 수요일 오후 3시 시작으로 회계원리 팀플 회의 일정 잡아줄래?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "회계원리 팀플 회의",
+          "start": "2027-06-30T15:00",
+          "end": "2027-06-30T16:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-07-07T16:00\", \"start\": \"2027-07-07T15:00\", \"title\": \"회계원리 팀플 회의\"}}</tool_call>",
+      "sec": 9.79,
+      "template": "next_wd|end30|wd6|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0073#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 수요일 저녁 8시 장학금 면접 일정 추가",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "장학금 면접",
+          "start": "2026-09-30T20:00",
+          "end": "2026-09-30T21:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2026-10-07T21:00\", \"start\": \"2026-10-07T20:00\", \"title\": \"장학금 면접\"}}</tool_call>",
+      "sec": 9.51,
+      "template": "next_wd|end30|wd6|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0074#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "6일 뒤 저녁 7시 반부터 헬스인데 일정에 넣어주실래요?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "헬스",
+          "start": "2027-03-30T19:30",
+          "end": "2027-03-30T20:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-03-30T20:30\", \"start\": \"2027-03-30T19:30\", \"title\": \"헬스\"}}</tool_call>",
+      "sec": 8.9,
+      "template": "n_days|d30of31|wd2|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0075#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "2일 후 오후 5시에 면접 있을 예정이야 넣어둬",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "면접",
+          "start": "2026-09-16T17:00",
+          "end": "2026-09-16T18:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2026-09-16T18:00\", \"start\": \"2026-09-16T17:00\", \"title\": \"면접\"}}</tool_call>",
+      "sec": 8.92,
+      "template": "n_days|mid|wd0|+2"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0076#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 화요일 정오부터 4시간 동안 토익 공부 일정 넣어주세요",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "토익 공부",
+          "start": "2027-03-30T12:00",
+          "end": "2027-03-30T16:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-03-30T16:00\", \"start\": \"2027-03-30T12:00\", \"title\": \"토익 공부\"}}</tool_call>",
+      "sec": 9.42,
+      "template": "next_wd|d30of31|wd4|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0077#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "4일 뒤 낮 2시로 안경 맞추기 일정 만들어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "안경 맞추기",
+          "start": "2027-06-01T14:00",
+          "end": "2027-06-01T15:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-06-01T15:00\", \"start\": \"2027-06-01T14:00\", \"title\": \"안경 맞추기\"}}</tool_call>",
+      "sec": 9.29,
+      "template": "n_days|d01|wd4|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0078#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 화요일 낮 1시부터 90분 동안 수영 일정 넣어줘요",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "수영",
+          "start": "2026-09-08T13:00",
+          "end": "2026-09-08T14:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-09-08T14:30\", \"start\": \"2026-09-08T13:00\", \"title\": \"수영\"}}</tool_call>",
+      "sec": 9.02,
+      "template": "next_wd|mid|wd2|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0079#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "오픽 준비 12일 뒤 14시 30분부터 2시간 반 잡아놔",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "오픽 준비",
+          "start": "2027-01-01T14:30",
+          "end": "2027-01-01T17:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-01-01T17:00\", \"start\": \"2027-01-01T14:30\", \"title\": \"오픽 준비\"}}</tool_call>",
+      "sec": 9.4,
+      "template": "n_days|d01|wd6|+12"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0080#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 목요일 전시회 보기 오후 2시 반에 넣어주세요",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "전시회 보기",
+          "start": "2026-12-10T14:30",
+          "end": "2026-12-10T15:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-12-10T15:30\", \"start\": \"2026-12-10T14:30\", \"title\": \"전시회 보기\"}}</tool_call>",
+      "sec": 9.31,
+      "template": "next_wd|mid|wd5|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0081#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 수요일 낮 12시에 알고리즘 팀플 회의 하나만 넣자",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "알고리즘 팀플 회의",
+          "start": "2026-12-30T12:00",
+          "end": "2026-12-30T13:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2026-12-30T13:00\", \"start\": \"2026-12-30T12:00\", \"title\": \"알고리즘 팀플 회의\"}}</tool_call>",
+      "sec": 9.96,
+      "template": "next_wd|d30of31|wd1|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0082#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 월요일 일정 추가할게 22시 반 특강",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "특강",
+          "start": "2027-05-31T22:30",
+          "end": "2027-05-31T23:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-05-31T23:30\", \"start\": \"2027-05-31T22:30\", \"title\": \"특강\"}}</tool_call>",
+      "sec": 9.19,
+      "template": "next_wd|d31|wd4|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0083#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "저기 멘토링을 10일 뒤 13시에 잡아놨어 캘린더에 올려줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "멘토링",
+          "start": "2026-09-30T13:00",
+          "end": "2026-09-30T14:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2026-09-30T14:00\", \"start\": \"2026-09-30T13:00\", \"title\": \"멘토링\"}}</tool_call>",
+      "sec": 9.3,
+      "template": "n_days|end30|wd6|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0084#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "CS 스터디를 13일 후 저녁 7시에 잡아놨어 캘린더에 올려줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "CS 스터디",
+          "start": "2026-09-30T19:00",
+          "end": "2026-09-30T20:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-10-09T20:00\", \"start\": \"2026-10-09T19:00\", \"title\": \"CS 스터디\"}}</tool_call>",
+      "sec": 9.31,
+      "template": "n_days|end30|wd3|+13"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0085#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "캘린더에 4일 뒤 오전 9시 스프린트 회의 추가",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "스프린트 회의",
+          "start": "2026-10-31T09:00",
+          "end": "2026-10-31T10:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2026-11-01T10:00\", \"start\": \"2026-11-01T09:00\", \"title\": \"스프린트 회의\"}}</tool_call>",
+      "sec": 9.51,
+      "template": "n_days|d31|wd1|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0086#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 화요일 낮 2시에 90분만 소프트웨어공학 복습 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "소프트웨어공학 복습",
+          "start": "2026-12-01T14:00",
+          "end": "2026-12-01T15:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-12-01T15:30\", \"start\": \"2026-12-01T14:00\", \"title\": \"소프트웨어공학 복습\"}}</tool_call>",
+      "sec": 9.91,
+      "template": "next_wd|d01|wd3|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0087#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 월요일 교수님 면담 저녁 8시에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "교수님 면담",
+          "start": "2027-05-31T20:00",
+          "end": "2027-05-31T21:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-05-31T21:00\", \"start\": \"2027-05-31T20:00\", \"title\": \"교수님 면담\"}}</tool_call>",
+      "sec": 9.36,
+      "template": "next_wd|d31|wd0|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0088#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "정보보호개론 팀플 회의 일정 14일 후 오후 2시로 등록해 주세요",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "정보보호개론 팀플 회의",
+          "start": "2027-03-30T14:00",
+          "end": "2027-03-30T15:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-03-30T15:00\", \"start\": \"2027-03-30T14:00\", \"title\": \"정보보호개론 팀플 회의\"}}</tool_call>",
+      "sec": 9.73,
+      "template": "n_days|d30of31|wd1|+14"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0089#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 목요일 점심 12시로 면접 일정 만들어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "면접",
+          "start": "2026-12-31T12:00",
+          "end": "2026-12-31T13:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2026-12-31T13:00\", \"start\": \"2026-12-31T12:00\", \"title\": \"면접\"}}</tool_call>",
+      "sec": 8.95,
+      "template": "next_wd|d31|wd3|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0090#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "7일 후 오전 11시에 정보보호개론 과제 하기 잡혔어 기록해줄 수 있어?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "정보보호개론 과제 하기",
+          "start": "2027-04-03T11:00",
+          "end": "2027-04-03T12:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-04-03T12:00\", \"start\": \"2027-04-03T11:00\", \"title\": \"정보보호개론 과제 하기\"}}</tool_call>",
+      "sec": 9.81,
+      "template": "n_days|cross|wd5|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0091#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "필라테스 잡아줘 12일 뒤 낮 12시 반ㅋㅋ",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "필라테스",
+          "start": "2027-03-30T12:30",
+          "end": "2027-03-30T13:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-03-30T13:30\", \"start\": \"2027-03-30T12:30\", \"title\": \"필라테스\"}}</tool_call>",
+      "sec": 9.31,
+      "template": "n_days|d30of31|wd3|+12"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0092#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "음 13일 뒤 오후 5시에 발표 리허설 한 시간 반만 잡아줘..",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "발표 리허설",
+          "start": "2026-11-16T17:00",
+          "end": "2026-11-16T18:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-11-16T18:30\", \"start\": \"2026-11-16T17:00\", \"title\": \"발표 리허설\"}}</tool_call>",
+      "sec": 9.33,
+      "template": "n_days|mid|wd1|+13"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0093#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "나 4일 뒤 15시에 영어 단어 암기 있어. 좀 추가해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "영어 단어 암기",
+          "start": "2026-11-30T15:00",
+          "end": "2026-11-30T16:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-12-01T16:00\", \"start\": \"2026-12-01T15:00\", \"title\": \"영어 단어 암기\"}}</tool_call>",
+      "sec": 9.65,
+      "template": "n_days|end30|wd3|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0094#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "11일 뒤 데이터베이스 스터디 밤 9시 시작 한 시간 반",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "데이터베이스 스터디",
+          "start": "2027-08-31T21:00",
+          "end": "2027-08-31T22:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-08-31T22:30\", \"start\": \"2027-08-31T21:00\", \"title\": \"데이터베이스 스터디\"}}</tool_call>",
+      "sec": 9.85,
+      "template": "n_days|d31|wd4|+11"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0095#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "캘린더에 내주 화요일 오후 1시 컴퓨터네트워크 시험 공부 추가",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "컴퓨터네트워크 시험 공부",
+          "start": "2027-08-31T13:00",
+          "end": "2027-08-31T14:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-08-31T14:00\", \"start\": \"2027-08-31T13:00\", \"title\": \"컴퓨터네트워크 시험 공부\"}}</tool_call>",
+      "sec": 9.81,
+      "template": "next_wd|d31|wd4|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0096#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 금요일 오후 한 시 장학금 면접 넣어놔~",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "장학금 면접",
+          "start": "2027-07-02T13:00",
+          "end": "2027-07-02T14:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2027-07-02T14:00\", \"start\": \"2027-07-02T13:00\", \"title\": \"장학금 면접\"}}</tool_call>",
+      "sec": 9.42,
+      "template": "next_wd|cross|wd5|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0097#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "10일 후 저녁 6시 선형대수 스터디 일정 추가",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "선형대수 스터디",
+          "start": "2027-01-30T18:00",
+          "end": "2027-01-30T19:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-01-30T19:00\", \"start\": \"2027-01-30T18:00\", \"title\": \"선형대수 스터디\"}}</tool_call>",
+      "sec": 9.58,
+      "template": "n_days|d30of31|wd2|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0098#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "2일 후에 팀플 PPT 작업 있는데 아침 아홉 시야. 등록 좀",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "팀플 PPT 작업",
+          "start": "2027-01-01T09:00",
+          "end": "2027-01-01T10:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-01-01T10:00\", \"start\": \"2027-01-01T09:00\", \"title\": \"팀플 PPT 작업\"}}</tool_call>",
+      "sec": 9.4,
+      "template": "n_days|d01|wd2|+2"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0099#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "9일 후 아침 7시에 콘서트가 생겼어 일정에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "콘서트",
+          "start": "2026-10-31T07:00",
+          "end": "2026-10-31T08:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-11-01T08:00\", \"start\": \"2026-11-01T07:00\", \"title\": \"콘서트\"}}</tool_call>",
+      "sec": 8.97,
+      "template": "n_days|d31|wd3|+9"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0100#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 일요일에 캡스톤 회의 있는데 오전 9시 반이야. 등록 좀",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "캡스톤 회의",
+          "start": "2027-07-04T09:30",
+          "end": "2027-07-04T10:30",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-07-04T10:30\", \"start\": \"2027-07-04T09:30\", \"title\": \"캡스톤 회의\"}}</tool_call>",
+      "sec": 9.31,
+      "template": "next_wd|cross|wd3|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0101#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "독서실 공부를 4일 뒤 오전 9시 30분에 잡아놨어 캘린더에 올려줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "독서실 공부",
+          "start": "2027-08-02T09:30",
+          "end": "2027-08-02T10:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-08-02T10:30\", \"start\": \"2027-08-02T09:30\", \"title\": \"독서실 공부\"}}</tool_call>",
+      "sec": 9.34,
+      "template": "n_days|cross|wd3|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0102#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 수요일 밤 9시 데이트 일정 추가",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "데이트",
+          "start": "2026-12-30T21:00",
+          "end": "2026-12-30T22:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-12-30T22:00\", \"start\": \"2026-12-30T21:00\", \"title\": \"데이트\"}}</tool_call>",
+      "sec": 9.05,
+      "template": "next_wd|d30of31|wd0|+9"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0103#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "운영체제 팀플 회의 넣어줘. 날짜는 다음주 금요일이고 시간은 아침 7시",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "운영체제 팀플 회의",
+          "start": "2026-10-30T07:00",
+          "end": "2026-10-30T08:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2026-10-30T08:00\", \"start\": \"2026-10-30T07:00\", \"title\": \"운영체제 팀플 회의\"}}</tool_call>",
+      "sec": 10.12,
+      "template": "next_wd|d30of31|wd0|+11"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0104#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "3일 후 오후 두 시 시작으로 카페 알바 일정 잡아줄래?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "카페 알바",
+          "start": "2027-08-13T14:00",
+          "end": "2027-08-13T15:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2027-08-13T15:00\", \"start\": \"2027-08-13T14:00\", \"title\": \"카페 알바\"}}</tool_call>",
+      "sec": 9.27,
+      "template": "n_days|mid|wd1|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0105#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "7일 후 오전 10시 30분에 스프린트 회의 잡혔어 기록해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "스프린트 회의",
+          "start": "2027-07-30T10:30",
+          "end": "2027-07-30T11:30",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-07-30T11:30\", \"start\": \"2027-07-30T10:30\", \"title\": \"스프린트 회의\"}}</tool_call>",
+      "sec": 9.32,
+      "template": "n_days|d30of31|wd4|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0106#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "일반물리학 팀플 회의 한 시간 반짜리 12일 후 저녁 7시에 등록해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "일반물리학 팀플 회의",
+          "start": "2027-05-31T19:00",
+          "end": "2027-05-31T20:30",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-05-31T20:30\", \"start\": \"2027-05-31T19:00\", \"title\": \"일반물리학 팀플 회의\"}}</tool_call>",
+      "sec": 9.84,
+      "template": "n_days|d31|wd2|+12"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0107#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "8일 뒤 13시 인턴 면접 스케줄 등록",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "인턴 면접",
+          "start": "2027-07-30T13:00",
+          "end": "2027-07-30T14:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2027-07-30T14:00\", \"start\": \"2027-07-30T13:00\", \"title\": \"인턴 면접\"}}</tool_call>",
+      "sec": 9.3,
+      "template": "n_days|d30of31|wd3|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0108#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 월요일 저녁 8시에 팀플 미팅 있어 한 시간 동안",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "팀플 미팅",
+          "start": "2027-05-31T20:00",
+          "end": "2027-05-31T21:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-05-31T21:00\", \"start\": \"2027-05-31T20:00\", \"title\": \"팀플 미팅\"}}</tool_call>",
+      "sec": 9.2,
+      "template": "next_wd|d31|wd5|+2"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0109#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 일요일 아침 8시에 영화 보기 3시간만 잡아줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "영화 보기",
+          "start": "2027-06-06T08:00",
+          "end": "2027-06-06T11:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-06-06T11:00\", \"start\": \"2027-06-06T08:00\", \"title\": \"영화 보기\"}}</tool_call>",
+      "sec": 9.06,
+      "template": "next_wd|cross|wd0|+13"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0110#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "농구 한 시간짜리 내주 토요일 밤 10시 반에 등록해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "농구",
+          "start": "2027-07-31T22:30",
+          "end": "2027-07-31T23:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-07-31T23:30\", \"start\": \"2027-07-31T22:30\", \"title\": \"농구\"}}</tool_call>",
+      "sec": 8.95,
+      "template": "next_wd|d31|wd1|+11"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0111#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "혹시 7일 뒤 18시에 컴파일러 예습 등록해줄 수 있어?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "컴파일러 예습",
+          "start": "2027-01-01T18:00",
+          "end": "2027-01-01T19:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-01-01T19:00\", \"start\": \"2027-01-01T18:00\", \"title\": \"컴파일러 예습\"}}</tool_call>",
+      "sec": 9.35,
+      "template": "n_days|d01|wd4|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0112#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 금요일 낮 12시에 세탁 있을 예정이야 넣어둬",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "세탁",
+          "start": "2027-04-30T12:00",
+          "end": "2027-04-30T13:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2027-04-30T13:00\", \"start\": \"2027-04-30T12:00\", \"title\": \"세탁\"}}</tool_call>",
+      "sec": 8.99,
+      "template": "next_wd|end30|wd1|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0113#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "혹시 3일 후 오전 9시에 웹프로그래밍 시험 공부 등록해줄 수 있어?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "웹프로그래밍 시험 공부",
+          "start": "2027-01-31T09:00",
+          "end": "2027-01-31T10:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-02-01T10:00\", \"start\": \"2027-02-01T09:00\", \"title\": \"웹프로그래밍 시험 공부\"}}</tool_call>",
+      "sec": 9.69,
+      "template": "n_days|d31|wd3|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0114#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 수요일 일정 추가할게 오전 11시 반 CS 스터디",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "CS 스터디",
+          "start": "2027-06-30T11:30",
+          "end": "2027-06-30T12:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-07-07T12:30\", \"start\": \"2027-07-07T11:30\", \"title\": \"CS 스터디\"}}</tool_call>",
+      "sec": 9.31,
+      "template": "next_wd|end30|wd3|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0115#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 토요일 오전 11시에 소프트웨어공학 팀플 회의 있을 예정이야 넣어둬",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "소프트웨어공학 팀플 회의",
+          "start": "2026-10-31T11:00",
+          "end": "2026-10-31T12:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2026-10-31T12:00\", \"start\": \"2026-10-31T11:00\", \"title\": \"소프트웨어공학 팀플 회의\"}}</tool_call>",
+      "sec": 10.45,
+      "template": "next_wd|d31|wd0|+12"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0116#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "14일 후 14시에 팀플 미팅 있을 예정이야 넣어둬",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "팀플 미팅",
+          "start": "2027-04-30T14:00",
+          "end": "2027-04-30T15:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-04-30T15:00\", \"start\": \"2027-04-30T14:00\", \"title\": \"팀플 미팅\"}}</tool_call>",
+      "sec": 9.23,
+      "template": "n_days|end30|wd4|+14"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0117#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 목요일 낮 12시 반 미시경제학 시험 공부 있어 30분 동안",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "미시경제학 시험 공부",
+          "start": "2026-10-08T12:30",
+          "end": "2026-10-08T13:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-10-08T13:00\", \"start\": \"2026-10-08T12:30\", \"title\": \"미시경제학 시험 공부\"}}</tool_call>",
+      "sec": 9.89,
+      "template": "next_wd|mid|wd5|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0118#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 금요일 발표 리허설 반 시간 넣어줄래? 점심 12시부터",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "발표 리허설",
+          "start": "2027-05-07T12:00",
+          "end": "2027-05-07T12:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-05-07T12:30\", \"start\": \"2027-05-07T12:00\", \"title\": \"발표 리허설\"}}</tool_call>",
+      "sec": 9.52,
+      "template": "next_wd|cross|wd3|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0119#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 화요일 17시에 이산수학 복습이 생겼어 일정에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "이산수학 복습",
+          "start": "2027-08-31T17:00",
+          "end": "2027-08-31T18:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-08-31T18:00\", \"start\": \"2027-08-31T17:00\", \"title\": \"이산수학 복습\"}}</tool_call>",
+      "sec": 9.6,
+      "template": "next_wd|d31|wd4|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0120#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "13일 뒤 낮 2시에 팀 코드 리뷰가 생겼어 일정에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "팀 코드 리뷰",
+          "start": "2027-01-31T14:00",
+          "end": "2027-01-31T15:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-02-01T15:00\", \"start\": \"2027-02-01T14:00\", \"title\": \"팀 코드 리뷰\"}}</tool_call>",
+      "sec": 9.48,
+      "template": "n_days|d31|wd0|+13"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0121#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "혹시 11일 뒤 낮 2시에 회계원리 과제 하기 등록해줄 수 있어?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "회계원리 과제 하기",
+          "start": "2027-07-01T14:00",
+          "end": "2027-07-01T15:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-06-31T15:00\", \"start\": \"2027-06-31T14:00\", \"title\": \"회계원리 과제 하기\"}}</tool_call>",
+      "sec": 9.71,
+      "template": "n_days|d01|wd6|+11"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0122#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "7일 뒤 낮 2시에 미시경제학 시험 공부 있어 4시간 동안",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "미시경제학 시험 공부",
+          "start": "2027-05-31T14:00",
+          "end": "2027-05-31T18:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-06-01T18:00\", \"start\": \"2027-06-01T14:00\", \"title\": \"미시경제학 시험 공부\"}}</tool_call>",
+      "sec": 9.55,
+      "template": "n_days|d31|wd0|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0123#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "5일 뒤 아침 7시 시작으로 미시경제학 시험 공부 일정 잡아줄래?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "미시경제학 시험 공부",
+          "start": "2026-12-05T07:00",
+          "end": "2026-12-05T08:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-12-05T08:00\", \"start\": \"2026-12-05T07:00\", \"title\": \"미시경제학 시험 공부\"}}</tool_call>",
+      "sec": 9.6,
+      "template": "n_days|cross|wd0|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0124#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 월요일 러닝 저녁 7시 시작 45분",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "러닝",
+          "start": "2026-11-30T19:00",
+          "end": "2026-11-30T19:45",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-11-30T19:45\", \"start\": \"2026-11-30T19:00\", \"title\": \"러닝\"}}</tool_call>",
+      "sec": 9.11,
+      "template": "next_wd|end30|wd2|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0125#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 일요일 정오 미시경제학 시험 공부 박아줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "미시경제학 시험 공부",
+          "start": "2026-11-01T12:00",
+          "end": "2026-11-01T13:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-10-31T13:00\", \"start\": \"2026-10-31T12:00\", \"title\": \"미시경제학 시험 공부\"}}</tool_call>",
+      "sec": 9.7,
+      "template": "next_wd|d01|wd3|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0126#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 월요일 아침 7시로 치과 예약 일정 만들어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "치과 예약",
+          "start": "2027-03-01T07:00",
+          "end": "2027-03-01T08:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-03-01T08:00\", \"start\": \"2027-03-01T07:00\", \"title\": \"치과 예약\"}}</tool_call>",
+      "sec": 9.19,
+      "template": "next_wd|d01|wd4|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0127#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 월요일 오후 1시 반 알고리즘 스터디 일정 추가",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "알고리즘 스터디",
+          "start": "2027-03-01T13:30",
+          "end": "2027-03-01T14:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-03-01T14:30\", \"start\": \"2027-03-01T13:30\", \"title\": \"알고리즘 스터디\"}}</tool_call>",
+      "sec": 9.59,
+      "template": "next_wd|d01|wd1|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0128#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "4일 뒤 점심 12시 웹프로그래밍 시험 공부 잡아줘 30분",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "웹프로그래밍 시험 공부",
+          "start": "2027-06-01T12:00",
+          "end": "2027-06-01T12:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-06-01T12:30\", \"start\": \"2027-06-01T12:00\", \"title\": \"웹프로그래밍 시험 공부\"}}</tool_call>",
+      "sec": 9.52,
+      "template": "n_days|d01|wd4|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0129#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "아 맞다 8일 뒤 콘서트 아침 아홉 시에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "콘서트",
+          "start": "2027-07-01T09:00",
+          "end": "2027-07-01T10:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-07-01T10:00\", \"start\": \"2027-07-01T09:00\", \"title\": \"콘서트\"}}</tool_call>",
+      "sec": 8.95,
+      "template": "n_days|d01|wd2|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0130#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "선형대수 시험 공부 잡아줘 10일 뒤 오후 2시",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "선형대수 시험 공부",
+          "start": "2027-06-21T14:00",
+          "end": "2027-06-21T15:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-06-21T15:00\", \"start\": \"2027-06-21T14:00\", \"title\": \"선형대수 시험 공부\"}}</tool_call>",
+      "sec": 9.53,
+      "template": "n_days|mid|wd4|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0131#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 목요일 낮 두 시 선형대수 시험 공부 한 시간 반만 잡아줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "선형대수 시험 공부",
+          "start": "2026-09-17T14:00",
+          "end": "2026-09-17T15:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-09-17T15:30\", \"start\": \"2026-09-17T14:00\", \"title\": \"선형대수 시험 공부\"}}</tool_call>",
+      "sec": 9.55,
+      "template": "next_wd|mid|wd0|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0132#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "2일 뒤 아침 7시에 경영학원론 과제 하기 박아줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "경영학원론 과제 하기",
+          "start": "2027-07-31T07:00",
+          "end": "2027-07-31T08:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-07-31T08:00\", \"start\": \"2027-07-31T07:00\", \"title\": \"경영학원론 과제 하기\"}}</tool_call>",
+      "sec": 9.64,
+      "template": "n_days|d31|wd3|+2"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0133#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "일정 하나 추가: 10일 뒤 아침 8시 프로그래밍언어론 팀플 회의",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "프로그래밍언어론 팀플 회의",
+          "start": "2027-08-01T08:00",
+          "end": "2027-08-01T09:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-07-32T09:00\", \"start\": \"2027-07-32T08:00\", \"title\": \"프로그래밍언어론 팀플 회의\"}}</tool_call>",
+      "sec": 9.93,
+      "template": "n_days|d01|wd3|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0134#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "6일 뒤 오후 5시부터 안경 맞추기인데 일정에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "안경 맞추기",
+          "start": "2027-05-31T17:00",
+          "end": "2027-05-31T18:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-06-01T18:00\", \"start\": \"2027-06-01T17:00\", \"title\": \"안경 맞추기\"}}</tool_call>",
+      "sec": 9.27,
+      "template": "n_days|d31|wd1|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0135#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "나 다음주 토요일 저녁 6시 반에 정보보호개론 과제 하기 있어. 추가해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "정보보호개론 과제 하기",
+          "start": "2026-10-31T18:30",
+          "end": "2026-10-31T19:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-10-31T19:30\", \"start\": \"2026-10-31T18:30\", \"title\": \"정보보호개론 과제 하기\"}}</tool_call>",
+      "sec": 9.51,
+      "template": "next_wd|d31|wd5|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0136#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "내주 월요일 아침 9시 오픽 준비 넣어놔",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "오픽 준비",
+          "start": "2027-03-01T09:00",
+          "end": "2027-03-01T10:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-03-01T10:00\", \"start\": \"2027-03-01T09:00\", \"title\": \"오픽 준비\"}}</tool_call>",
+      "sec": 9.14,
+      "template": "next_wd|d01|wd5|+2"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0137#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 월요일 오전 열한 시에 팀플 발표 연습 4시간만 잡아줘~",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "팀플 발표 연습",
+          "start": "2027-02-01T11:00",
+          "end": "2027-02-01T15:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-02-01T15:00\", \"start\": \"2027-02-01T11:00\", \"title\": \"팀플 발표 연습\"}}</tool_call>",
+      "sec": 9.28,
+      "template": "next_wd|d01|wd2|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0138#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "9일 뒤 밤 10시 데이터마이닝 팀플 회의 있어 캘린더에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "데이터마이닝 팀플 회의",
+          "start": "2027-05-30T22:00",
+          "end": "2027-05-30T23:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-05-30T23:00\", \"start\": \"2027-05-30T22:00\", \"title\": \"데이터마이닝 팀플 회의\"}}</tool_call>",
+      "sec": 10.01,
+      "template": "n_days|d30of31|wd4|+9"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0139#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "그리고 3일 후 아침 여덟 시에 데이터마이닝 팀플 회의가 생겼어 일정에 넣어줘요",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "데이터마이닝 팀플 회의",
+          "start": "2027-07-31T08:00",
+          "end": "2027-07-31T09:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-07-31T09:00\", \"start\": \"2027-07-31T08:00\", \"title\": \"데이터마이닝 팀플 회의\"}}</tool_call>",
+      "sec": 9.89,
+      "template": "n_days|d31|wd2|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0140#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "10일 후 아침 9시에 소프트웨어공학 팀플 회의가 생겼어 일정에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "소프트웨어공학 팀플 회의",
+          "start": "2027-01-31T09:00",
+          "end": "2027-01-31T10:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-01-31T10:00\", \"start\": \"2027-01-31T09:00\", \"title\": \"소프트웨어공학 팀플 회의\"}}</tool_call>",
+      "sec": 9.79,
+      "template": "n_days|d31|wd3|+10"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0141#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "5일 뒤 오후 1시 반에 동기 모임 있어 1시간 동안",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "동기 모임",
+          "start": "2026-09-30T13:30",
+          "end": "2026-09-30T14:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-09-30T14:30\", \"start\": \"2026-09-30T13:30\", \"title\": \"동기 모임\"}}</tool_call>",
+      "sec": 9.11,
+      "template": "n_days|end30|wd4|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0142#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "전공 공부 반 시간짜리 7일 뒤 아침 9시 반에 등록해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "전공 공부",
+          "start": "2027-05-14T09:30",
+          "end": "2027-05-14T10:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-05-14T10:00\", \"start\": \"2027-05-14T09:30\", \"title\": \"전공 공부\"}}</tool_call>",
+      "sec": 9.21,
+      "template": "n_days|mid|wd4|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0143#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "나 다음 주 목요일 낮 2시에 팀 발표 준비 있어. 추가해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "팀 발표 준비",
+          "start": "2026-11-05T14:00",
+          "end": "2026-11-05T15:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2026-11-05T15:00\", \"start\": \"2026-11-05T14:00\", \"title\": \"팀 발표 준비\"}}</tool_call>",
+      "sec": 8.94,
+      "template": "next_wd|cross|wd3|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0144#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "캘린더에 7일 뒤 오후 한 시 프로그래밍언어론 팀플 회의 추가",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "프로그래밍언어론 팀플 회의",
+          "start": "2026-12-01T13:00",
+          "end": "2026-12-01T14:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2026-12-01T14:00\", \"start\": \"2026-12-01T13:00\", \"title\": \"프로그래밍언어론 팀플 회의\"}}</tool_call>",
+      "sec": 9.69,
+      "template": "n_days|d01|wd1|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0145#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "7일 뒤 밤 10시에 캡스톤 회의 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "캡스톤 회의",
+          "start": "2026-12-31T22:00",
+          "end": "2026-12-31T23:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2026-12-31T23:00\", \"start\": \"2026-12-31T22:00\", \"title\": \"캡스톤 회의\"}}</tool_call>",
+      "sec": 9.05,
+      "template": "n_days|d31|wd3|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0146#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "일정 하나 추가: 내주 목요일 오전 11시 반 요가",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "요가",
+          "start": "2027-05-06T11:30",
+          "end": "2027-05-06T12:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-05-06T12:30\", \"start\": \"2027-05-06T11:30\", \"title\": \"요가\"}}</tool_call>",
+      "sec": 8.84,
+      "template": "next_wd|cross|wd1|+9"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0147#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "캘린더에 12일 뒤 밤 열 시 인턴 면접 추가",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "인턴 면접",
+          "start": "2027-06-01T22:00",
+          "end": "2027-06-01T23:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2027-05-31T23:00\", \"start\": \"2027-05-31T22:00\", \"title\": \"인턴 면접\"}}</tool_call>",
+      "sec": 9.29,
+      "template": "n_days|d01|wd3|+12"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0148#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "3일 뒤 정오 동기 모임 잡아줘 1시간 반",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "동기 모임",
+          "start": "2027-06-30T12:00",
+          "end": "2027-06-30T13:30",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-06-30T13:30\", \"start\": \"2027-06-30T12:00\", \"title\": \"동기 모임\"}}</tool_call>",
+      "sec": 9.15,
+      "template": "n_days|end30|wd6|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0149#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 일요일 오전 9시 일반물리학 스터디 잡아줘 세 시간",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "일반물리학 스터디",
+          "start": "2027-01-31T09:00",
+          "end": "2027-01-31T12:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-01-31T12:00\", \"start\": \"2027-01-31T09:00\", \"title\": \"일반물리학 스터디\"}}</tool_call>",
+      "sec": 9.54,
+      "template": "next_wd|d31|wd4|+9"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0150#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "알바 일정 담주 토요일 아침 7시로 등록해 주세요",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "알바",
+          "start": "2027-07-31T07:00",
+          "end": "2027-07-31T08:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2027-07-31T08:00\", \"start\": \"2027-07-31T07:00\", \"title\": \"알바\"}}</tool_call>",
+      "sec": 8.89,
+      "template": "next_wd|d31|wd5|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0151#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "혹시 다음 주 수요일 오후 1시에 동기 모임 등록해줄 수 있어?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "동기 모임",
+          "start": "2027-06-30T13:00",
+          "end": "2027-06-30T14:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2027-06-30T14:00\", \"start\": \"2027-06-30T13:00\", \"title\": \"동기 모임\"}}</tool_call>",
+      "sec": 9.21,
+      "template": "next_wd|end30|wd1|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0152#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "요가 일정 만들어줘. 3일 후 낮 12시 시작이고 2시간 걸려",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "요가",
+          "start": "2026-09-30T12:00",
+          "end": "2026-09-30T14:00",
+          "allDay": false,
+          "category": "personal"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-09-30T14:00\", \"start\": \"2026-09-30T12:00\", \"title\": \"요가\"}}</tool_call>",
+      "sec": 9.09,
+      "template": "n_days|end30|wd6|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0153#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 토요일 아침 7시 반부터 기계학습 복습인데 일정에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "기계학습 복습",
+          "start": "2027-07-03T07:30",
+          "end": "2027-07-03T08:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-07-03T08:30\", \"start\": \"2027-07-03T07:30\", \"title\": \"기계학습 복습\"}}</tool_call>",
+      "sec": 9.66,
+      "template": "next_wd|cross|wd3|+9"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0154#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 일요일 자격증 공부 정오에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "자격증 공부",
+          "start": "2027-01-31T12:00",
+          "end": "2027-01-31T13:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-01-31T13:00\", \"start\": \"2027-01-31T12:00\", \"title\": \"자격증 공부\"}}</tool_call>",
+      "sec": 9.18,
+      "template": "next_wd|d31|wd1|+12"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0155#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "기계학습 스터디 잡아줘 담주 일요일 아침 9시",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "기계학습 스터디",
+          "start": "2027-08-01T09:00",
+          "end": "2027-08-01T10:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-07-25T10:00\", \"start\": \"2027-07-25T09:00\", \"title\": \"기계학습 스터디\"}}</tool_call>",
+      "sec": 9.71,
+      "template": "next_wd|d01|wd2|+11"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0156#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "코딩 연습 추가해줘 5일 후 점심 12시",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "코딩 연습",
+          "start": "2027-01-16T12:00",
+          "end": "2027-01-16T13:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-01-16T13:00\", \"start\": \"2027-01-16T12:00\", \"title\": \"코딩 연습\"}}</tool_call>",
+      "sec": 9.4,
+      "template": "n_days|mid|wd0|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0157#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "8일 뒤 오후 5시 반에 컴파일러 과제 하기 있어 세 시간 동안",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "컴파일러 과제 하기",
+          "start": "2027-05-31T17:30",
+          "end": "2027-05-31T20:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-05-31T20:30\", \"start\": \"2027-05-31T17:30\", \"title\": \"컴파일러 과제 하기\"}}</tool_call>",
+      "sec": 9.95,
+      "template": "n_days|d31|wd6|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0158#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "9일 후 아침 8시부터 독서실 공부인데 일정에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "독서실 공부",
+          "start": "2027-03-31T08:00",
+          "end": "2027-03-31T09:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-04-01T09:00\", \"start\": \"2027-04-01T08:00\", \"title\": \"독서실 공부\"}}</tool_call>",
+      "sec": 9.47,
+      "template": "n_days|d31|wd0|+9"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0159#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 금요일 아침 7시에 확률과통계 예습 잡혔어 기록해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "확률과통계 예습",
+          "start": "2027-04-30T07:00",
+          "end": "2027-04-30T08:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-04-30T08:00\", \"start\": \"2027-04-30T07:00\", \"title\": \"확률과통계 예습\"}}</tool_call>",
+      "sec": 9.5,
+      "template": "next_wd|end30|wd2|+9"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0160#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "2일 뒤 아침 여덟 시 이산수학 예습 스케줄 등록",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "이산수학 예습",
+          "start": "2027-01-31T08:00",
+          "end": "2027-01-31T09:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-01-31T09:00\", \"start\": \"2027-01-31T08:00\", \"title\": \"이산수학 예습\"}}</tool_call>",
+      "sec": 10.65,
+      "template": "n_days|d31|wd4|+2"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0161#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "14일 뒤 낮 1시에 90분만 자료구조 복습 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "자료구조 복습",
+          "start": "2027-04-30T13:00",
+          "end": "2027-04-30T14:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-04-30T14:30\", \"start\": \"2027-04-30T13:00\", \"title\": \"자료구조 복습\"}}</tool_call>",
+      "sec": 9.56,
+      "template": "n_days|end30|wd4|+14"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0162#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 토요일 아침 7시에 경영학원론 스터디 박아줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "경영학원론 스터디",
+          "start": "2027-05-01T07:00",
+          "end": "2027-05-01T08:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-05-01T08:00\", \"start\": \"2027-05-01T07:00\", \"title\": \"경영학원론 스터디\"}}</tool_call>",
+      "sec": 9.61,
+      "template": "next_wd|d01|wd3|+9"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0163#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "4일 후 오후 네 시 이산수학 스터디 잡아줘 90분",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "이산수학 스터디",
+          "start": "2026-10-12T16:00",
+          "end": "2026-10-12T17:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-10-12T17:30\", \"start\": \"2026-10-12T16:00\", \"title\": \"이산수학 스터디\"}}</tool_call>",
+      "sec": 9.65,
+      "template": "n_days|mid|wd3|+4"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0164#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "담주 수요일에 영어 회화 연습 있는데 저녁 6시 반이야. 등록 좀",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "영어 회화 연습",
+          "start": "2027-03-31T18:30",
+          "end": "2027-03-31T19:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-04-07T19:30\", \"start\": \"2027-04-07T18:30\", \"title\": \"영어 회화 연습\"}}</tool_call>",
+      "sec": 10.19,
+      "template": "next_wd|d31|wd2|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0165#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 토요일에 독서실 공부 있는데 오후 2시 15분이야. 등록 좀",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "독서실 공부",
+          "start": "2027-05-15T14:15",
+          "end": "2027-05-15T15:15",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-05-15T15:15\", \"start\": \"2027-05-15T14:15\", \"title\": \"독서실 공부\"}}</tool_call>",
+      "sec": 10.24,
+      "template": "next_wd|mid|wd1|+11"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0166#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "혹시 2일 후 16시 반에 기계학습 시험 공부 등록해줄 수 있어?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "기계학습 시험 공부",
+          "start": "2027-02-08T16:30",
+          "end": "2027-02-08T17:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-02-08T17:30\", \"start\": \"2027-02-08T16:30\", \"title\": \"기계학습 시험 공부\"}}</tool_call>",
+      "sec": 10.23,
+      "template": "n_days|mid|wd5|+2"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0167#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "주민센터 가기 넣어줘. 날짜는 6일 후고 시간은 17시~",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "주민센터 가기",
+          "start": "2027-08-06T17:00",
+          "end": "2027-08-06T18:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2027-08-06T18:00\", \"start\": \"2027-08-06T17:00\", \"title\": \"주민센터 가기\"}}</tool_call>",
+      "sec": 9.26,
+      "template": "n_days|cross|wd5|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0168#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 화요일 밤 9시 경영학원론 스터디 일정 추가",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "경영학원론 스터디",
+          "start": "2027-08-31T21:00",
+          "end": "2027-08-31T22:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-08-31T22:00\", \"start\": \"2027-08-31T21:00\", \"title\": \"경영학원론 스터디\"}}</tool_call>",
+      "sec": 10.36,
+      "template": "next_wd|d31|wd2|+6"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0169#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "모바일프로그래밍 스터디 2시간짜리 다음 주 일요일 점심 12시에 등록해 주세요",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "모바일프로그래밍 스터디",
+          "start": "2026-12-13T12:00",
+          "end": "2026-12-13T14:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-12-13T14:00\", \"start\": \"2026-12-13T12:00\", \"title\": \"모바일프로그래밍 스터디\"}}</tool_call>",
+      "sec": 9.78,
+      "template": "next_wd|mid|wd5|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0170#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "14일 후 아침 8시부터 3시간 동안 기계학습 복습 일정 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "기계학습 복습",
+          "start": "2027-04-30T08:00",
+          "end": "2027-04-30T11:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-04-30T11:00\", \"start\": \"2027-04-30T08:00\", \"title\": \"기계학습 복습\"}}</tool_call>",
+      "sec": 9.63,
+      "template": "n_days|end30|wd4|+14"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0171#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "12일 후 저녁 6시에 3시간만 조별 과제 모임 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "조별 과제 모임",
+          "start": "2027-07-08T18:00",
+          "end": "2027-07-08T21:00",
+          "allDay": false,
+          "category": "team"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2027-07-08T21:00\", \"start\": \"2027-07-08T18:00\", \"title\": \"조별 과제 모임\"}}</tool_call>",
+      "sec": 9.47,
+      "template": "n_days|cross|wd5|+12"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0172#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "장학금 면접 세 시간짜리 다음 주 수요일 오후 1시 30분에 등록해줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "장학금 면접",
+          "start": "2026-09-30T13:30",
+          "end": "2026-09-30T16:30",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2026-09-30T16:30\", \"start\": \"2026-09-30T13:30\", \"title\": \"장학금 면접\"}}</tool_call>",
+      "sec": 9.51,
+      "template": "next_wd|end30|wd2|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0173#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 목요일 아침 7시부터 2시간 반 동안 컴퓨터구조 시험 공부 일정 넣어줄래?",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "컴퓨터구조 시험 공부",
+          "start": "2026-12-31T07:00",
+          "end": "2026-12-31T09:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-12-31T09:30\", \"start\": \"2026-12-31T07:00\", \"title\": \"컴퓨터구조 시험 공부\"}}</tool_call>",
+      "sec": 10.24,
+      "template": "next_wd|d31|wd2|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0174#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음주 토요일 일정 추가할게 오후 3시 멘토링",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "멘토링",
+          "start": "2026-10-31T15:00",
+          "end": "2026-10-31T16:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2026-11-01T16:00\", \"start\": \"2026-11-01T15:00\", \"title\": \"멘토링\"}}</tool_call>",
+      "sec": 9.4,
+      "template": "next_wd|d31|wd5|+7"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0175#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "12일 뒤 오후 5시 반에 미시경제학 예습 있을 예정이야 넣어둬",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "미시경제학 예습",
+          "start": "2027-07-30T17:30",
+          "end": "2027-07-30T18:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-07-30T18:30\", \"start\": \"2027-07-30T17:30\", \"title\": \"미시경제학 예습\"}}</tool_call>",
+      "sec": 9.58,
+      "template": "n_days|d30of31|wd6|+12"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0176#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "5일 후 오후 3시 반부터 기계학습 과제 하기인데 일정에 넣어줘",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "기계학습 과제 하기",
+          "start": "2027-08-31T15:30",
+          "end": "2027-08-31T16:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-08-31T16:30\", \"start\": \"2027-08-31T15:30\", \"title\": \"기계학습 과제 하기\"}}</tool_call>",
+      "sec": 9.62,
+      "template": "n_days|d31|wd3|+5"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": false,
+      "field_total": 5,
+      "field_ok": 3,
+      "text_ok": null,
+      "id": "probe-0177#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "이산수학 복습 담주 수요일 저녁 7시 반부터 4시간 잡아놔",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "이산수학 복습",
+          "start": "2027-03-31T19:30",
+          "end": "2027-03-31T23:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-04-07T23:30\", \"start\": \"2027-04-07T19:30\", \"title\": \"이산수학 복습\"}}</tool_call>",
+      "sec": 9.43,
+      "template": "next_wd|d31|wd6|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0178#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "다음 주 화요일 일정 추가할게 오후 4시 우체국 가기",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "우체국 가기",
+          "start": "2027-08-10T16:00",
+          "end": "2027-08-10T17:00",
+          "allDay": false,
+          "category": "etc"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"etc\", \"end\": \"2027-08-10T17:00\", \"start\": \"2027-08-10T16:00\", \"title\": \"우체국 가기\"}}</tool_call>",
+      "sec": 9.09,
+      "template": "next_wd|mid|wd5|+3"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0179#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "일정 하나 추가: 내주 목요일 밤 9시 반 오픽 준비!",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "오픽 준비",
+          "start": "2027-01-07T21:30",
+          "end": "2027-01-07T22:30",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2027-01-07T22:30\", \"start\": \"2027-01-07T21:30\", \"title\": \"오픽 준비\"}}</tool_call>",
+      "sec": 9.27,
+      "template": "next_wd|cross|wd2|+8"
+    },
+    {
+      "expected_tool": "create_event",
+      "pred_tool": "create_event",
+      "name_ok": true,
+      "exact_ok": true,
+      "field_total": 5,
+      "field_ok": 5,
+      "text_ok": null,
+      "id": "probe-0180#t0",
+      "turn": 0,
+      "turn_type": "tool",
+      "user": "도서관 공부 잡아줘 다음주 수요일 저녁 여섯 시",
+      "expected": {
+        "name": "create_event",
+        "arguments": {
+          "title": "도서관 공부",
+          "start": "2026-09-30T18:00",
+          "end": "2026-09-30T19:00",
+          "allDay": false,
+          "category": "study"
+        }
+      },
+      "pred_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"study\", \"end\": \"2026-09-30T19:00\", \"start\": \"2026-09-30T18:00\", \"title\": \"도서관 공부\"}}</tool_call>",
+      "sec": 9.27,
+      "template": "next_wd|end30|wd2|+7"
+    }
+  ]
+}
