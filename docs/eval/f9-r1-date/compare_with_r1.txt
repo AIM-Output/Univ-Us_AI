@@ -1,0 +1,74 @@
+== f9-r1 → f9-r1-date · 턴 358
+어댑터: outputs/f9-r1/adapter → outputs/f9-r1-date/adapter
+  f9-r1        턴 정확도 351/358 (98.0%) · 도구 선택 293/293 · 인자 일치 286/293 · 거절 65/65 · 과잉 거절(도구 턴에 글로 답) 0 · 다른 도구 0 · 거절 턴에 도구 호출 0 · 평균 지연 5.23s
+  f9-r1-date   턴 정확도 346/358 (96.6%) · 도구 선택 293/293 · 인자 일치 281/293 · 거절 65/65 · 과잉 거절(도구 턴에 글로 답) 0 · 다른 도구 0 · 거절 턴에 도구 호출 0 · 평균 지연 6.30s
+
+턴별 변화: 둘 다 맞음 345 · 고쳐짐 1 · 나빠짐 6 · 둘 다 틀림 6
+
+도구(턴 종류)별 맞은 턴 — 달라진 것만
+  create_event       44/46 → 43/46
+  list_events        69/69 → 67/69
+  update_event       19/19 → 17/19
+
+틀(template)별 맞은 턴 — 달라진 것만
+  ce_F               44/46 → 43/46
+  del_B              48/48 → 47/48
+  up_B               38/38 → 35/38
+
+[나빠짐] 6턴
+  f9-00145#t0 `up_B` [tool] 사용자: 이번 주 토요일 팀 회의 시간을 오후 5시로 바꿔줘
+      기대 {"name": "list_events", "arguments": {"from": "2026-12-12", "to": "2026-12-12"}}
+      f9-r1 <tool_call>{"name": "list_events", "arguments": {"from": "2026-12-12", "to": "2026-12-12"}}</tool_call>
+      f9-r1-date <tool_call>{"name": "list_events", "arguments": {"from": "2026-12-11", "to": "2026-12-11"}}</tool_call>
+  f9-00482#t0 `ce_F` [tool] 사용자: 4일 뒤 오전 11시 알바 일정 넣어
+      기대 {"name": "create_event", "arguments": {"title": "알바", "start": "2026-12-01T11:00", "end": "2026-12-01T12:00", "allDay": false, "category": "etc"}}
+      f9-r1 <tool_call>{"name": "create_event", "arguments": {"allDay": false, "category": "etc", "end": "2026-12-01T12:00", "start": "2026-12-01T11:00", "title":
+      f9-r1-date <tool_call>{"name": "create_event", "arguments": {"allDay": false, "category": "etc", "end": "2026-11-31T12:00", "start": "2026-11-31T11:00", "title":
+  f9-00844#t0 `del_B` [tool] 사용자: 2일 뒤 친구 약속 일정 지워줘
+      기대 {"name": "list_events", "arguments": {"from": "2026-12-01", "to": "2026-12-01"}}
+      f9-r1 <tool_call>{"name": "list_events", "arguments": {"from": "2026-12-01", "to": "2026-12-01"}}</tool_call>
+      f9-r1-date <tool_call>{"name": "list_events", "arguments": {"from": "2026-11-31", "to": "2026-11-31"}}</tool_call>
+  f9-01177#t1 `up_B` [tool] 사용자: 모레 동아리 모임 시간을 저녁 8시로 바꿔줘
+      기대 {"name": "update_event", "arguments": {"id": "ev:7773", "patch": {"start": "2026-10-04T20:00", "end": "2026-10-04T21:00"}}}
+      f9-r1 <tool_call>{"name": "update_event", "arguments": {"id": "ev:7773", "patch": {"end": "2026-10-04T21:00", "start": "2026-10-04T20:00"}}}</tool_call>
+      f9-r1-date <tool_call>{"name": "update_event", "arguments": {"id": "ev:7773", "patch": {"end": "2026-10-04T21:00", "start": "2026-10-04T20:00", "title": "동아리 모임"
+  f9-01246#t1 `up_B` [tool] 사용자: 오늘 스터디 시간을 저녁 7시 반로 바꿔줘
+      기대 {"name": "update_event", "arguments": {"id": "ev:6132", "patch": {"start": "2026-11-14T19:30", "end": "2026-11-14T20:30"}}}
+      f9-r1 <tool_call>{"name": "update_event", "arguments": {"id": "ev:6132", "patch": {"end": "2026-11-14T20:30", "start": "2026-11-14T19:30"}}}</tool_call>
+      f9-r1-date <tool_call>{"name": "update_event", "arguments": {"id": "ev:6132", "patch": {"end": "2026-11-14T20:30", "start": "2026-11-14T19:30", "title": "스터디"}}}
+  f9-01426#t0 `ce_F` [tool] 사용자: 다음 달 16일 오후 1시 캡스톤 회의 일정 넣어 3시간
+      기대 {"name": "create_event", "arguments": {"title": "캡스톤 회의", "start": "2027-01-16T13:00", "end": "2027-01-16T16:00", "allDay": false, "category": "team"}
+      f9-r1 <tool_call>{"name": "create_event", "arguments": {"allDay": false, "category": "team", "end": "2027-01-16T16:00", "start": "2027-01-16T13:00", "title"
+      f9-r1-date <tool_call>{"name": "create_event", "arguments": {"allDay": false, "category": "team", "end": "2026-12-16T16:00", "start": "2026-12-16T13:00", "title"
+
+[고쳐짐] 1턴
+  f9-00889#t0 `ce_F` [tool] 사용자: 9일 뒤 오전 10시 멘토링 일정 넣어 1시간
+      기대 {"name": "create_event", "arguments": {"title": "멘토링", "start": "2026-10-31T10:00", "end": "2026-10-31T11:00", "allDay": false, "category": "etc"}}
+      f9-r1 <tool_call>{"name": "create_event", "arguments": {"allDay": false, "category": "etc", "end": "2026-11-01T11:00", "start": "2026-11-01T10:00", "title":
+      f9-r1-date <tool_call>{"name": "create_event", "arguments": {"allDay": false, "category": "etc", "end": "2026-10-31T11:00", "start": "2026-10-31T10:00", "title":
+
+[둘 다 틀림] 6턴
+  f9-00178#t0 `pl_eval` [tool] 사용자: 비는 시간에 공부 계획 넣어줘
+      기대 {"name": "open_placement", "arguments": {"range": "this_week"}}
+      f9-r1 <tool_call>{"name": "open_placement", "arguments": {}}</tool_call>
+      f9-r1-date <tool_call>{"name": "open_placement", "arguments": {}}</tool_call> (예측 같음)
+  f9-00381#t0 `pl_eval` [tool] 사용자: 비는 시간에 공부 계획 넣어줘
+      기대 {"name": "open_placement", "arguments": {"range": "this_week"}}
+      f9-r1 <tool_call>{"name": "open_placement", "arguments": {}}</tool_call>
+      f9-r1-date <tool_call>{"name": "open_placement", "arguments": {}}</tool_call> (예측 같음)
+  f9-00776#t0 `pl_eval` [tool] 사용자: 비는 시간에 공부 계획 넣어줘
+      기대 {"name": "open_placement", "arguments": {"range": "this_week"}}
+      f9-r1 <tool_call>{"name": "open_placement", "arguments": {}}</tool_call>
+      f9-r1-date <tool_call>{"name": "open_placement", "arguments": {}}</tool_call> (예측 같음)
+  f9-00823#t0 `pl_eval` [tool] 사용자: 비는 시간에 공부 계획 넣어줘
+      기대 {"name": "open_placement", "arguments": {"range": "this_week"}}
+      f9-r1 <tool_call>{"name": "open_placement", "arguments": {}}</tool_call>
+      f9-r1-date <tool_call>{"name": "open_placement", "arguments": {}}</tool_call> (예측 같음)
+  f9-00970#t0 `pl_eval` [tool] 사용자: 비는 시간에 공부 계획 넣어줘
+      기대 {"name": "open_placement", "arguments": {"range": "this_week"}}
+      f9-r1 <tool_call>{"name": "open_placement", "arguments": {}}</tool_call>
+      f9-r1-date <tool_call>{"name": "open_placement", "arguments": {}}</tool_call> (예측 같음)
+  f9-01350#t0 `ce_F` [tool] 사용자: 다음 주 토요일 저녁 8시 멘토링 일정 넣어
+      기대 {"name": "create_event", "arguments": {"title": "멘토링", "start": "2026-10-31T20:00", "end": "2026-10-31T21:00", "allDay": false, "category": "etc"}}
+      f9-r1 <tool_call>{"name": "create_event", "arguments": {"allDay": false, "category": "etc", "end": "2026-11-07T21:00", "start": "2026-11-07T20:00", "title":
+      f9-r1-date <tool_call>{"name": "create_event", "arguments": {"allDay": false, "category": "etc", "end": "2026-11-01T21:00", "start": "2026-11-01T20:00", "title":
