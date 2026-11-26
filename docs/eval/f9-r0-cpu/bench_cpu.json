@@ -1,0 +1,617 @@
+{
+ "model": "f9-r0-Q4_K_M.gguf",
+ "model_gb": 2.33,
+ "cpu": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+ "runs": [
+  {
+   "threads": 4,
+   "load_s": 2.6,
+   "cold": [
+    {
+     "wall_s": 38.9,
+     "prompt_n": 2025,
+     "prompt_s": 34.36,
+     "prompt_tps": 58.9,
+     "gen_n": 43,
+     "gen_s": 4.53,
+     "gen_tps": 9.3,
+     "cache_n": 0,
+     "id": "f9-00000",
+     "template": "up_B",
+     "hf_prompt_tokens": 2025
+    },
+    {
+     "wall_s": 35.03,
+     "prompt_n": 2015,
+     "prompt_s": 33.11,
+     "prompt_tps": 60.9,
+     "gen_n": 17,
+     "gen_s": 1.84,
+     "gen_tps": 8.7,
+     "cache_n": 0,
+     "id": "f9-00004",
+     "template": "nav_goto",
+     "hf_prompt_tokens": 2015
+    }
+   ],
+   "warm": [
+    {
+     "wall_s": 2.5,
+     "prompt_n": 17,
+     "prompt_s": 0.78,
+     "prompt_tps": 21.8,
+     "gen_n": 17,
+     "gen_s": 1.71,
+     "gen_tps": 9.3,
+     "cache_n": 1998
+    },
+    {
+     "wall_s": 5.6,
+     "prompt_n": 21,
+     "prompt_s": 0.91,
+     "prompt_tps": 23.0,
+     "gen_n": 43,
+     "gen_s": 4.67,
+     "gen_tps": 9.0,
+     "cache_n": 1998
+    },
+    {
+     "wall_s": 2.7,
+     "prompt_n": 15,
+     "prompt_s": 0.73,
+     "prompt_tps": 20.5,
+     "gen_n": 19,
+     "gen_s": 1.94,
+     "gen_tps": 9.3,
+     "cache_n": 1998
+    }
+   ],
+   "minute": [
+    {
+     "wall_s": 38.65,
+     "prompt_n": 2000,
+     "prompt_s": 34.02,
+     "prompt_tps": 58.8,
+     "gen_n": 43,
+     "gen_s": 4.55,
+     "gen_tps": 9.2,
+     "cache_n": 25
+    }
+   ],
+   "check": [],
+   "prime": {
+    "wall_s": 5.22,
+    "prompt_n": 1,
+    "prompt_s": 0.13,
+    "prompt_tps": 8.0,
+    "gen_n": 43,
+    "gen_s": 4.96,
+    "gen_tps": 8.5,
+    "cache_n": 2024
+   },
+   "server_rss_gb": 5.24,
+   "server_private_gb": 2.99
+  },
+  {
+   "threads": 6,
+   "load_s": 2.5,
+   "cold": [
+    {
+     "wall_s": 30.7,
+     "prompt_n": 2025,
+     "prompt_s": 26.39,
+     "prompt_tps": 76.7,
+     "gen_n": 43,
+     "gen_s": 4.3,
+     "gen_tps": 9.8,
+     "cache_n": 0,
+     "id": "f9-00000",
+     "template": "up_B",
+     "hf_prompt_tokens": 2025
+    },
+    {
+     "wall_s": 27.42,
+     "prompt_n": 2015,
+     "prompt_s": 25.76,
+     "prompt_tps": 78.2,
+     "gen_n": 17,
+     "gen_s": 1.6,
+     "gen_tps": 10.0,
+     "cache_n": 0,
+     "id": "f9-00004",
+     "template": "nav_goto",
+     "hf_prompt_tokens": 2015
+    }
+   ],
+   "warm": [
+    {
+     "wall_s": 2.28,
+     "prompt_n": 17,
+     "prompt_s": 0.63,
+     "prompt_tps": 26.9,
+     "gen_n": 17,
+     "gen_s": 1.64,
+     "gen_tps": 9.8,
+     "cache_n": 1998
+    },
+    {
+     "wall_s": 5.08,
+     "prompt_n": 21,
+     "prompt_s": 0.83,
+     "prompt_tps": 25.2,
+     "gen_n": 43,
+     "gen_s": 4.23,
+     "gen_tps": 9.9,
+     "cache_n": 1998
+    },
+    {
+     "wall_s": 2.43,
+     "prompt_n": 15,
+     "prompt_s": 0.61,
+     "prompt_tps": 24.8,
+     "gen_n": 19,
+     "gen_s": 1.82,
+     "gen_tps": 9.9,
+     "cache_n": 1998
+    }
+   ],
+   "minute": [
+    {
+     "wall_s": 30.72,
+     "prompt_n": 2000,
+     "prompt_s": 26.3,
+     "prompt_tps": 76.1,
+     "gen_n": 43,
+     "gen_s": 4.36,
+     "gen_tps": 9.6,
+     "cache_n": 25
+    }
+   ],
+   "check": [],
+   "prime": {
+    "wall_s": 4.43,
+    "prompt_n": 1,
+    "prompt_s": 0.1,
+    "prompt_tps": 10.0,
+    "gen_n": 43,
+    "gen_s": 4.24,
+    "gen_tps": 9.9,
+    "cache_n": 2024
+   },
+   "server_rss_gb": 5.24,
+   "server_private_gb": 2.99
+  },
+  {
+   "threads": 8,
+   "load_s": 2.5,
+   "cold": [
+    {
+     "wall_s": 26.11,
+     "prompt_n": 2025,
+     "prompt_s": 22.71,
+     "prompt_tps": 89.2,
+     "gen_n": 43,
+     "gen_s": 3.38,
+     "gen_tps": 12.4,
+     "cache_n": 0,
+     "id": "f9-00000",
+     "template": "up_B",
+     "hf_prompt_tokens": 2025
+    },
+    {
+     "wall_s": 23.85,
+     "prompt_n": 2015,
+     "prompt_s": 22.51,
+     "prompt_tps": 89.5,
+     "gen_n": 17,
+     "gen_s": 1.27,
+     "gen_tps": 12.6,
+     "cache_n": 0,
+     "id": "f9-00004",
+     "template": "nav_goto",
+     "hf_prompt_tokens": 2015
+    },
+    {
+     "wall_s": 25.92,
+     "prompt_n": 2019,
+     "prompt_s": 22.49,
+     "prompt_tps": 89.8,
+     "gen_n": 43,
+     "gen_s": 3.36,
+     "gen_tps": 12.5,
+     "cache_n": 0,
+     "id": "f9-00008",
+     "template": "del_B",
+     "hf_prompt_tokens": 2019
+    },
+    {
+     "wall_s": 24.01,
+     "prompt_n": 2013,
+     "prompt_s": 22.48,
+     "prompt_tps": 89.6,
+     "gen_n": 19,
+     "gen_s": 1.43,
+     "gen_tps": 12.5,
+     "cache_n": 0,
+     "id": "f9-00022",
+     "template": "sync_refresh",
+     "hf_prompt_tokens": 2013
+    },
+    {
+     "wall_s": 26.01,
+     "prompt_n": 2023,
+     "prompt_s": 22.52,
+     "prompt_tps": 89.8,
+     "gen_n": 43,
+     "gen_s": 3.39,
+     "gen_tps": 12.4,
+     "cache_n": 0,
+     "id": "f9-00026",
+     "template": "ref_class",
+     "hf_prompt_tokens": 2023
+    },
+    {
+     "wall_s": 26.12,
+     "prompt_n": 2018,
+     "prompt_s": 22.63,
+     "prompt_tps": 89.2,
+     "gen_n": 43,
+     "gen_s": 3.41,
+     "gen_tps": 12.3,
+     "cache_n": 0,
+     "id": "f9-00610",
+     "template": "ref_class",
+     "hf_prompt_tokens": 2018
+    },
+    {
+     "wall_s": 24.52,
+     "prompt_n": 2018,
+     "prompt_s": 22.67,
+     "prompt_tps": 89.0,
+     "gen_n": 23,
+     "gen_s": 1.76,
+     "gen_tps": 12.5,
+     "cache_n": 0,
+     "id": "f9-00035",
+     "template": "at_ask2",
+     "hf_prompt_tokens": 2018
+    },
+    {
+     "wall_s": 26.68,
+     "prompt_n": 2013,
+     "prompt_s": 23.16,
+     "prompt_tps": 86.9,
+     "gen_n": 43,
+     "gen_s": 3.43,
+     "gen_tps": 12.2,
+     "cache_n": 0,
+     "id": "f9-00065",
+     "template": "le_today",
+     "hf_prompt_tokens": 2013
+    },
+    {
+     "wall_s": 26.23,
+     "prompt_n": 2013,
+     "prompt_s": 22.77,
+     "prompt_tps": 88.4,
+     "gen_n": 43,
+     "gen_s": 3.37,
+     "gen_tps": 12.5,
+     "cache_n": 0,
+     "id": "f9-01015",
+     "template": "le_today",
+     "hf_prompt_tokens": 2013
+    },
+    {
+     "wall_s": 23.99,
+     "prompt_n": 2019,
+     "prompt_s": 22.35,
+     "prompt_tps": 90.3,
+     "gen_n": 20,
+     "gen_s": 1.56,
+     "gen_tps": 12.2,
+     "cache_n": 0,
+     "id": "f9-00083",
+     "template": "pl_eval",
+     "hf_prompt_tokens": 2019
+    },
+    {
+     "wall_s": 29.78,
+     "prompt_n": 2032,
+     "prompt_s": 23.42,
+     "prompt_tps": 86.8,
+     "gen_n": 76,
+     "gen_s": 6.26,
+     "gen_tps": 12.0,
+     "cache_n": 0,
+     "id": "f9-00090",
+     "template": "ce_F",
+     "hf_prompt_tokens": 2032
+    },
+    {
+     "wall_s": 29.53,
+     "prompt_n": 2030,
+     "prompt_s": 23.05,
+     "prompt_tps": 88.1,
+     "gen_n": 77,
+     "gen_s": 6.39,
+     "gen_tps": 11.9,
+     "cache_n": 0,
+     "id": "f9-00510",
+     "template": "ce_F",
+     "hf_prompt_tokens": 2030
+    },
+    {
+     "wall_s": 29.2,
+     "prompt_n": 2034,
+     "prompt_s": 22.84,
+     "prompt_tps": 89.1,
+     "gen_n": 77,
+     "gen_s": 6.28,
+     "gen_tps": 12.1,
+     "cache_n": 0,
+     "id": "f9-00993",
+     "template": "ce_F",
+     "hf_prompt_tokens": 2034
+    },
+    {
+     "wall_s": 23.83,
+     "prompt_n": 2018,
+     "prompt_s": 22.55,
+     "prompt_tps": 89.5,
+     "gen_n": 16,
+     "gen_s": 1.21,
+     "gen_tps": 12.4,
+     "cache_n": 0,
+     "id": "f9-00111",
+     "template": "gr_ask2",
+     "hf_prompt_tokens": 2018
+    },
+    {
+     "wall_s": 24.78,
+     "prompt_n": 2019,
+     "prompt_s": 22.96,
+     "prompt_tps": 87.9,
+     "gen_n": 20,
+     "gen_s": 1.74,
+     "gen_tps": 10.9,
+     "cache_n": 0,
+     "id": "f9-00138",
+     "template": "as_eval",
+     "hf_prompt_tokens": 2019
+    },
+    {
+     "wall_s": 25.16,
+     "prompt_n": 2013,
+     "prompt_s": 23.56,
+     "prompt_tps": 85.5,
+     "gen_n": 20,
+     "gen_s": 1.55,
+     "gen_tps": 12.3,
+     "cache_n": 0,
+     "id": "f9-00267",
+     "template": "ex_ask2",
+     "hf_prompt_tokens": 2013
+    }
+   ],
+   "warm": [
+    {
+     "wall_s": 1.79,
+     "prompt_n": 17,
+     "prompt_s": 0.5,
+     "prompt_tps": 33.7,
+     "gen_n": 17,
+     "gen_s": 1.28,
+     "gen_tps": 12.5,
+     "cache_n": 1998
+    },
+    {
+     "wall_s": 4.01,
+     "prompt_n": 21,
+     "prompt_s": 0.61,
+     "prompt_tps": 34.4,
+     "gen_n": 43,
+     "gen_s": 3.39,
+     "gen_tps": 12.4,
+     "cache_n": 1998
+    },
+    {
+     "wall_s": 1.95,
+     "prompt_n": 15,
+     "prompt_s": 0.47,
+     "prompt_tps": 31.6,
+     "gen_n": 19,
+     "gen_s": 1.45,
+     "gen_tps": 12.4,
+     "cache_n": 1998
+    }
+   ],
+   "minute": [
+    {
+     "wall_s": 26.42,
+     "prompt_n": 2000,
+     "prompt_s": 22.93,
+     "prompt_tps": 87.2,
+     "gen_n": 43,
+     "gen_s": 3.42,
+     "gen_tps": 12.3,
+     "cache_n": 25
+    }
+   ],
+   "check": [
+    {
+     "id": "f9-00000",
+     "template": "up_B",
+     "user": "내일 동아리 모임 시간을 저녁 8시로 바꿔줘",
+     "gguf_ok": true,
+     "hf_ok": true,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-09-05\", \"to\": \"2026-09-05\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-09-05\", \"to\": \"2026-09-05\"}}</tool_call>"
+    },
+    {
+     "id": "f9-00004",
+     "template": "nav_goto",
+     "user": "대시보드 페이지로 가줘",
+     "gguf_ok": true,
+     "hf_ok": true,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"navigate\", \"arguments\": {\"route\": \"/\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"navigate\", \"arguments\": {\"route\": \"/\"}}</tool_call>"
+    },
+    {
+     "id": "f9-00008",
+     "template": "del_B",
+     "user": "내일 동아리 모임 일정 지워줘",
+     "gguf_ok": true,
+     "hf_ok": true,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-12-09\", \"to\": \"2026-12-09\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-12-09\", \"to\": \"2026-12-09\"}}</tool_call>"
+    },
+    {
+     "id": "f9-00022",
+     "template": "sync_refresh",
+     "user": "대외활동 새로 받아와",
+     "gguf_ok": true,
+     "hf_ok": true,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"run_sync\", \"arguments\": {\"source\": \"activity\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"run_sync\", \"arguments\": {\"source\": \"activity\"}}</tool_call>"
+    },
+    {
+     "id": "f9-00026",
+     "template": "ref_class",
+     "user": "선형대수 수업 밤 9시로 옮겨줘",
+     "gguf_ok": false,
+     "hf_ok": false,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-10-22\", \"to\": \"2026-10-22\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-10-22\", \"to\": \"2026-10-22\"}}</tool_call>"
+    },
+    {
+     "id": "f9-00610",
+     "template": "ref_class",
+     "user": "기계학습 수업 일정 지워줘",
+     "gguf_ok": false,
+     "hf_ok": false,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-12-07\", \"to\": \"2026-12-07\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-12-07\", \"to\": \"2026-12-07\"}}</tool_call>"
+    },
+    {
+     "id": "f9-00035",
+     "template": "at_ask2",
+     "user": "운영체제 출석 상태 어때?",
+     "gguf_ok": true,
+     "hf_ok": true,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"get_attendance\", \"arguments\": {\"course\": \"운영체제\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"get_attendance\", \"arguments\": {\"course\": \"운영체제\"}}</tool_call>"
+    },
+    {
+     "id": "f9-00065",
+     "template": "le_today",
+     "user": "오늘 일정 알려줘",
+     "gguf_ok": true,
+     "hf_ok": true,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-09-17\", \"to\": \"2026-09-17\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-09-17\", \"to\": \"2026-09-17\"}}</tool_call>"
+    },
+    {
+     "id": "f9-01015",
+     "template": "le_today",
+     "user": "오늘 일정 알려줘",
+     "gguf_ok": true,
+     "hf_ok": true,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-11-02\", \"to\": \"2026-11-02\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-11-02\", \"to\": \"2026-11-02\"}}</tool_call>"
+    },
+    {
+     "id": "f9-00083",
+     "template": "pl_eval",
+     "user": "이번 주 빈 시간 채워줘",
+     "gguf_ok": true,
+     "hf_ok": false,
+     "same_as_hf": false,
+     "gguf_text": "<tool_call>{\"name\": \"open_placement\", \"arguments\": {\"range\": \"this_week\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"list_events\", \"arguments\": {\"from\": \"2026-11-23\", \"to\": \"2026-11-29\"}}</tool_call>"
+    },
+    {
+     "id": "f9-00090",
+     "template": "ce_F",
+     "user": "다음 주 월요일 아침 9시 치과 예약 일정 넣어 3시간",
+     "gguf_ok": true,
+     "hf_ok": true,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-11-23T12:00\", \"start\": \"2026-11-23T09:00\", \"title\": \"치과 예약\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-11-23T12:00\", \"start\": \"2026-11-23T09:00\", \"title\": \"치과 예약\"}}</tool_call>"
+    },
+    {
+     "id": "f9-00510",
+     "template": "ce_F",
+     "user": "6일 뒤 점심 12시 친구 약속 일정 넣어",
+     "gguf_ok": true,
+     "hf_ok": true,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-09-18T13:00\", \"start\": \"2026-09-18T12:00\", \"title\": \"친구 약속\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"personal\", \"end\": \"2026-09-18T13:00\", \"start\": \"2026-09-18T12:00\", \"title\": \"친구 약속\"}}</tool_call>"
+    },
+    {
+     "id": "f9-00993",
+     "template": "ce_F",
+     "user": "다음 주 일요일 오전 10시 캡스톤 회의 일정 넣어 2시간",
+     "gguf_ok": true,
+     "hf_ok": true,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2026-10-11T12:00\", \"start\": \"2026-10-11T10:00\", \"title\": \"캡스톤 회의\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"create_event\", \"arguments\": {\"allDay\": false, \"category\": \"team\", \"end\": \"2026-10-11T12:00\", \"start\": \"2026-10-11T10:00\", \"title\": \"캡스톤 회의\"}}</tool_call>"
+    },
+    {
+     "id": "f9-00111",
+     "template": "gr_ask2",
+     "user": "졸업요건 얼마나 채웠어?",
+     "gguf_ok": true,
+     "hf_ok": true,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"get_graduation\", \"arguments\": {}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"get_graduation\", \"arguments\": {}}</tool_call>"
+    },
+    {
+     "id": "f9-00138",
+     "template": "as_eval",
+     "user": "제일 먼저 할 과제가 뭐야?",
+     "gguf_ok": true,
+     "hf_ok": true,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"list_assignments\", \"arguments\": {\"group\": \"now\"}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"list_assignments\", \"arguments\": {\"group\": \"now\"}}</tool_call>"
+    },
+    {
+     "id": "f9-00267",
+     "template": "ex_ask2",
+     "user": "다가오는 시험 알려줘",
+     "gguf_ok": true,
+     "hf_ok": true,
+     "same_as_hf": true,
+     "gguf_text": "<tool_call>{\"name\": \"get_exams\", \"arguments\": {\"upcoming\": true}}</tool_call>",
+     "hf_text": "<tool_call>{\"name\": \"get_exams\", \"arguments\": {\"upcoming\": true}}</tool_call>"
+    }
+   ],
+   "prime": {
+    "wall_s": 3.65,
+    "prompt_n": 1,
+    "prompt_s": 0.08,
+    "prompt_tps": 12.3,
+    "gen_n": 43,
+    "gen_s": 3.45,
+    "gen_tps": 12.2,
+    "cache_n": 2024
+   },
+   "server_rss_gb": 9.2,
+   "server_private_gb": 6.96
+  }
+ ]
+}
